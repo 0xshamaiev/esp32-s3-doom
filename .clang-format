@@ -1,0 +1,15 @@
+BasedOnStyle: LLVM
+Language: Cpp
+Standard: c++03
+IndentWidth: 4
+ColumnLimit: 100
+# 1. Forces 'void' and function name onto the exact same line
+BreakBeforeConceptDeclarations: Never
+AlwaysBreakAfterDefinitionReturnType: None
+# 2. Controls brace placement (attaches '{' to the function signature)
+BreakBeforeBraces: Attach
+# 3. Forces 'for' loops without braces to add braces or indent properly
+AllowShortBlocksOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+# 4. Enforces space after keywords (e.g., 'for (', 'if (')
+SpaceBeforeParens: ControlStatements

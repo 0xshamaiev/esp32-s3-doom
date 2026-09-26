@@ -1,0 +1,82 @@
+//
+// Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 2005-2014 Simon Howard
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// DESCRIPTION:
+//	Simple basic typedefs, isolated here to make it easier
+//	 separating modules.
+//    
+
+
+#ifndef __DOOMTYPE__
+#define __DOOMTYPE__
+
+#include <strings.h>
+#include <stdbool.h>
+
+
+//
+// The packed attribute forces structures to be packed into the minimum 
+// space necessary.  If this is not done, the compiler may align structure
+// fields differently to optimize memory access, inflating the overall
+// structure size.  It is important to use the packed attribute on certain
+// structures where alignment is important, particularly data read/written
+// to disk.
+//
+
+#ifdef __GNUC__
+#define PACKEDATTR __attribute__((packed))
+#else
+#define PACKEDATTR
+#endif
+
+#include <stdint.h>
+
+#if defined(__cplusplus) || defined(__bool_true_false_are_defined)
+
+//boolean is cast to int* in doom. so to keep size the same, make boolean an int.
+typedef unsigned int boolean;
+
+#else
+
+#ifndef __bool_true_false_are_defined
+typedef enum {
+
+
+
+
+
+
+
+    false	= 0,
+    true	= 1,
+    undef = 0xFFFFFFFF
+} boolean;
+#endif
+
+#endif
+
+typedef uint8_t byte;
+
+#include <limits.h>
+
+
+#define DIR_SEPARATOR '/'
+#define DIR_SEPARATOR_S "/"
+#define PATH_SEPARATOR ':'
+
+
+#define arrlen(array) (sizeof(array) / sizeof(*array))
+
+#endif
+
