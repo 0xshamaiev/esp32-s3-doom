@@ -243,7 +243,7 @@ static default_t doom_defaults_list[] = {
     CONFIG_VARIABLE_INT(joyb_speed),
 
     //!
-    // @game doom heretic hexen
+    // @game doom
     //
     // Screen size, range 3-11.
     //
@@ -352,7 +352,7 @@ static default_t extra_defaults_list[] = {
     CONFIG_VARIABLE_STRING(snd_musiccmd),
 
     //!
-    // @game doom strife
+    // @game doom
     //
     // If non-zero, the Vanilla savegame limit is enforced; if the
     // savegame exceeds 180224 bytes in size, the game will exit with
@@ -363,7 +363,7 @@ static default_t extra_defaults_list[] = {
     CONFIG_VARIABLE_INT(vanilla_savegame_limit),
 
     //!
-    // @game doom strife
+    // @game doom
     //
     // If non-zero, the Vanilla demo size limit is enforced; the game
     // exits with an error when a demo exceeds the demo size limit

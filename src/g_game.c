@@ -235,7 +235,7 @@ int G_CmdChecksum(ticcmd_t *cmd) {
 static boolean WeaponSelectable(weapontype_t weapon) {
     // Can't select the super shotgun in Doom 1.
 
-    if (weapon == wp_supershotgun && logical_gamemission == doom) {
+    if (weapon == wp_supershotgun && gamemission == doom) {
         return false;
     }
 
@@ -538,25 +538,6 @@ void G_DoLoadLevel(void) {
     //  setting one.
 
     skyflatnum = R_FlatNumForName(DEH_String(SKYFLATNAME));
-
-    // The "Sky never changes in Doom II" bug was fixed in
-    // the id Anthology version of doom2.exe for Final Doom.
-    if (gamemode == commercial
-        && (gameversion == exe_final2 || gameversion == exe_chex)) {
-        char *skytexturename;
-
-        if (gamemap < 12) {
-            skytexturename = "SKY1";
-        } else if (gamemap < 21) {
-            skytexturename = "SKY2";
-        } else {
-            skytexturename = "SKY3";
-        }
-
-        skytexturename = DEH_String(skytexturename);
-
-        skytexture = R_TextureNumForName(skytexturename);
-    }
 
     levelstarttic = gametic; // for time calculation
 
@@ -996,35 +977,26 @@ void G_DoCompleted(void) {
         AM_Stop();
 
     if (gamemode != commercial) {
-        // Chex Quest ends after 5 levels, rather than 8.
-
-        if (gameversion == exe_chex) {
-            if (gamemap == 5) {
+        switch (gamemap) {
+            case 8:
                 gameaction = ga_victory;
                 return;
-            }
-        } else {
-            switch (gamemap) {
-                case 8:
-                    gameaction = ga_victory;
-                    return;
-                case 9:
-                    for (int i = 0; i < MAXPLAYERS; i++)
-                        players[i].didsecret = true;
-                    break;
-            }
+            case 9:
+                for (int i = 0; i < MAXPLAYERS; i++)
+                    players[i].didsecret = true;
+                break;
         }
     }
 
     //#if 0  Hmmm - why?
-    if ((gamemap == 8)
+    if (gamemap == 8
         && (gamemode != commercial)) {
         // victory
         gameaction = ga_victory;
         return;
     }
 
-    if ((gamemap == 9)
+    if (gamemap == 9
         && (gamemode != commercial)) {
         // exit secret level
         for (int i = 0; i < MAXPLAYERS; i++)
@@ -1392,6 +1364,10 @@ G_InitNew
     if ((map > 9)
         && (gamemode != commercial))
         map = 9;
+
+    if (!D_ValidEpisodeMap(gamemission, gamemode,
+                           gamemode == commercial ? 1 : episode, map))
+        I_Error("Unsupported episode/map: %d/%d", episode, map);
 
     M_ClearRandom();
 

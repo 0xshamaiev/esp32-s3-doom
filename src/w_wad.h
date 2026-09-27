@@ -73,6 +73,4 @@ void W_ReleaseLumpNum(int lump);
 
 void W_ReleaseLumpName(char *name);
 
-void W_CheckCorrectIWAD(GameMission_t mission);
-
 #endif

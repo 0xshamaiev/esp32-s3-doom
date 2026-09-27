@@ -27,13 +27,6 @@
 typedef enum {
     doom, // Doom 1
     doom2, // Doom 2
-    pack_tnt, // Final Doom: TNT: Evilution
-    pack_plut, // Final Doom: The Plutonia Experiment
-    pack_chex, // Chex Quest (modded doom)
-    pack_hacx, // Hacx (modded doom2)
-    heretic, // Heretic
-    hexen, // Hexen
-    strife, // Strife
 
     none
 } GameMission_t;
@@ -43,9 +36,9 @@ typedef enum {
 // same mission, but a different mode.
 
 typedef enum {
-    shareware, // Doom/Heretic shareware
-    registered, // Doom/Heretic registered
-    commercial, // Doom II/Hexen
+    shareware, // Doom shareware
+    registered, // Doom registered
+    commercial, // Doom II
     retail, // Ultimate Doom
     indetermined // Unknown.
 } GameMode_t;
@@ -58,17 +51,7 @@ typedef enum {
     exe_doom_1_7, // Doom 1.7/1.7a: "
     exe_doom_1_8, // Doom 1.8: "
     exe_doom_1_9, // Doom 1.9: "
-    exe_hacx, // Hacx
     exe_ultimate, // Ultimate Doom (retail)
-    exe_final, // Final Doom
-    exe_final2, // Final Doom (alternate exe)
-    exe_chex, // Chex Quest executable (based on Final Doom)
-
-    exe_heretic_1_3, // Heretic 1.3
-
-    exe_hexen_1_1, // Hexen 1.1
-    exe_strife_1_2, // Strife v1.2
-    exe_strife_1_31 // Strife v1.31
 } GameVersion_t;
 
 // Skill level.
@@ -96,4 +79,3 @@ boolean D_IsEpisodeMap(GameMission_t mission);
 char *D_GameMissionString(GameMission_t mission);
 
 #endif /* #ifndef __D_MODE__ */
-

@@ -45,9 +45,6 @@
 //
 #define HU_TITLE (mapnames[(gameepisode - 1) * 9 + gamemap - 1])
 #define HU_TITLE2 (mapnames_commercial[gamemap - 1])
-#define HU_TITLEP (mapnames_commercial[gamemap - 1 + 32])
-#define HU_TITLET (mapnames_commercial[gamemap - 1 + 64])
-#define HU_TITLE_CHEX (mapnames[gamemap - 1])
 #define HU_TITLEHEIGHT 1
 #define HU_TITLEX 0
 #define HU_TITLEY (167 - SHORT(hu_font[0]->height))
@@ -85,17 +82,9 @@ char *mapnames[] = // DOOM shareware/registered/retail (Ultimate) names.
      HUSTR_E3M6, HUSTR_E3M7, HUSTR_E3M8, HUSTR_E3M9,
 
      HUSTR_E4M1, HUSTR_E4M2, HUSTR_E4M3, HUSTR_E4M4, HUSTR_E4M5,
-     HUSTR_E4M6, HUSTR_E4M7, HUSTR_E4M8, HUSTR_E4M9,
+     HUSTR_E4M6, HUSTR_E4M7, HUSTR_E4M8, HUSTR_E4M9};
 
-     "NEWLEVEL", "NEWLEVEL", "NEWLEVEL", "NEWLEVEL", "NEWLEVEL",
-     "NEWLEVEL", "NEWLEVEL", "NEWLEVEL", "NEWLEVEL"};
-
-// List of names for levels in commercial IWADs
-// (doom2.wad, plutonia.wad, tnt.wad).  These are stored in a
-// single large array; WADs like pl2.wad have a MAP33, and rely on
-// the layout in the Vanilla executable, where it is possible to
-// overflow the end of one array into the next.
-
+// Doom II map names.
 char *mapnames_commercial[] = {
     // DOOM 2 map names.
 
@@ -106,28 +95,7 @@ char *mapnames_commercial[] = {
 
     HUSTR_21, HUSTR_22, HUSTR_23, HUSTR_24, HUSTR_25, HUSTR_26, HUSTR_27, HUSTR_28, HUSTR_29,
     HUSTR_30, HUSTR_31, HUSTR_32,
-
-    // Plutonia WAD map names.
-
-    PHUSTR_1, PHUSTR_2, PHUSTR_3, PHUSTR_4, PHUSTR_5, PHUSTR_6, PHUSTR_7, PHUSTR_8, PHUSTR_9,
-    PHUSTR_10, PHUSTR_11,
-
-    PHUSTR_12, PHUSTR_13, PHUSTR_14, PHUSTR_15, PHUSTR_16, PHUSTR_17, PHUSTR_18, PHUSTR_19,
-    PHUSTR_20,
-
-    PHUSTR_21, PHUSTR_22, PHUSTR_23, PHUSTR_24, PHUSTR_25, PHUSTR_26, PHUSTR_27, PHUSTR_28,
-    PHUSTR_29, PHUSTR_30, PHUSTR_31, PHUSTR_32,
-
-    // TNT WAD map names.
-
-    THUSTR_1, THUSTR_2, THUSTR_3, THUSTR_4, THUSTR_5, THUSTR_6, THUSTR_7, THUSTR_8, THUSTR_9,
-    THUSTR_10, THUSTR_11,
-
-    THUSTR_12, THUSTR_13, THUSTR_14, THUSTR_15, THUSTR_16, THUSTR_17, THUSTR_18, THUSTR_19,
-    THUSTR_20,
-
-    THUSTR_21, THUSTR_22, THUSTR_23, THUSTR_24, THUSTR_25, THUSTR_26, THUSTR_27, THUSTR_28,
-    THUSTR_29, THUSTR_30, THUSTR_31, THUSTR_32};
+};
 
 void HU_Init(void) {
     char buffer[9];
@@ -159,29 +127,16 @@ void HU_Start(void) {
     // create the map title widget
     HUlib_initTextLine(&w_title, HU_TITLEX, HU_TITLEY, hu_font, HU_FONTSTART);
 
-    switch (logical_gamemission) {
+    switch (gamemission) {
     case doom:
         s = HU_TITLE;
         break;
     case doom2:
         s = HU_TITLE2;
         break;
-    case pack_plut:
-        s = HU_TITLEP;
-        break;
-    case pack_tnt:
-        s = HU_TITLET;
-        break;
     default:
         s = "Unknown level";
         break;
-    }
-
-    // Chex.exe always uses the episode 1 level title
-    // eg. E2M1 gives the title for E1M1
-
-    if (gameversion == exe_chex) {
-        s = HU_TITLE_CHEX;
     }
 
     // dehacked substitution to get modified level name

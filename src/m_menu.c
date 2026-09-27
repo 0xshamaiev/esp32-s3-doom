@@ -569,7 +569,6 @@ void M_DrawReadThis1(void) {
     case exe_doom_1_7:
     case exe_doom_1_8:
     case exe_doom_1_9:
-    case exe_hacx:
 
         if (gamemode == commercial) {
             // Doom 2
@@ -590,23 +589,10 @@ void M_DrawReadThis1(void) {
         break;
 
     case exe_ultimate:
-    case exe_chex:
 
         // Ultimate Doom always displays "HELP1".
 
-        // Chex Quest version also uses "HELP1", even though it is based
-        // on Final Doom.
-
         lumpname = "HELP1";
-
-        break;
-
-    case exe_final:
-    case exe_final2:
-
-        // Final Doom always displays "HELP".
-
-        lumpname = "HELP";
 
         break;
 
@@ -694,9 +680,9 @@ void M_DrawNewGame(void) {
 }
 
 void M_NewGame(int choice) {
-    // Chex Quest disabled the episode select screen, as did Doom II.
+    // Doom II skips the episode selection screen.
 
-    if (gamemode == commercial || gameversion == exe_chex)
+    if (gamemode == commercial)
         M_SetupNextMenu(&NewDef);
     else
         M_SetupNextMenu(&EpiDef);
@@ -772,8 +758,6 @@ void M_Options(int choice) { M_SetupNextMenu(&OptionsDef); }
 //      Toggle messages on/off
 //
 void M_ChangeMessages(int choice) {
-    // warning: unused parameter `int choice'
-    choice = 0;
     showMessages = 1 - showMessages;
 
     if (!showMessages)
@@ -810,7 +794,6 @@ void M_EndGame(int choice) {
 // M_ReadThis
 //
 void M_ReadThis(int choice) {
-    choice = 0;
     M_SetupNextMenu(&ReadDef1);
 }
 
@@ -819,17 +802,14 @@ void M_ReadThis2(int choice) {
     // All others had only one
 
     if (gameversion <= exe_doom_1_9 && gamemode != commercial) {
-        choice = 0;
         M_SetupNextMenu(&ReadDef2);
     } else {
         // Close the menu
-
         M_FinishReadThis(0);
     }
 }
 
 void M_FinishReadThis(int choice) {
-    choice = 0;
     M_SetupNextMenu(&MainDef);
 }
 
@@ -858,7 +838,7 @@ void M_QuitResponse(int key) {
 static char *M_SelectEndMessage(void) {
     char **endmsg;
 
-    if (logical_gamemission == doom) {
+    if (gamemission == doom) {
         // Doom 1
 
         endmsg = doom1_endmsg;
@@ -891,7 +871,6 @@ void M_ChangeSensitivity(int choice) {
 }
 
 void M_ChangeDetail(int choice) {
-    choice = 0;
     detailLevel = 1 - detailLevel;
 
     R_SetViewSize(screenblocks, detailLevel);

@@ -69,11 +69,6 @@ extern const byte gammatable[5][256];
 #define ANG1            (ANG45 / 45)
 #define ANG60           (ANG180 / 3)
 
-// Heretic code uses this definition as though it represents one
-// degree, but it is not!  This is actually ~1.40 degrees.
-
-#define ANG1_X          0x01000000
-
 #define SLOPERANGE		2048
 #define SLOPEBITS		11
 #define DBITS			(FRACBITS-SLOPEBITS)

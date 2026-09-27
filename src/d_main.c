@@ -110,9 +110,6 @@ boolean advancedemo;
 // Store demo, do not accept any inputs
 boolean storedemo;
 
-// "BFG Edition" version of doom2.wad does not include TITLEPIC.
-boolean bfgedition;
-
 // If true, the main game loop has started.
 boolean main_loop_started = false;
 
@@ -340,7 +337,7 @@ boolean D_GrabMouseCallback(void) {
 }
 
 void doomgeneric_Tick() {
-    // frame syncronous IO operations
+    // frame synchronous IO operations
     I_StartFrame();
 
     TryRunTics(); // will run at least one tic
@@ -357,14 +354,6 @@ void doomgeneric_Tick() {
 //  D_DoomLoop
 //
 void D_DoomLoop(void) {
-    if (bfgedition &&
-        (demorecording || (gameaction == ga_playdemo))) {
-        printf(" WARNING: You are playing using one of the Doom Classic\n"
-            " IWAD files shipped with the Doom 3: BFG Edition. These are\n"
-            " known to be incompatible with the regular IWAD files and\n"
-            " may cause demos to get out of sync.\n");
-    }
-
     if (demorecording)
         G_BeginRecording();
 
@@ -437,16 +426,7 @@ void D_DoAdvanceDemo(void) {
     paused = false;
     gameaction = ga_nothing;
 
-    // The Ultimate Doom executable changed the demo sequence to add
-    // a DEMO4 demo.  Final Doom was based on Ultimate, so also
-    // includes this change; however, the Final Doom IWADs do not
-    // include a DEMO4 lump, so the game bombs out with an error
-    // when it reaches this point in the demo sequence.
-
-    // However! There is an alternate version of Final Doom that
-    // includes a fixed executable.
-
-    if (gameversion == exe_ultimate || gameversion == exe_final)
+    if (gameversion == exe_ultimate)
         demosequence = (demosequence + 1) % 7;
     else
         demosequence = (demosequence + 1) % 6;
@@ -498,13 +478,6 @@ void D_DoAdvanceDemo(void) {
             G_DeferedPlayDemo(DEH_String("demo4"));
             break;
     }
-
-    // The Doom 3: BFG Edition version of doom2.wad does not have a
-    // TITLETPIC lump. Use INTERPIC instead as a workaround.
-    if (bfgedition && !strcasecmp(pagename, "TITLEPIC")
-        && W_CheckNumForName("titlepic") < 0) {
-        pagename = DEH_String("INTERPIC");
-    }
 }
 
 
@@ -544,14 +517,6 @@ static char *banners[] =
     "                         "
     "The Ultimate DOOM Startup v%i.%i"
     "                        ",
-    // tnt.wad
-    "                     "
-    "DOOM 2: TNT - Evilution v%i.%i"
-    "                           ",
-    // plutonia.wad
-    "                   "
-    "DOOM 2: Plutonia Experiment v%i.%i"
-    "                           ",
 };
 
 //
@@ -591,64 +556,14 @@ static char *GetGameName(char *gamename) {
     return gamename;
 }
 
-static void SetMissionForPackName(char *pack_name) {
-    static const struct {
-        char *name;
-        int mission;
-    } packs[] = {
-        {"doom2", doom2},
-        {"tnt", pack_tnt},
-        {"plutonia", pack_plut},
-    };
-
-    for (int i = 0; i < arrlen(packs); ++i) {
-        if (!strcasecmp(pack_name, packs[i].name)) {
-            gamemission = packs[i].mission;
-            return;
-        }
-    }
-
-    printf("Valid mission packs are:\n");
-
-    for (int i = 0; i < arrlen(packs); ++i) {
-        printf("\t%s\n", packs[i].name);
-    }
-
-    I_Error("Unknown mission pack name: %s", pack_name);
-}
-
 //
 // Find out what version of Doom is playing.
 //
 
 void D_IdentifyVersion(void) {
-    // gamemission is set up by the D_FindIWAD function.  But if
-    // we specify '-iwad', we have to identify using
-    // IdentifyIWADByName.  However, if the iwad does not match
-    // any known IWAD name, we may have a dilemma.  Try to
-    // identify by its contents.
-
-    if (gamemission == none) {
-        for (unsigned int i = 0; i < numlumps; ++i) {
-            if (!strncasecmp(lumpinfo[i].name, "MAP01", 8)) {
-                gamemission = doom2;
-                break;
-            } else if (!strncasecmp(lumpinfo[i].name, "E1M1", 8)) {
-                gamemission = doom;
-                break;
-            }
-        }
-
-        if (gamemission == none) {
-            // Still no idea.  I don't think this is going to work.
-
-            I_Error("Unknown or invalid IWAD file.");
-        }
-    }
-
     // Make sure gamemode is set up correctly
 
-    if (logical_gamemission == doom) {
+    if (gamemission == doom) {
         // Doom 1.  But which version?
 
         if (W_CheckNumForName("E4M1") > 0) {
@@ -661,66 +576,22 @@ void D_IdentifyVersion(void) {
             gamemode = shareware;
         }
     } else {
-        // Doom 2 of some kind.
+        // Doom II.
         gamemode = commercial;
-
-        // We can manually override the gamemission that we got from the
-        // IWAD detection code. This allows us to eg. play Plutonia 2
-        // with Freedoom and get the right level names.
-
-        //!
-        // @arg <pack>
-        //
-        // Explicitly specify a Doom II "mission pack" to run as, instead of
-        // detecting it based on the filename. Valid values are: "doom2",
-        // "tnt" and "plutonia".
-        //
-        int p = M_CheckParmWithArgs("-pack", 1);
-        if (p > 0) {
-            SetMissionForPackName(myargv[p + 1]);
-        }
     }
 }
 
 // Set the gamedescription string
 
 void D_SetGameDescription(void) {
-    boolean is_freedoom = W_CheckNumForName("FREEDOOM") >= 0;
-    boolean is_freedm = W_CheckNumForName("FREEDM") >= 0;
-
-    gamedescription = "Unknown";
-
-    if (logical_gamemission == doom) {
-        // Doom 1.  But which version?
-
-        if (is_freedoom) {
-            gamedescription = GetGameName("Freedoom: Phase 1");
-        } else if (gamemode == retail) {
-            // Ultimate Doom
-
-            gamedescription = GetGameName("The Ultimate DOOM");
-        } else if (gamemode == registered) {
-            gamedescription = GetGameName("DOOM Registered");
-        } else if (gamemode == shareware) {
-            gamedescription = GetGameName("DOOM Shareware");
-        }
-    } else {
-        // Doom 2 of some kind.  But which mission?
-
-        if (is_freedoom) {
-            if (is_freedm) {
-                gamedescription = GetGameName("FreeDM");
-            } else {
-                gamedescription = GetGameName("Freedoom: Phase 2");
-            }
-        } else if (logical_gamemission == doom2) {
-            gamedescription = GetGameName("DOOM 2: Hell on Earth");
-        } else if (logical_gamemission == pack_plut) {
-            gamedescription = GetGameName("DOOM 2: Plutonia Experiment");
-        } else if (logical_gamemission == pack_tnt) {
-            gamedescription = GetGameName("DOOM 2: TNT - Evilution");
-        }
-    }
+    if (gamemode == commercial)
+        gamedescription = GetGameName("DOOM 2: Hell on Earth");
+    else if (gamemode == retail)
+        gamedescription = GetGameName("The Ultimate DOOM");
+    else if (gamemode == registered)
+        gamedescription = GetGameName("DOOM Registered");
+    else
+        gamedescription = GetGameName("DOOM Shareware");
 }
 
 //      print title for every printed line
@@ -784,11 +655,7 @@ static struct {
     {"Doom 1.7/1.7a", "1.7", exe_doom_1_7},
     {"Doom 1.8", "1.8", exe_doom_1_8},
     {"Doom 1.9", "1.9", exe_doom_1_9},
-    {"Hacx", "hacx", exe_hacx},
     {"Ultimate Doom", "ultimate", exe_ultimate},
-    {"Final Doom", "final", exe_final},
-    {"Final Doom (alt)", "final2", exe_final2},
-    {"Chex Quest", "chex", exe_chex},
     {NULL, NULL, 0},
 };
 
@@ -801,8 +668,7 @@ static void InitGameVersion(void) {
     // @arg <version>
     // @category compat
     //
-    // Emulate a specific version of Doom.  Valid values are "1.9",
-    // "ultimate", "final", "final2", "hacx" and "chex".
+    // Emulate Doom "1.666", "1.7", "1.8", "1.9", or "ultimate".
     //
 
     int p = M_CheckParmWithArgs("-gameversion", 1);
@@ -826,50 +692,13 @@ static void InitGameVersion(void) {
             I_Error("Unknown game version '%s'", myargv[p + 1]);
         }
     } else {
-        // Determine automatically
-
-        if (gamemission == pack_chex) {
-            // chex.exe - identified by iwad filename
-
-            gameversion = exe_chex;
-        } else if (gamemission == pack_hacx) {
-            // hacx.exe: identified by iwad filename
-
-            gameversion = exe_hacx;
-        } else if (gamemode == shareware || gamemode == registered) {
-            // original
-
-            gameversion = exe_doom_1_9;
-
-            // TODO: Detect IWADs earlier than Doom v1.9.
-        } else if (gamemode == retail) {
-            gameversion = exe_ultimate;
-        } else if (gamemode == commercial) {
-            if (gamemission == doom2) {
-                gameversion = exe_doom_1_9;
-            } else {
-                // Final Doom: tnt or plutonia
-                // Defaults to emulating the first Final Doom executable,
-                // which has the crash in the demo loop; however, having
-                // this as the default should mean that it plays back
-                // most demos correctly.
-
-                gameversion = exe_final;
-            }
-        }
+        gameversion = gamemode == retail ? exe_ultimate : exe_doom_1_9;
     }
 
     // The original exe does not support retail - 4th episode not supported
 
     if (gameversion < exe_ultimate && gamemode == retail) {
         gamemode = registered;
-    }
-
-    // EXEs prior to the Final Doom exes do not support Final Doom.
-
-    if (gameversion < exe_final && gamemode == commercial
-        && (gamemission == pack_tnt || gamemission == pack_plut)) {
-        gamemission = doom2;
     }
 }
 
@@ -1001,49 +830,11 @@ void D_DoomMain(void) {
     DEH_printf("W_Init: Init WADfiles.\n");
     D_AddFile(iwadfile);
 
-    W_CheckCorrectIWAD(doom);
-
     // Now that we've loaded the IWAD, we can figure out what gamemission
     // we're playing and which version of Vanilla Doom we need to emulate.
     D_IdentifyVersion();
     InitGameVersion();
 
-
-    // Doom 3: BFG Edition includes modified versions of the classic
-    // IWADs which can be identified by an additional DMENUPIC lump.
-    // Furthermore, the M_GDHIGH lumps have been modified in a way that
-    // makes them incompatible to Vanilla Doom and the modified version
-    // of doom2.wad is missing the TITLEPIC lump.
-    // We specifically check for DMENUPIC here, before PWADs have been
-    // loaded which could probably include a lump of that name.
-
-    if (W_CheckNumForName("dmenupic") >= 0) {
-        printf("BFG Edition: Using workarounds as needed.\n");
-        bfgedition = true;
-
-        // BFG Edition changes the names of the secret levels to
-        // censor the Wolfenstein references. It also has an extra
-        // secret level (MAP33). In Vanilla Doom (meaning the DOS
-        // version), MAP33 overflows into the Plutonia level names
-        // array, so HUSTR_33 is actually PHUSTR_1.
-
-        DEH_AddStringReplacement(HUSTR_31, "level 31: idkfa");
-        DEH_AddStringReplacement(HUSTR_32, "level 32: keen");
-        DEH_AddStringReplacement(PHUSTR_1, "level 33: betray");
-
-        // The BFG edition doesn't have the "low detail" menu option (fair
-        // enough). But bizarrely, it reuses the M_GDHIGH patch as a label
-        // for the options menu (says "Fullscreen:"). Why the perpetrators
-        // couldn't just add a new graphic lump and had to reuse this one,
-        // I don't know.
-        //
-        // The end result is that M_GDHIGH is too wide and causes the game
-        // to crash. As a workaround to get a minimum level of support for
-        // the BFG edition IWADs, use the "ON"/"OFF" graphics instead.
-
-        DEH_AddStringReplacement("M_GDHIGH", "M_MSGON");
-        DEH_AddStringReplacement("M_GDLOW", "M_MSGOFF");
-    }
 
 #ifdef FEATURE_DEHACKED
     // Load Dehacked patches specified on the command line with -deh.
@@ -1154,17 +945,6 @@ void D_DoomMain(void) {
 
     I_PrintStartupBanner(gamedescription);
     PrintDehackedBanners();
-
-    // Freedoom's IWADs are Boom-compatible, which means they usually
-    // don't work in Vanilla (though FreeDM is okay). Show a warning
-    // message and give a link to the website.
-    if (W_CheckNumForName("FREEDOOM") >= 0 && W_CheckNumForName("FREEDM") < 0) {
-        printf(" WARNING: You are playing using one of the Freedoom IWAD\n"
-            " files, which might not work in this port. See this page\n"
-            " for more information on how to play using Freedoom:\n"
-            "   http://www.chocolate-doom.org/wiki/index.php/Freedoom\n");
-        I_PrintDivider();
-    }
 
     DEH_printf("I_Init: Setting up machine state.\n");
     I_CheckIsScreensaver();

@@ -497,9 +497,9 @@ ST_Responder(event_t *ev) {
                     else
                         S_ChangeMusic(musnum, 1);
                 }
-            } else if ((logical_gamemission == doom
+            } else if ((gamemission == doom
                         && cht_CheckCheat(&cheat_noclip, ev->data2))
-                       || (logical_gamemission != doom
+                       || (gamemission != doom
                            && cht_CheckCheat(&cheat_commercial_noclip, ev->data2))) {
                 // Noclip cheat.
                 // For Doom 1, use the idspipsopd cheat; for all others, use
@@ -561,12 +561,6 @@ ST_Responder(event_t *ev) {
             } else {
                 epsd = buf[0] - '0';
                 map = buf[1] - '0';
-            }
-
-            // Chex.exe always warps to episode 1.
-
-            if (gameversion == exe_chex) {
-                epsd = 1;
             }
 
             // Catch invalid maps.
@@ -837,16 +831,6 @@ void ST_doPaletteStuff(void) {
         palette = RADIATIONPAL;
     else
         palette = 0;
-
-    // In Chex Quest, the player never sees red.  Instead, the
-    // radiation suit palette is used to tint the screen green,
-    // as though the player is being covered in goo by an
-    // attacking flemoid.
-
-    if (gameversion == exe_chex
-        && palette >= STARTREDPALS && palette < STARTREDPALS + NUMREDPALS) {
-        palette = RADIATIONPAL;
-    }
 
     if (palette != st_palette) {
         st_palette = palette;

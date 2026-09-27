@@ -76,20 +76,6 @@ static textscreen_t textscreens[] =
     {doom2, 1, 30, "RROCK17", C4TEXT},
     {doom2, 1, 15, "RROCK13", C5TEXT},
     {doom2, 1, 31, "RROCK19", C6TEXT},
-
-    {pack_tnt, 1, 6, "SLIME16", T1TEXT},
-    {pack_tnt, 1, 11, "RROCK14", T2TEXT},
-    {pack_tnt, 1, 20, "RROCK07", T3TEXT},
-    {pack_tnt, 1, 30, "RROCK17", T4TEXT},
-    {pack_tnt, 1, 15, "RROCK13", T5TEXT},
-    {pack_tnt, 1, 31, "RROCK19", T6TEXT},
-
-    {pack_plut, 1, 6, "SLIME16", P1TEXT},
-    {pack_plut, 1, 11, "RROCK14", P2TEXT},
-    {pack_plut, 1, 20, "RROCK07", P3TEXT},
-    {pack_plut, 1, 30, "RROCK17", P4TEXT},
-    {pack_plut, 1, 15, "RROCK13", P5TEXT},
-    {pack_plut, 1, 31, "RROCK19", P6TEXT},
 };
 
 char *finaletext;
@@ -112,7 +98,7 @@ void F_StartFinale(void) {
     viewactive = false;
     automapactive = false;
 
-    if (logical_gamemission == doom) {
+    if (gamemission == doom) {
         S_ChangeMusic(mus_victor, true);
     } else {
         S_ChangeMusic(mus_read_m, true);
@@ -121,16 +107,10 @@ void F_StartFinale(void) {
     // Find the right screen and set the text and background
 
     for (size_t i = 0; i < arrlen(textscreens); ++i) {
-        textscreen_t *screen = &textscreens[i];
+        const textscreen_t *screen = &textscreens[i];
 
-        // Hack for Chex Quest
-
-        if (gameversion == exe_chex && screen->mission == doom) {
-            screen->level = 5;
-        }
-
-        if (logical_gamemission == screen->mission
-            && (logical_gamemission != doom || gameepisode == screen->episode)
+        if (gamemission == screen->mission
+            && (gamemission != doom || gameepisode == screen->episode)
             && gamemap == screen->level) {
             finaletext = screen->text;
             finaleflat = screen->background;
@@ -228,7 +208,7 @@ void F_TextWrite(void) {
     // draw some of the text onto the screen
     int cx = 10;
     int cy = 10;
-    char *ch = finaletext;
+    const char *ch = finaletext;
 
     int count = ((signed int)finalecount - 10) / TEXTSPEED;
     if (count < 0)
@@ -523,11 +503,7 @@ void F_CastDrawer(void) {
 //
 // F_DrawPatchCol
 //
-void
-F_DrawPatchCol
-(int x,
- patch_t *patch,
- int col) {
+void F_DrawPatchCol(int x, patch_t *patch, int col) {
     column_t *column = (column_t *)((byte *)patch + LONG(patch->columnofs[col]));
     byte *desttop = I_VideoBuffer + x;
 

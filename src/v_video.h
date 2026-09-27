@@ -36,16 +36,6 @@
 
 extern int dirtybox[4];
 
-extern byte *tinttable;
-
-// haleyjd 08/28/10: implemented for Strife support
-// haleyjd 08/28/10: Patch clipping callback, implemented to support Choco
-// Strife.
-typedef boolean (*vpatchclipfunc_t)(patch_t *, int, int);
-
-void V_SetPatchClipCallback(vpatchclipfunc_t func);
-
-
 // Allocates buffer screens, call before R_Init.
 void V_Init(void);
 
@@ -59,13 +49,6 @@ void V_DrawPatch(int x, int y, patch_t *patch);
 
 void V_DrawPatchFlipped(int x, int y, patch_t *patch);
 
-void V_DrawTLPatch(int x, int y, patch_t *patch);
-
-void V_DrawAltTLPatch(int x, int y, patch_t *patch);
-
-void V_DrawShadowedPatch(int x, int y, patch_t *patch);
-
-void V_DrawXlaPatch(int x, int y, patch_t *patch); // villsa [STRIFE]
 void V_DrawPatchDirect(int x, int y, patch_t *patch);
 
 // Draw a linear block of pixels into the view buffer.
@@ -99,17 +82,6 @@ void V_RestoreBuffer(void);
 // "DOOM%02i.pcx"
 
 void V_ScreenShot(char *format);
-
-// Load the lookup table for translucency calculations from the TINTTAB
-// lump.
-
-void V_LoadTintTable(void);
-
-// villsa [STRIFE]
-// Load the lookup table for translucency calculations from the XLATAB
-// lump.
-
-void V_LoadXlaTable(void);
 
 void V_DrawMouseSpeedBox(int speed);
 

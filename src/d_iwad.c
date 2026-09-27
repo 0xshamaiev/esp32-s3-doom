@@ -18,37 +18,21 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
 #include <string.h>
 
 #include "config.h"
 #include "deh_str.h"
-#include "doomkeys.h"
 #include "d_iwad.h"
 #include "i_system.h"
 #include "m_argv.h"
-#include "m_config.h"
 #include "m_misc.h"
 #include "w_wad.h"
-#include "z_zone.h"
 
 static const iwad_t iwads[] =
 {
     {"doom2.wad", doom2, commercial, "Doom II"},
-    {"plutonia.wad", pack_plut, commercial, "Final Doom: Plutonia Experiment"},
-    {"tnt.wad", pack_tnt, commercial, "Final Doom: TNT: Evilution"},
     {"doom.wad", doom, retail, "Doom"},
     {"doom1.wad", doom, shareware, "Doom Shareware"},
-    {"chex.wad", pack_chex, shareware, "Chex Quest"},
-    {"hacx.wad", pack_hacx, commercial, "Hacx"},
-    {"freedm.wad", doom2, commercial, "FreeDM"},
-    {"freedoom2.wad", doom2, commercial, "Freedoom: Phase 2"},
-    {"freedoom1.wad", doom, retail, "Freedoom: Phase 1"},
-    {"heretic.wad", heretic, retail, "Heretic"},
-    {"heretic1.wad", heretic, shareware, "Heretic Shareware"},
-    {"hexen.wad", hexen, commercial, "Hexen"},
-    //{ "strife0.wad",  strife,    commercial, "Strife" }, // haleyjd: STRIFE-FIXME
-    {"strife1.wad", strife, commercial, "Strife"},
 };
 
 // Check if the specified directory contains the specified IWAD
@@ -192,6 +176,8 @@ char *D_FindIWAD(int mask, GameMission_t *mission) {
         }
 
         *mission = IdentifyIWADByName(result, mask);
+        if (*mission == none)
+            I_Error("Unsupported IWAD '%s'. Use doom1.wad, doom.wad or doom2.wad.", iwadfile);
     } else {
         // Search through the list and look for an IWAD
 
@@ -216,7 +202,7 @@ const iwad_t **D_FindAllIWADs(int mask) {
             continue;
         }
 
-        char *filename = D_FindWADByName(iwads[i].name);
+        const char *filename = D_FindWADByName(iwads[i].name);
 
         if (filename != NULL) {
             result[result_len] = &iwads[i];

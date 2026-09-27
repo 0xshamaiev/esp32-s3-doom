@@ -29,9 +29,6 @@
 typedef struct sfxinfo_struct sfxinfo_t;
 
 struct sfxinfo_struct {
-    // tag name, used for hexen.
-    char *tagname;
-
     // lump name.  If we are running with use_sfx_prefix=true, a
     // 'DS' (or 'DP' for PC speaker sounds) is prepended to this.
 
@@ -56,10 +53,6 @@ struct sfxinfo_struct {
 
     // lump number of sfx
     int lumpnum;
-
-    // Maximum number of channels that the sound can be played on
-    // (Heretic)
-    int numchannels;
 
     // data used by the low level code
     void *driver_data;
