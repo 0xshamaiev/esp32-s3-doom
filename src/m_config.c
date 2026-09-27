@@ -100,17 +100,6 @@ typedef struct {
 
 static default_t doom_defaults_list[] = {
     //!
-    // Mouse sensitivity.  This value is used to multiply input mouse
-    // movement to control the effect of moving the mouse.
-    //
-    // The "normal" maximum value available for this through the
-    // in-game options menu is 9. A value of 31 or greater will cause
-    // the game to crash when entering the options menu.
-    //
-
-    CONFIG_VARIABLE_INT(mouse_sensitivity),
-
-    //!
     // Volume of sound effects, range 0-15.
     //
 
@@ -193,25 +182,6 @@ static default_t doom_defaults_list[] = {
     //
 
     CONFIG_VARIABLE_KEY(key_speed),
-
-    //!
-    // Mouse button to fire the currently selected weapon.
-    //
-
-    CONFIG_VARIABLE_INT(mouseb_fire),
-
-    //!
-    // Mouse button to turn on strafing.  When held down, the player
-    // will strafe left and right instead of turning left and right.
-    //
-
-    CONFIG_VARIABLE_INT(mouseb_strafe),
-
-    //!
-    // Mouse button to move forward.
-    //
-
-    CONFIG_VARIABLE_INT(mouseb_forward),
 
     //!
     // Joystick virtual button that fires the current weapon.
@@ -402,49 +372,6 @@ static default_t extra_defaults_list[] = {
     //
 
     CONFIG_VARIABLE_INT(joyb_nextweapon),
-
-    //!
-    // Mouse button to strafe left.
-    //
-
-    CONFIG_VARIABLE_INT(mouseb_strafeleft),
-
-    //!
-    // Mouse button to strafe right.
-    //
-
-    CONFIG_VARIABLE_INT(mouseb_straferight),
-
-    //!
-    // Mouse button to "use" an object, eg. a door or switch.
-    //
-
-    CONFIG_VARIABLE_INT(mouseb_use),
-
-    //!
-    // Mouse button to move backwards.
-    //
-
-    CONFIG_VARIABLE_INT(mouseb_backward),
-
-    //!
-    // Mouse button to cycle to the previous weapon.
-    //
-
-    CONFIG_VARIABLE_INT(mouseb_prevweapon),
-
-    //!
-    // Mouse button to cycle to the next weapon.
-    //
-
-    CONFIG_VARIABLE_INT(mouseb_nextweapon),
-
-    //!
-    // If non-zero, double-clicking a mouse button acts like pressing
-    // the "use" key to use an object in-game, eg. a door or switch.
-    //
-
-    CONFIG_VARIABLE_INT(dclick_use),
 
 #ifdef FEATURE_SOUND
 

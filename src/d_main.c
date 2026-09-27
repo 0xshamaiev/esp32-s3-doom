@@ -241,12 +241,6 @@ void D_Display(void) {
         }
     }
 
-    if (testcontrols) {
-        // Box showing current mouse speed
-
-        V_DrawMouseSpeedBox(testcontrols_mousespeed);
-    }
-
     menuactivestate = menuactive;
     viewactivestate = viewactive;
     inhelpscreensstate = inhelpscreens;
@@ -308,7 +302,6 @@ void D_BindVariables(void) {
     M_BindWeaponControls();
     M_BindMapControls();
     M_BindMenuControls();
-    M_BindVariable("mouse_sensitivity", &mouseSensitivity);
     M_BindVariable("sfx_volume", &sfxVolume);
     M_BindVariable("music_volume", &musicVolume);
     M_BindVariable("show_messages", &showMessages);
@@ -317,23 +310,6 @@ void D_BindVariables(void) {
     M_BindVariable("snd_channels", &snd_channels);
     M_BindVariable("vanilla_savegame_limit", &vanilla_savegame_limit);
     M_BindVariable("vanilla_demo_limit", &vanilla_demo_limit);
-}
-
-//
-// D_GrabMouseCallback
-//
-// Called to determine whether to grab the mouse pointer
-//
-
-bool D_GrabMouseCallback(void) {
-    // when menu is active or game is paused, release the mouse
-
-    if (menuactive || paused)
-        return false;
-
-    // only grab mouse when playing levels (but not demos)
-
-    return (gamestate == GS_LEVEL) && !demoplayback && !advancedemo;
 }
 
 void doomgeneric_Tick() {
@@ -944,7 +920,6 @@ void D_DoomMain(void) {
     PrintDehackedBanners();
 
     DEH_printf("I_Init: Setting up machine state.\n");
-    I_CheckIsScreensaver();
     I_InitTimer();
 
     I_InitSound(true);

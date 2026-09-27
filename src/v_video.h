@@ -85,7 +85,5 @@ void V_RestoreBuffer(void);
 
 void V_ScreenShot(char *format);
 
-void V_DrawMouseSpeedBox(int speed);
-
 #endif
 

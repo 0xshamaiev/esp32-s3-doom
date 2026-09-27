@@ -122,7 +122,6 @@ extern bool viewactive;
 extern bool nodrawers;
 
 extern bool testcontrols;
-extern int testcontrols_mousespeed;
 
 // This one is related to the 3-screen display mode.
 // ANG90 = left side, ANG270 = right
@@ -198,8 +197,6 @@ extern bool precache;
 // wipegamestate can be set to -1
 //  to force a wipe on the next draw
 extern gamestate_t wipegamestate;
-
-extern int mouseSensitivity;
 
 // Needed to store the number of the dummy sky flat.
 // Used for rendering,

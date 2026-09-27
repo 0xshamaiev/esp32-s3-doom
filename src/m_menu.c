@@ -59,11 +59,6 @@
 extern patch_t *hu_font[HU_FONTSIZE];
 extern bool message_dontfuckwithme;
 
-//
-// defaulted values
-//
-int mouseSensitivity = 5;
-
 // Show messages has default, 0 = off, 1 = on
 int showMessages = 1;
 
@@ -309,7 +304,6 @@ enum {
     detail,
     scrnsize,
     option_empty1,
-    mousesens,
     option_empty2,
     soundvol,
     opt_end
@@ -320,7 +314,6 @@ menuitem_t OptionsMenu[] = {{1, "M_ENDGAM", M_EndGame, 'e'},
                             {1, "M_DETAIL", M_ChangeDetail, 'g'},
                             {2, "M_SCRNSZ", M_SizeDisplay, 's'},
                             {-1, "", 0, '\0'},
-                            {2, "M_MSENS", M_ChangeSensitivity, 'm'},
                             {-1, "", 0, '\0'},
                             {1, "M_SVOL", M_Sound, 's'}};
 
@@ -748,8 +741,6 @@ void M_DrawOptions(void) {
     V_DrawPatchDirect(OptionsDef.x + 120, OptionsDef.y + LINEHEIGHT * messages,
                       W_CacheLumpName(DEH_String(msgNames[showMessages]), PU_CACHE));
 
-    M_DrawThermo(OptionsDef.x, OptionsDef.y + LINEHEIGHT * (mousesens + 1), 10, mouseSensitivity);
-
     M_DrawThermo(OptionsDef.x, OptionsDef.y + LINEHEIGHT * (scrnsize + 1), 9, screenSize);
 }
 
@@ -856,19 +847,6 @@ void M_QuitDOOM(int choice) {
     DEH_snprintf(endstring, sizeof(endstring), "%s\n\n" DOSY, DEH_String(M_SelectEndMessage()));
 
     M_StartMessage(endstring, M_QuitResponse, true);
-}
-
-void M_ChangeSensitivity(int choice) {
-    switch (choice) {
-    case 0:
-        if (mouseSensitivity)
-            mouseSensitivity--;
-        break;
-    case 1:
-        if (mouseSensitivity < 9)
-            mouseSensitivity++;
-        break;
-    }
 }
 
 void M_ChangeDetail(int choice) {
@@ -1021,11 +999,6 @@ static bool IsNullKey(int key) {
 //
 bool M_Responder(event_t *ev) {
     static int joywait = 0;
-    static int mousewait = 0;
-    static int mousey = 0;
-    static int lasty = 0;
-    static int mousex = 0;
-    static int lastx = 0;
 
     // In testcontrols mode, none of the function keys should do anything
     // - the only key is escape to quit.
@@ -1038,21 +1011,6 @@ bool M_Responder(event_t *ev) {
         }
 
         return false;
-    }
-
-    // "close" button pressed on window?
-    if (ev->type == ev_quit) {
-        // First click on close button = bring up quit confirm message.
-        // Second click on close button = confirm quit
-
-        if (menuactive && messageToPrint && messageRoutine == M_QuitResponse) {
-            M_QuitResponse(key_menu_confirm);
-        } else {
-            S_StartSound(NULL, sfx_swtchn);
-            M_QuitDOOM(0);
-        }
-
-        return true;
     }
 
     // key is the key pressed, ch is the actual character typed
@@ -1090,43 +1048,9 @@ bool M_Responder(event_t *ev) {
             joywait = I_GetTime() + 5;
         }
     } else {
-        if (ev->type == ev_mouse && mousewait < I_GetTime()) {
-            mousey += ev->data3;
-            if (mousey < lasty - 30) {
-                key = key_menu_down;
-                mousewait = I_GetTime() + 5;
-                mousey = lasty -= 30;
-            } else if (mousey > lasty + 30) {
-                key = key_menu_up;
-                mousewait = I_GetTime() + 5;
-                mousey = lasty += 30;
-            }
-
-            mousex += ev->data2;
-            if (mousex < lastx - 30) {
-                key = key_menu_left;
-                mousewait = I_GetTime() + 5;
-                mousex = lastx -= 30;
-            } else if (mousex > lastx + 30) {
-                key = key_menu_right;
-                mousewait = I_GetTime() + 5;
-                mousex = lastx += 30;
-            }
-
-            if (ev->data1 & 1) {
-                key = key_menu_forward;
-                mousewait = I_GetTime() + 15;
-            }
-
-            if (ev->data1 & 2) {
-                key = key_menu_back;
-                mousewait = I_GetTime() + 15;
-            }
-        } else {
-            if (ev->type == ev_keydown) {
-                key = ev->data1;
-                ch = ev->data2;
-            }
+        if (ev->type == ev_keydown) {
+            key = ev->data1;
+            ch = ev->data2;
         }
     }
 
