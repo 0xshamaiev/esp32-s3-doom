@@ -9,7 +9,6 @@ void D_DoomMain(void);
 void doomgeneric_Create(int argc, char **argv) {
     myargc = argc;
     myargv = argv;
-    M_FindResponseFile();
 
     DG_ScreenBuffer = malloc(DOOMGENERIC_RESX * DOOMGENERIC_RESY * sizeof(*DG_ScreenBuffer));
     if (DG_ScreenBuffer == NULL)

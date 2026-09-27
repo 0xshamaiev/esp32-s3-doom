@@ -303,8 +303,6 @@ void D_Display(void) {
 //
 
 void D_BindVariables(void) {
-    M_ApplyPlatformDefaults();
-
     I_BindVideoVariables();
 
     I_BindSoundVariables();
@@ -1342,4 +1340,3 @@ void D_DoomMain(void) {
 
     D_DoomLoop();
 }
-

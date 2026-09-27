@@ -137,7 +137,7 @@ boolean M_StrToInt(const char *str, int *result) {
 void M_ExtractFileBase(char *path, char *dest) {
     char *src = path + strlen(path) - 1;
 
-    // back up until a \ or the start
+    // Back up until a slash or the start.
     while (src != path && *(src - 1) != DIR_SEPARATOR) {
         src--;
     }

@@ -326,16 +326,7 @@ void *W_CacheLumpNum(int lumpnum, int tag) {
 
     lumpinfo_t *lump = &lumpinfo[lumpnum];
 
-    // Get the pointer to return.  If the lump is in a memory-mapped
-    // file, we can just return a pointer to within the memory-mapped
-    // region.  If the lump is in an ordinary file, we may already
-    // have it cached; otherwise, load it into memory.
-
-    if (lump->wad_file->mapped != NULL) {
-        // Memory mapped file, return from the mmapped region.
-
-        result = lump->wad_file->mapped + lump->position;
-    } else if (lump->cache != NULL) {
+    if (lump->cache != NULL) {
         // Already cached, so just switch the zone tag.
 
         result = lump->cache;
@@ -364,10 +355,6 @@ void *W_CacheLumpName(char *name, int tag) {
 // without having to read from disk again, or alternatively, discarded
 // if we run out of memory.
 //
-// Back in Vanilla Doom, this was just done using Z_ChangeTag
-// directly, but now that we have WAD mmap, things are a bit more
-// complicated ...
-//
 
 void W_ReleaseLumpNum(int lumpnum) {
     if ((unsigned)lumpnum >= numlumps) {
@@ -376,11 +363,7 @@ void W_ReleaseLumpNum(int lumpnum) {
 
     lumpinfo_t *lump = &lumpinfo[lumpnum];
 
-    if (lump->wad_file->mapped != NULL) {
-        // Memory-mapped file, so nothing needs to be done here.
-    } else {
-        Z_ChangeTag(lump->cache, PU_CACHE);
-    }
+    Z_ChangeTag(lump->cache, PU_CACHE);
 }
 
 void W_ReleaseLumpName(char *name) {

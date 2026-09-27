@@ -28,7 +28,6 @@ set(DOOM_SOURCES
     src/d_loop.c
     src/d_main.c
     src/d_mode.c
-    src/d_singleplayer.c
     src/doomdef.c
     src/doomgeneric.c
     src/doomstat.c
@@ -89,7 +88,6 @@ set(DOOM_SOURCES
     src/tables.c
     src/v_video.c
     src/w_file.c
-    src/w_file_stdc.c
     src/w_main.c
     src/w_wad.c
     src/wi_stuff.c

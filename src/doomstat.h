@@ -92,10 +92,6 @@ extern int gamemap;
 // Nightmare mode flag, single player.
 extern boolean respawnmonsters;
 
-// Netgame? Only true if >1 player.
-
-// 0=Cooperative; 1=Deathmatch; 2=Altdeath
-
 // -------------------------
 // Internal parameters for sound rendering.
 // These have been taken from the DOS version,

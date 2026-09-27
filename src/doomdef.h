@@ -40,7 +40,7 @@
 // most parameter validation debugging code will not be compiled
 #define RANGECHECK
 
-// The maximum number of players, multiplayer/networking.
+// Player slots in the original game data formats.
 // Keep the original four-slot save/demo layout; only slot zero is active.
 #define MAXPLAYERS 4
 

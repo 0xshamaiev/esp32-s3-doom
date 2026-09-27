@@ -56,22 +56,6 @@ boolean M_ParmExists(char *check) { return M_CheckParm(check) != 0; }
 
 int M_CheckParm(const char *check) { return M_CheckParmWithArgs(check, 0); }
 
-#define MAXARGVS 100
-
-static void LoadResponseFile(int argv_index) {}
-
-//
-// Find a Response File
-//
-
-void M_FindResponseFile(void) {
-    for (int i = 1; i < myargc; i++) {
-        if (myargv[i][0] == '@') {
-            LoadResponseFile(i);
-        }
-    }
-}
-
 // Return the name of the executable used to start the program:
 
 char *M_GetExecutableName(void) {

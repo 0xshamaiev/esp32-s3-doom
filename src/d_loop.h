@@ -18,18 +18,6 @@
 #include "d_ticcmd.h"
 #include "doomtype.h"
 
-typedef struct {
-    void (*ProcessEvents)(void);
-
-    void (*BuildTiccmd)(ticcmd_t *cmd, int maketic);
-
-    void (*RunTic)(ticcmd_t *cmds);
-
-    void (*RunMenu)(void);
-} loop_interface_t;
-
-void D_RegisterLoopCallbacks(loop_interface_t *callbacks);
-
 void D_InitSinglePlayer(void);
 
 void D_UpdateTics(void);

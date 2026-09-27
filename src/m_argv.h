@@ -35,8 +35,6 @@ int M_CheckParm(const char *check);
 // following the specified argument.
 int M_CheckParmWithArgs(const char *check, int num_args);
 
-void M_FindResponseFile(void);
-
 // Parameter has been specified?
 
 boolean M_ParmExists(char *check);

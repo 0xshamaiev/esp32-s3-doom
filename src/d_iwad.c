@@ -51,45 +51,12 @@ static const iwad_t iwads[] =
     {"strife1.wad", strife, commercial, "Strife"},
 };
 
-// Array of locations to search for IWAD files
-//
-// "128 IWAD search directories should be enough for anybody".
-
-#define MAX_IWAD_DIRS 128
-
-static boolean iwad_dirs_built = false;
-static char *iwad_dirs[MAX_IWAD_DIRS];
-static int num_iwad_dirs = 0;
-
-static void AddIWADDir(char *dir) {
-    if (num_iwad_dirs < MAX_IWAD_DIRS) {
-        iwad_dirs[num_iwad_dirs] = dir;
-        ++num_iwad_dirs;
-    }
-}
-
-static boolean DirIsFile(char *path, char *filename) {
-    size_t path_len = strlen(path);
-    size_t filename_len = strlen(filename);
-
-    return path_len >= filename_len + 1
-           && path[path_len - filename_len - 1] == DIR_SEPARATOR
-           && !strcasecmp(&path[path_len - filename_len], filename);
-}
-
 // Check if the specified directory contains the specified IWAD
 // file, returning the full path to the IWAD if found, or NULL
 // if not found.
 
 static char *CheckDirectoryHasIWAD(char *dir, char *iwadname) {
     char *filename;
-
-    // As a special case, the "directory" may refer directly to an
-    // IWAD file if the path comes from DOOMWADDIR or DOOMWADPATH.
-
-    if (DirIsFile(dir, iwadname) && M_FileExists(dir)) {
-        return strdup(dir);
-    }
 
     // Construct the full path to the IWAD if it is located in
     // this directory, and check if it exists.
@@ -164,57 +131,16 @@ static GameMission_t IdentifyIWADByName(char *name, int mask) {
 }
 
 
-//
-// Build a list of IWAD files
-//
-
-static void BuildIWADDirList(void) {
-    if (iwad_dirs_built)
-        return;
-    AddIWADDir(FILES_DIR);
-
-    // Don't run this function again.
-
-    iwad_dirs_built = true;
-}
-
-//
-// Searches WAD search paths for an WAD with a specific filename.
-//
-
+// Search an explicit path first, then the application's mounted storage.
 char *D_FindWADByName(char *name) {
-    // Absolute path?
-
-    if (M_FileExists(name)) {
+    if (M_FileExists(name))
         return name;
-    }
 
-    BuildIWADDirList();
+    char *path = M_StringJoin(FILES_DIR, DIR_SEPARATOR_S, name, NULL);
+    if (M_FileExists(path))
+        return path;
 
-    // Search through all IWAD paths for a file with the given name.
-
-    for (int i = 0; i < num_iwad_dirs; ++i) {
-        // As a special case, if this is in DOOMWADDIR or DOOMWADPATH,
-        // the "directory" may actually refer directly to an IWAD
-        // file.
-
-        if (DirIsFile(iwad_dirs[i], name) && M_FileExists(iwad_dirs[i])) {
-            return strdup(iwad_dirs[i]);
-        }
-
-        // Construct a string for the full path
-
-        char *path = M_StringJoin(iwad_dirs[i], DIR_SEPARATOR_S, name, NULL);
-
-        if (M_FileExists(path)) {
-            return path;
-        }
-
-        free(path);
-    }
-
-    // File not found
-
+    free(path);
     return NULL;
 }
 
@@ -255,7 +181,7 @@ char *D_FindIWAD(int mask, GameMission_t *mission) {
     int iwadparm = M_CheckParmWithArgs("-iwad", 1);
 
     if (iwadparm) {
-        // Search through IWAD dirs for an IWAD with the given name.
+        // Find the requested IWAD on mounted storage.
 
         char *iwadfile = myargv[iwadparm + 1];
 
@@ -271,13 +197,7 @@ char *D_FindIWAD(int mask, GameMission_t *mission) {
 
         printf("-iwad not specified, trying a few iwad names\n");
 
-        result = NULL;
-
-        BuildIWADDirList();
-
-        for (int i = 0; result == NULL && i < num_iwad_dirs; ++i) {
-            result = SearchDirectoryForIWAD(iwad_dirs[i], mask, mission);
-        }
+        result = SearchDirectoryForIWAD(FILES_DIR, mask, mission);
     }
 
     return result;

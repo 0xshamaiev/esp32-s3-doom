@@ -19,25 +19,31 @@
 #include <string.h>
 
 #include "d_loop.h"
-#include "doomdef.h"
+#include "d_main.h"
+#include "doomstat.h"
+#include "g_game.h"
 #include "i_system.h"
 #include "i_timer.h"
 #include "i_video.h"
+#include "m_argv.h"
+#include "m_menu.h"
 
 #define BACKUPTICS 8
 
 static ticcmd_t ticdata[BACKUPTICS];
 static int maketic;
 static int lasttime;
-static loop_interface_t *loop_interface;
+
+// Input for the only active player.
+ticcmd_t *localcmds;
 
 int gametic;
 boolean singletics = false;
 
 static boolean BuildNewTic(void) {
     I_StartTic();
-    loop_interface->ProcessEvents();
-    loop_interface->RunMenu();
+    D_ProcessEvents();
+    M_Ticker();
 
     // Bound input buffering when rendering or loading takes a long time.
     if (maketic - gametic >= 5)
@@ -45,7 +51,7 @@ static boolean BuildNewTic(void) {
 
     ticcmd_t *cmd = &ticdata[maketic % BACKUPTICS];
     memset(cmd, 0, sizeof(*cmd));
-    loop_interface->BuildTiccmd(cmd, maketic);
+    G_BuildTiccmd(cmd, maketic);
     ++maketic;
     return true;
 }
@@ -98,10 +104,19 @@ void TryRunTics(void) {
     }
 
     while (counts-- > 0) {
-        loop_interface->RunTic(&ticdata[gametic % BACKUPTICS]);
+        localcmds = &ticdata[gametic % BACKUPTICS];
+        if (advancedemo)
+            D_DoAdvanceDemo();
+        G_Ticker();
         ++gametic;
         D_UpdateTics();
     }
 }
 
-void D_RegisterLoopCallbacks(loop_interface_t *callbacks) { loop_interface = callbacks; }
+void D_InitSinglePlayer(void) {
+    consoleplayer = displayplayer = 0;
+    for (unsigned int i = 0; i < MAXPLAYERS; ++i)
+        playeringame[i] = i == 0;
+
+    lowres_turn = M_CheckParm("-record") > 0 && M_CheckParm("-longtics") == 0;
+}
