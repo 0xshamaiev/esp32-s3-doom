@@ -13,6 +13,7 @@
 // GNU General Public License for more details.
 //
 
+#include <stdint.h>
 #include <ctype.h>
 #include <fcntl.h>
 #include <math.h>
@@ -46,7 +47,7 @@ static int shiftdown = 0;
 
 // Lookup table for mapping ASCII characters to their equivalent when
 // shift is pressed on an American layout keyboard:
-static const char shiftxform[] = {
+static constexpr char shiftxform[] = {
     0,    1,   2,   3,   4,   5,   6,   7,   8,   9,   10,  11,  12,  13,  14,  15,
     16,   17,  18,  19,  20,  21,  22,  23,  24,  25,  26,  27,  28,  29,  30,  31,
     ' ',  '!', '"', '#', '$', '%', '&',
@@ -80,7 +81,7 @@ static const char shiftxform[] = {
     'A',  'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
     'Q',  'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '{', '|', '}', '~', 127};
 
-static unsigned char TranslateKey(unsigned char key) {
+static uint8_t TranslateKey(uint8_t key) {
     return key;
 
     /*
@@ -96,7 +97,7 @@ static unsigned char TranslateKey(unsigned char key) {
 
 // Get the equivalent ASCII (Unicode?) character for a keypress.
 
-static unsigned char GetTypedChar(unsigned char key) {
+static uint8_t GetTypedChar(uint8_t key) {
     key = TranslateKey(key);
 
     // Is shift held down?  If so, perform a translation.
@@ -112,7 +113,7 @@ static unsigned char GetTypedChar(unsigned char key) {
     return key;
 }
 
-static void UpdateShiftStatus(const int pressed, const unsigned char key) {
+static void UpdateShiftStatus(const int pressed, const uint8_t key) {
     int change;
 
     if (pressed) {
@@ -129,7 +130,7 @@ static void UpdateShiftStatus(const int pressed, const unsigned char key) {
 void I_GetEvent(void) {
     event_t event;
     int pressed;
-    unsigned char key;
+    uint8_t key;
 
     while (DG_GetKey(&pressed, &key)) {
         UpdateShiftStatus(pressed, key);

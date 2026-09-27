@@ -37,7 +37,7 @@
 
 
 // in AM_map.c
-extern boolean automapactive;
+extern bool automapactive;
 
 
 //
@@ -52,7 +52,7 @@ void STlib_init(void) {
 
 
 // ?
-void STlib_initNum(st_number_t *n, int x, int y, patch_t **pl, int *num, boolean *on, int width) {
+void STlib_initNum(st_number_t *n, int x, int y, patch_t **pl, int *num, bool *on, int width) {
     n->x = x;
     n->y = y;
     n->oldnum = 0;
@@ -68,7 +68,7 @@ void STlib_initNum(st_number_t *n, int x, int y, patch_t **pl, int *num, boolean
 //  based on differences from the old number.
 // Note: worth the trouble?
 //
-void STlib_drawNum(st_number_t *n, boolean refresh) {
+void STlib_drawNum(st_number_t *n, bool refresh) {
     int numdigits = n->width;
     int num = *n->num;
 
@@ -121,7 +121,7 @@ void STlib_drawNum(st_number_t *n, boolean refresh) {
 
 
 //
-void STlib_updateNum(st_number_t *n, boolean refresh) {
+void STlib_updateNum(st_number_t *n, bool refresh) {
     if (*n->on) STlib_drawNum(n, refresh);
 }
 
@@ -133,14 +133,14 @@ void STlib_initPercent
  int y,
  patch_t **pl,
  int *num,
- boolean *on,
+ bool *on,
  patch_t *percent) {
     STlib_initNum(&p->n, x, y, pl, num, on, 3);
     p->p = percent;
 }
 
 
-void STlib_updatePercent(st_percent_t *per, int refresh) {
+void STlib_updatePercent(st_percent_t *per, bool refresh) {
     if (refresh && *per->n.on)
         V_DrawPatch(per->n.x, per->n.y, per->p);
 
@@ -154,7 +154,7 @@ void STlib_initMultIcon
  int y,
  patch_t **il,
  int *inum,
- boolean *on) {
+ bool *on) {
     i->x = x;
     i->y = y;
     i->oldinum = -1;
@@ -164,7 +164,7 @@ void STlib_initMultIcon
 }
 
 
-void STlib_updateMultIcon(st_multicon_t *mi, boolean refresh) {
+void STlib_updateMultIcon(st_multicon_t *mi, bool refresh) {
     if (*mi->on && (mi->oldinum != *mi->inum || refresh) && (*mi->inum != -1)) {
         if (mi->oldinum != -1) {
             int x = mi->x - SHORT(mi->p[mi->oldinum]->leftoffset);
@@ -188,8 +188,8 @@ void STlib_initBinIcon
  int x,
  int y,
  patch_t *i,
- boolean *val,
- boolean *on) {
+ bool *val,
+ bool *on) {
     b->x = x;
     b->y = y;
     b->oldval = false;
@@ -199,7 +199,7 @@ void STlib_initBinIcon
 }
 
 
-void STlib_updateBinIcon(st_binicon_t *bi, boolean refresh) {
+void STlib_updateBinIcon(st_binicon_t *bi, bool refresh) {
     if (*bi->on && (bi->oldval != *bi->val || refresh)) {
         int x = bi->x - SHORT(bi->p->leftoffset);
         int y = bi->y - SHORT(bi->p->topoffset);

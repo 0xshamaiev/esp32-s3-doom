@@ -16,6 +16,7 @@
 //      Timer functions.
 //
 
+#include <stdint.h>
 #include "i_timer.h"
 #include "doomtype.h"
 

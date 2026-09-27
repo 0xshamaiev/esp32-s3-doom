@@ -20,6 +20,8 @@
 #ifndef V_PATCH_H
 #define V_PATCH_H
 
+#include <stdint.h>
+
 // Patches.
 // A patch holds one or more columns.
 // Patches are used for sprites and all masked pictures,
@@ -27,11 +29,11 @@
 // of patches.
 
 typedef struct {
-    short width; // bounding box size
-    short height;
-    short leftoffset; // pixels to the left of origin
-    short topoffset; // pixels below the origin
-    int columnofs[8]; // only [width] used
+    int16_t width; // bounding box size
+    int16_t height;
+    int16_t leftoffset; // pixels to the left of origin
+    int16_t topoffset; // pixels below the origin
+    int32_t columnofs[8]; // only [width] used
     // the [0] is &columnofs[width]
 }
 
@@ -39,13 +41,13 @@ PACKEDATTR patch_t;
 
 // posts are runs of non masked source pixels
 typedef struct {
-    byte topdelta; // -1 is the last post in a column
-    byte length; // length data bytes follows
+    uint8_t topdelta; // -1 is the last post in a column
+    uint8_t length; // length data bytes follows
 }
 
 PACKEDATTR post_t;
 
-// column_t is a list of 0 or more post_t, (byte)-1 terminated
+// column_t is a list of 0 or more post_t, (uint8_t)-1 terminated
 typedef post_t column_t;
 
 #endif

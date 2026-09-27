@@ -26,7 +26,7 @@ void TryRunTics(void);
 
 void D_StartGameLoop(void);
 
-extern boolean singletics;
+extern bool singletics;
 extern int gametic;
 
 #endif

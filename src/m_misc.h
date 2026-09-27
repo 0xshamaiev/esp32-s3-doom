@@ -20,23 +20,24 @@
 #ifndef __M_MISC__
 #define __M_MISC__
 
+#include <stdint.h>
 #include <stdio.h>
 
 #include <stdarg.h>
 
 #include "doomtype.h"
 
-boolean M_WriteFile(char *name, void *source, int length);
+bool M_WriteFile(char *name, void *source, int length);
 
-int M_ReadFile(char *name, byte **buffer);
+int M_ReadFile(char *name, uint8_t **buffer);
 
 void M_MakeDirectory(char *dir);
 
-boolean M_FileExists(char *file);
+bool M_FileExists(char *file);
 
-long M_FileLength(FILE * handle);
+int32_t M_FileLength(FILE * handle);
 
-boolean M_StrToInt(const char *str, int *result);
+bool M_StrToInt(const char *str, int *result);
 
 void M_ExtractFileBase(char *path, char *dest);
 
@@ -46,22 +47,24 @@ char *M_StrCaseStr(char *haystack, char *needle);
 
 char *M_StringDuplicate(const char *orig);
 
-boolean M_StringCopy(char *dest, const char *src, size_t dest_size);
+bool M_StringCopy(char *dest, const char *src, size_t dest_size);
 
-boolean M_StringConcat(char *dest, const char *src, size_t dest_size);
+bool M_StringConcat(char *dest, const char *src, size_t dest_size);
 
 char *M_StringReplace(const char *haystack, const char *needle,
                       const char *replacement);
 
 char *M_StringJoin(const char *s, ...);
 
-boolean M_StringStartsWith(const char *s, const char *prefix);
+bool M_StringStartsWith(const char *s, const char *prefix);
 
-boolean M_StringEndsWith(const char *s, const char *suffix);
+bool M_StringEndsWith(const char *s, const char *suffix);
 
-int M_vsnprintf(char *buf, size_t buf_len, const char *s, va_list args);
+int M_vsnprintf(char *buf, size_t buf_len, const char *s, va_list args)
+    __attribute__((format(printf, 3, 0)));
 
-int M_snprintf(char *buf, size_t buf_len, const char *s, ...);
+int M_snprintf(char *buf, size_t buf_len, const char *s, ...)
+    __attribute__((format(printf, 3, 4)));
 
 char *M_TempFile(char *name);
 

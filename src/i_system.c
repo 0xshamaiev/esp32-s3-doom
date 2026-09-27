@@ -16,6 +16,7 @@
 //
 
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -42,7 +43,7 @@
 #include "z_zone.h"
 
 
-#define DEFAULT_RAM 6 /* MiB */
+#define DEFAULT_RAM 8 /* MiB */
 #define MIN_RAM     6  /* MiB */
 
 
@@ -50,13 +51,13 @@ typedef struct atexit_listentry_s atexit_listentry_t;
 
 struct atexit_listentry_s {
     atexit_func_t func;
-    boolean run_on_error;
+    bool run_on_error;
     atexit_listentry_t *next;
 };
 
 static atexit_listentry_t *exit_funcs = NULL;
 
-void I_AtExit(atexit_func_t func, boolean run_on_error) {
+void I_AtExit(atexit_func_t func, bool run_on_error) {
     atexit_listentry_t *entry = malloc(sizeof(*entry));
 
     entry->func = func;
@@ -74,13 +75,13 @@ void I_Tactile(int on, int off, int total) {
 // by trying progressively smaller zone sizes until one is found that
 // works.
 
-static byte *AutoAllocMemory(int *size, int default_ram, int min_ram) {
+static uint8_t *AutoAllocMemory(int *size, int default_ram, int min_ram) {
     // Allocate the zone memory.  This loop tries progressively smaller
     // zone sizes until a size is found that can be allocated.
     // If we used the -mb command line parameter, only the parameter
     // provided is accepted.
 
-    byte *zonemem = NULL;
+    uint8_t *zonemem = NULL;
 
     while (zonemem == NULL) {
         // We need a reasonable minimum amount of RAM to start.
@@ -106,7 +107,7 @@ static byte *AutoAllocMemory(int *size, int default_ram, int min_ram) {
     return zonemem;
 }
 
-byte *I_ZoneBase(int *size) {
+uint8_t *I_ZoneBase(int *size) {
     int min_ram;
     int default_ram;
 
@@ -126,7 +127,7 @@ byte *I_ZoneBase(int *size) {
         min_ram = MIN_RAM;
     }
 
-    byte *zonemem = AutoAllocMemory(size, default_ram, min_ram);
+    uint8_t *zonemem = AutoAllocMemory(size, default_ram, min_ram);
 
     printf("zone memory: %p, %x allocated for zone\n",
            zonemem, *size);
@@ -171,7 +172,7 @@ void I_PrintStartupBanner(char *gamedescription) {
 // Returns true if stdout is a real console, false if it is a file
 //
 
-boolean I_ConsoleStdout(void) {
+bool I_ConsoleStdout(void) {
     return 0;
 }
 
@@ -214,7 +215,7 @@ void I_Quit(void) {
 // I_Error
 //
 
-static boolean already_quitting = false;
+static bool already_quitting = false;
 
 void I_Error(char *error, ...) {
     va_list argptr;
@@ -270,21 +271,21 @@ void I_Error(char *error, ...) {
 
 #define DOS_MEM_DUMP_SIZE 10
 
-static const unsigned char mem_dump_dos622[DOS_MEM_DUMP_SIZE] = {
+static const uint8_t mem_dump_dos622[DOS_MEM_DUMP_SIZE] = {
     0x57, 0x92, 0x19, 0x00, 0xF4, 0x06, 0x70, 0x00, 0x16, 0x00
 };
-static const unsigned char mem_dump_win98[DOS_MEM_DUMP_SIZE] = {
+static const uint8_t mem_dump_win98[DOS_MEM_DUMP_SIZE] = {
     0x9E, 0x0F, 0xC9, 0x00, 0x65, 0x04, 0x70, 0x00, 0x16, 0x00
 };
-static const unsigned char mem_dump_dosbox[DOS_MEM_DUMP_SIZE] = {
+static const uint8_t mem_dump_dosbox[DOS_MEM_DUMP_SIZE] = {
     0x00, 0x00, 0x00, 0xF1, 0x00, 0x00, 0x00, 0x00, 0x07, 0x00
 };
-static unsigned char mem_dump_custom[DOS_MEM_DUMP_SIZE];
+static uint8_t mem_dump_custom[DOS_MEM_DUMP_SIZE];
 
-static const unsigned char *dos_mem_dump = mem_dump_dos622;
+static const uint8_t *dos_mem_dump = mem_dump_dos622;
 
-boolean I_GetMemoryValue(unsigned int offset, void *value, int size) {
-    static boolean firsttime = true;
+bool I_GetMemoryValue(uint32_t offset, void *value, int size) {
+    static bool firsttime = true;
 
     if (firsttime) {
         int val;
@@ -320,7 +321,7 @@ boolean I_GetMemoryValue(unsigned int offset, void *value, int size) {
                     }
 
                     M_StrToInt(myargv[p], &val);
-                    mem_dump_custom[i++] = (unsigned char) val;
+                    mem_dump_custom[i++] = (uint8_t) val;
                 }
 
                 dos_mem_dump = mem_dump_custom;
@@ -330,14 +331,14 @@ boolean I_GetMemoryValue(unsigned int offset, void *value, int size) {
 
     switch (size) {
         case 1:
-            *(unsigned char *)value = dos_mem_dump[offset];
+            *(uint8_t *)value = dos_mem_dump[offset];
             return true;
         case 2:
-            *(unsigned short *)value = dos_mem_dump[offset]
+            *(uint16_t *)value = dos_mem_dump[offset]
                                           | (dos_mem_dump[offset + 1] << 8);
             return true;
         case 4:
-            *(unsigned int *)value = dos_mem_dump[offset]
+            *(uint32_t *)value = dos_mem_dump[offset]
                                         | (dos_mem_dump[offset + 1] << 8)
                                         | (dos_mem_dump[offset + 2] << 16)
                                         | (dos_mem_dump[offset + 3] << 24);

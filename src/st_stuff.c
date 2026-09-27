@@ -19,6 +19,8 @@
 //
 
 
+#include <stdint.h>
+#include <inttypes.h>
 #include <stdio.h>
 
 #include "i_system.h"
@@ -259,19 +261,19 @@
 #define ST_MAPHEIGHT		1
 
 // graphics are drawn to a backing screen and blitted to the real screen
-byte *st_backing_screen;
+uint8_t *st_backing_screen;
 
 // main player in game
 static player_t *plyr;
 
 // ST_Start() has just been called
-static boolean st_firsttime;
+static bool st_firsttime;
 
 // lump number for PLAYPAL
 static int lu_palette;
 
 // used for timing
-static unsigned int st_clock;
+static uint32_t st_clock;
 
 // used for making messages go away
 
@@ -280,12 +282,12 @@ static unsigned int st_clock;
 static st_stateenum_t st_gamestate;
 
 // whether left-side main status bar is active
-static boolean st_statusbaron;
+static bool st_statusbaron;
 
 
-static boolean st_armbackground;
+static bool st_armbackground;
 
-static boolean st_armson;
+static bool st_armson;
 
 
 // main bar left
@@ -328,6 +330,8 @@ static st_binicon_t w_armsbg;
 
 // weapon ownership widgets
 static st_multicon_t w_arms[6];
+// The icon widget reads an integer index; weapon ownership uses native bool.
+static int weaponicons[6];
 
 // face status widget
 static st_multicon_t w_faces;
@@ -349,7 +353,7 @@ static st_number_t w_maxammo[4];
 static int st_oldhealth = -1;
 
 // used for evil grin
-static boolean oldweaponsowned[NUMWEAPONS];
+static bool oldweaponsowned[NUMWEAPONS];
 
 // count until face changes
 static int st_facecount = 0;
@@ -407,7 +411,7 @@ void ST_refreshBackground(void) {
 
 // Respond to keyboard input events,
 //  intercept cheats.
-boolean
+bool
 ST_Responder(event_t *ev) {
     // Filter automap on/off.
     if (ev->type == ev_keyup
@@ -539,10 +543,10 @@ ST_Responder(event_t *ev) {
             // 'mypos' for player position
             else if (cht_CheckCheat(&cheat_mypos, ev->data2)) {
                 static char buf[ST_MSGWIDTH];
-                M_snprintf(buf, sizeof(buf), "ang=0x%x;x,y=(0x%x,0x%x)",
+                M_snprintf(buf, sizeof(buf), "ang=0x%" PRIx32 ";x,y=(0x%" PRIx32 ",0x%" PRIx32 ")",
                            players[consoleplayer].mo->angle,
-                           players[consoleplayer].mo->x,
-                           players[consoleplayer].mo->y);
+                           (uint32_t)players[consoleplayer].mo->x,
+                           (uint32_t)players[consoleplayer].mo->y);
                 plyr->message = buf;
             }
         }
@@ -636,7 +640,7 @@ void ST_updateFaceWidget(void) {
     if (priority < 9) {
         if (plyr->bonuscount) {
             // picking up bonus
-            boolean doevilgrin = false;
+            bool doevilgrin = false;
 
             for (i = 0; i < NUMWEAPONS; i++) {
                 if (oldweaponsowned[i] != plyr->weaponowned[i]) {
@@ -834,12 +838,12 @@ void ST_doPaletteStuff(void) {
 
     if (palette != st_palette) {
         st_palette = palette;
-        byte *pal = (byte *)W_CacheLumpNum(lu_palette, PU_CACHE) + palette * 768;
+        uint8_t *pal = (uint8_t *)W_CacheLumpNum(lu_palette, PU_CACHE) + palette * 768;
         I_SetPalette(pal);
     }
 }
 
-void ST_drawWidgets(boolean refresh) {
+void ST_drawWidgets(bool refresh) {
     // used by w_arms[] widgets
     st_armson = st_statusbaron;
 
@@ -855,8 +859,10 @@ void ST_drawWidgets(boolean refresh) {
 
     STlib_updateBinIcon(&w_armsbg, refresh);
 
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < 6; i++) {
+        weaponicons[i] = plyr->weaponowned[i + 1];
         STlib_updateMultIcon(&w_arms[i], refresh);
+    }
 
     STlib_updateMultIcon(&w_faces, refresh);
 
@@ -879,7 +885,7 @@ void ST_diffDraw(void) {
     ST_drawWidgets(false);
 }
 
-void ST_Drawer(boolean fullscreen, boolean refresh) {
+void ST_Drawer(bool fullscreen, bool refresh) {
     st_statusbaron = (!fullscreen) || automapactive;
     st_firsttime = st_firsttime || refresh;
 
@@ -1057,7 +1063,7 @@ void ST_createWidgets(void) {
         STlib_initMultIcon(&w_arms[i],
                            ST_ARMSX + (i % 3) * ST_ARMSXSPACE,
                            ST_ARMSY + (i / 3) * ST_ARMSYSPACE,
-                           arms[i], (int *) &plyr->weaponowned[i + 1],
+                           arms[i], &weaponicons[i],
                            &st_armson);
     }
 
@@ -1166,7 +1172,7 @@ void ST_createWidgets(void) {
                   ST_MAXAMMO3WIDTH);
 }
 
-static boolean st_stopped = true;
+static bool st_stopped = true;
 
 
 void ST_Start(void) {
@@ -1189,6 +1195,6 @@ void ST_Stop(void) {
 
 void ST_Init(void) {
     ST_loadData();
-    st_backing_screen = (byte *) Z_Malloc(ST_WIDTH * ST_HEIGHT, PU_STATIC, 0);
+    st_backing_screen = (uint8_t *) Z_Malloc(ST_WIDTH * ST_HEIGHT, PU_STATIC, 0);
 }
 

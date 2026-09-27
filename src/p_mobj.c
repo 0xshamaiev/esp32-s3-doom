@@ -16,6 +16,7 @@
 //	Moving object handling. Spawn functions.
 //
 
+#include <stdint.h>
 #include <stdio.h>
 
 #include "i_system.h"
@@ -45,7 +46,7 @@ void P_SpawnMapThing(mapthing_t * mthing);
 //
 int test;
 
-boolean P_SetMobjState(mobj_t *mobj, statenum_t state) {
+bool P_SetMobjState(mobj_t *mobj, statenum_t state) {
     do {
         if (state == S_NULL) {
             mobj->state = (state_t *) S_NULL;
@@ -61,8 +62,8 @@ boolean P_SetMobjState(mobj_t *mobj, statenum_t state) {
 
         // Modified handling.
         // Call action functions when the state is set
-        if (st->action.acp1)
-            st->action.acp1(mobj);
+        if (st->action.mobj)
+            st->action.mobj(mobj);
 
         state = st->nextstate;
     } while (!mobj->tics);
@@ -194,7 +195,7 @@ void P_XYMovement(mobj_t *mo) {
             || (player->cmd.forwardmove == 0
                 && player->cmd.sidemove == 0))) {
         // if in a walking frame, stop moving
-        if (player && (unsigned) ((player->mo->state - states) - S_PLAY_RUN1) < 4)
+        if (player && (uint32_t) ((player->mo->state - states) - S_PLAY_RUN1) < 4)
             P_SetMobjState(player->mo, S_PLAY);
 
         mo->momx = 0;

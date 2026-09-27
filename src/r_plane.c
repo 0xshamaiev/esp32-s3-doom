@@ -18,6 +18,7 @@
 //	Moreover, the sky areas have to be determined.
 //
 
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -47,16 +48,16 @@ visplane_t *ceilingplane;
 
 // ?
 #define MAXOPENINGS SCREENWIDTH * 64
-short openings[MAXOPENINGS];
-short *lastopening;
+int16_t openings[MAXOPENINGS];
+int16_t *lastopening;
 
 //
 // Clip values are the solid pixel bounding the range.
 //  floorclip starts out SCREENHEIGHT
 //  ceilingclip starts out -1
 //
-short floorclip[SCREENWIDTH];
-short ceilingclip[SCREENWIDTH];
+int16_t floorclip[SCREENWIDTH];
+int16_t ceilingclip[SCREENWIDTH];
 
 //
 // spanstart holds the start of a plane span
@@ -130,7 +131,7 @@ void R_MapPlane(int y, int x1, int x2) {
     if (fixedcolormap)
         ds_colormap = fixedcolormap;
     else {
-        unsigned int index = distance >> LIGHTZSHIFT;
+        uint32_t index = distance >> LIGHTZSHIFT;
 
         if (index >= MAXLIGHTZ)
             index = MAXLIGHTZ - 1;

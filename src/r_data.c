@@ -17,6 +17,7 @@
 //	generation of lookups, caching, retrieval by name.
 //
 
+#include <stdint.h>
 #include <stdio.h>
 
 #include "deh_main.h"
@@ -56,11 +57,11 @@
 // and possibly other attributes.
 //
 typedef struct {
-    short originx;
-    short originy;
-    short patch;
-    short stepdir;
-    short colormap;
+    int16_t originx;
+    int16_t originy;
+    int16_t patch;
+    int16_t stepdir;
+    int16_t colormap;
 }
 
 PACKEDATTR mappatch_t;
@@ -73,11 +74,11 @@ PACKEDATTR mappatch_t;
 //
 typedef struct {
     char name[8];
-    int masked;
-    short width;
-    short height;
-    int obsolete;
-    short patchcount;
+    int32_t masked;
+    int16_t width;
+    int16_t height;
+    int32_t obsolete;
+    int16_t patchcount;
     mappatch_t patches[1];
 }
 
@@ -91,8 +92,8 @@ typedef struct {
     // Block origin (allways UL),
     // which has allready accounted
     // for the internal origin of the patch.
-    short originx;
-    short originy;
+    int16_t originx;
+    int16_t originy;
     int patch;
 } texpatch_t;
 
@@ -106,8 +107,8 @@ typedef struct texture_s texture_t;
 struct texture_s {
     // Keep name for switch changing, etc.
     char name[8];
-    short width;
-    short height;
+    int16_t width;
+    int16_t height;
 
     // Index in textures list
 
@@ -119,7 +120,7 @@ struct texture_s {
 
     // All the patches[patchcount]
     //  are drawn back to front into the cached texture.
-    short patchcount;
+    int16_t patchcount;
     texpatch_t patches[1];
 };
 
@@ -145,9 +146,9 @@ int *texturewidthmask;
 // needed for texture pegging
 fixed_t *textureheight;
 int *texturecompositesize;
-short **texturecolumnlump;
-unsigned short **texturecolumnofs;
-byte **texturecomposite;
+int16_t **texturecolumnlump;
+uint16_t **texturecolumnofs;
+uint8_t **texturecomposite;
 
 // for global animation
 int *flattranslation;
@@ -182,11 +183,11 @@ lighttable_t *colormaps;
 void
 R_DrawColumnInCache
 (column_t *patch,
- byte *cache,
+ uint8_t *cache,
  int originy,
  int cacheheight) {
     while (patch->topdelta != 0xff) {
-        byte *source = (byte *)patch + 3;
+        uint8_t *source = (uint8_t *)patch + 3;
         int count = patch->length;
         int position = originy + patch->topdelta;
 
@@ -201,7 +202,7 @@ R_DrawColumnInCache
         if (count > 0)
             memcpy(cache + position, source, count);
 
-        patch = (column_t *) ((byte *) patch + patch->length + 4);
+        patch = (column_t *) ((uint8_t *) patch + patch->length + 4);
     }
 }
 
@@ -218,10 +219,10 @@ void R_GenerateComposite(int texnum) {
 
     texture_t *texture = textures[texnum];
 
-    byte *block = Z_Malloc(texturecompositesize[texnum], PU_STATIC, &texturecomposite[texnum]);
+    uint8_t *block = Z_Malloc(texturecompositesize[texnum], PU_STATIC, &texturecomposite[texnum]);
 
-    short *collump = texturecolumnlump[texnum];
-    unsigned short *colofs = texturecolumnofs[texnum];
+    int16_t *collump = texturecolumnlump[texnum];
+    uint16_t *colofs = texturecolumnofs[texnum];
 
     // Composite the columns together.
     texpatch_t *patch = texture->patches;
@@ -247,7 +248,7 @@ void R_GenerateComposite(int texnum) {
                 continue;
 
             column_t *patchcol =
-                (column_t *)((byte *)realpatch + LONG(realpatch->columnofs[x - x1]));
+                (column_t *)((uint8_t *)realpatch + LONG(realpatch->columnofs[x - x1]));
             R_DrawColumnInCache(patchcol,
                                 block + colofs[x],
                                 patch->originy,
@@ -265,7 +266,7 @@ void R_GenerateComposite(int texnum) {
 // R_GenerateLookup
 //
 void R_GenerateLookup(int texnum) {
-    byte *patchcount; // patchcount[texture->width]
+    uint8_t *patchcount; // patchcount[texture->width]
     int x;
     int i;
 
@@ -275,14 +276,14 @@ void R_GenerateLookup(int texnum) {
     texturecomposite[texnum] = 0;
 
     texturecompositesize[texnum] = 0;
-    short *collump = texturecolumnlump[texnum];
-    unsigned short *colofs = texturecolumnofs[texnum];
+    int16_t *collump = texturecolumnlump[texnum];
+    uint16_t *colofs = texturecolumnofs[texnum];
 
     // Now count the number of columns
     //  that are covered by more than one patch.
     // Fill in the lump / offset, so columns
     //  with only a single patch are all done.
-    patchcount = (byte *) Z_Malloc(texture->width, PU_STATIC, &patchcount);
+    patchcount = (uint8_t *) Z_Malloc(texture->width, PU_STATIC, &patchcount);
     memset(patchcount, 0, texture->width);
     texpatch_t *patch = texture->patches;
 
@@ -336,7 +337,7 @@ void R_GenerateLookup(int texnum) {
 //
 // R_GetColumn
 //
-byte *
+uint8_t *
 R_GetColumn
 (int tex,
  int col) {
@@ -345,7 +346,7 @@ R_GetColumn
     int ofs = texturecolumnofs[tex][col];
 
     if (lump > 0)
-        return (byte *) W_CacheLumpNum(lump, PU_CACHE) + ofs;
+        return (uint8_t *) W_CacheLumpNum(lump, PU_CACHE) + ofs;
 
     if (!texturecomposite[tex])
         R_GenerateComposite(tex);
@@ -409,7 +410,7 @@ void R_InitTextures(void) {
     // Load the patch names from pnames.lmp.
     name[8] = 0;
     char *names = W_CacheLumpName(DEH_String("PNAMES"), PU_STATIC);
-    int nummappatches = LONG(*((int *)names));
+    int nummappatches = LONG(*((int32_t *)names));
     char *name_p = names + 4;
     patchlookup = Z_Malloc(nummappatches * sizeof(*patchlookup), PU_STATIC, NULL);
 
@@ -482,7 +483,7 @@ void R_InitTextures(void) {
         if (offset > maxoff)
             I_Error("R_InitTextures: bad texture directory");
 
-        maptexture_t *mtexture = (maptexture_t *)((byte *)maptex + offset);
+        maptexture_t *mtexture = (maptexture_t *)((uint8_t *)maptex + offset);
 
         texture_t *texture = textures[i] =
             Z_Malloc(sizeof(texture_t) + sizeof(texpatch_t) * (SHORT(mtexture->patchcount) - 1),

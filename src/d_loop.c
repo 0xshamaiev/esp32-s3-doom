@@ -16,6 +16,7 @@
 //     Local 35 Hz game loop.
 //
 
+#include <stdint.h>
 #include <string.h>
 
 #include "d_loop.h"
@@ -38,9 +39,9 @@ static int lasttime;
 ticcmd_t *localcmds;
 
 int gametic;
-boolean singletics = false;
+bool singletics = false;
 
-static boolean BuildNewTic(void) {
+static bool BuildNewTic(void) {
     I_StartTic();
     D_ProcessEvents();
     M_Ticker();
@@ -115,7 +116,7 @@ void TryRunTics(void) {
 
 void D_InitSinglePlayer(void) {
     consoleplayer = displayplayer = 0;
-    for (unsigned int i = 0; i < MAXPLAYERS; ++i)
+    for (uint32_t i = 0; i < MAXPLAYERS; ++i)
         playeringame[i] = i == 0;
 
     lowres_turn = M_CheckParm("-record") > 0 && M_CheckParm("-longtics") == 0;

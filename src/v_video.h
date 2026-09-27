@@ -22,7 +22,9 @@
 #ifndef __V_VIDEO__
 #define __V_VIDEO__
 
+#include <stdint.h>
 #include "doomtype.h"
+#include "m_fixed.h"
 
 // Needed because we are refering to patches.
 #include "v_patch.h"
@@ -34,14 +36,14 @@
 #define CENTERY			(SCREENHEIGHT/2)
 
 
-extern int dirtybox[4];
+extern fixed_t dirtybox[4];
 
 // Allocates buffer screens, call before R_Init.
 void V_Init(void);
 
 // Draw a block from the specified source screen to the screen.
 
-void V_CopyRect(int srcx, int srcy, byte *source,
+void V_CopyRect(int srcx, int srcy, uint8_t *source,
                 int width, int height,
                 int destx, int desty);
 
@@ -53,7 +55,7 @@ void V_DrawPatchDirect(int x, int y, patch_t *patch);
 
 // Draw a linear block of pixels into the view buffer.
 
-void V_DrawBlock(int x, int y, int width, int height, byte *src);
+void V_DrawBlock(int x, int y, int width, int height, uint8_t *src);
 
 void V_MarkRect(int x, int y, int width, int height);
 
@@ -67,11 +69,11 @@ void V_DrawBox(int x, int y, int w, int h, int c);
 
 // Draw a raw screen lump
 
-void V_DrawRawScreen(byte * raw);
+void V_DrawRawScreen(uint8_t * raw);
 
 // Temporarily switch to using a different buffer to draw graphics, etc.
 
-void V_UseBuffer(byte * buffer);
+void V_UseBuffer(uint8_t * buffer);
 
 // Return to using the normal screen buffer to draw graphics.
 

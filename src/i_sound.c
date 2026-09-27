@@ -75,7 +75,7 @@ static sound_module_t *sound_modules[] =
 
 // Check if a sound device is in the given list of devices
 
-static boolean SndDeviceInList(snddevice_t device, snddevice_t *list,
+static bool SndDeviceInList(snddevice_t device, snddevice_t *list,
                                int len) {
     for (int i = 0; i < len; ++i) {
         if (device == list[i]) {
@@ -89,7 +89,7 @@ static boolean SndDeviceInList(snddevice_t device, snddevice_t *list,
 // Find and initialize a sound_module_t appropriate for the setting
 // in snd_sfxdevice.
 
-static void InitSfxModule(boolean use_sfx_prefix) {
+static void InitSfxModule(bool use_sfx_prefix) {
     sound_module = NULL;
 
     for (int i = 0; sound_modules[i] != NULL; ++i) {
@@ -123,14 +123,14 @@ static void InitMusicModule(void) {
 //  allocates channel buffer, sets S_sfx lookup.
 //
 
-void I_InitSound(boolean use_sfx_prefix) {
+void I_InitSound(bool use_sfx_prefix) {
     //!
     // @vanilla
     //
     // Disable all sound output.
     //
 
-    boolean nosound = M_CheckParm("-nosound") > 0;
+    bool nosound = M_CheckParm("-nosound") > 0;
 
     //!
     // @vanilla
@@ -138,7 +138,7 @@ void I_InitSound(boolean use_sfx_prefix) {
     // Disable sound effects.
     //
 
-    boolean nosfx = M_CheckParm("-nosfx") > 0;
+    bool nosfx = M_CheckParm("-nosfx") > 0;
 
     //!
     // @vanilla
@@ -146,7 +146,7 @@ void I_InitSound(boolean use_sfx_prefix) {
     // Disable music.
     //
 
-    boolean nomusic = M_CheckParm("-nomusic") > 0;
+    bool nomusic = M_CheckParm("-nomusic") > 0;
 
     // Initialize the sound and music subsystems.
 
@@ -225,7 +225,7 @@ void I_StopSound(int channel) {
     }
 }
 
-boolean I_SoundIsPlaying(int channel) {
+bool I_SoundIsPlaying(int channel) {
     if (sound_module != NULL) {
         return sound_module->SoundIsPlaying(channel);
     }
@@ -280,7 +280,7 @@ void I_UnRegisterSong(void *handle) {
     }
 }
 
-void I_PlaySong(void *handle, boolean looping) {
+void I_PlaySong(void *handle, bool looping) {
     if (music_module != NULL) {
         music_module->PlaySong(handle, looping);
     }
@@ -292,7 +292,7 @@ void I_StopSong(void) {
     }
 }
 
-boolean I_MusicIsPlaying(void) {
+bool I_MusicIsPlaying(void) {
     if (music_module != NULL) {
         return music_module->MusicIsPlaying();
     }

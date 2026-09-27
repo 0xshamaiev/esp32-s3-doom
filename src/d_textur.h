@@ -20,6 +20,7 @@
 #ifndef __D_TEXTUR__
 #define __D_TEXTUR__
 
+#include <stdint.h>
 #include "doomtype.h"
 
 //
@@ -27,9 +28,9 @@
 //
 // a pic is an unmasked block of pixels
 typedef struct {
-    byte width;
-    byte height;
-    byte data;
+    uint8_t width;
+    uint8_t height;
+    uint8_t data;
 } pic_t;
 
 #endif

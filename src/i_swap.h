@@ -19,13 +19,15 @@
 #ifndef __I_SWAP__
 #define __I_SWAP__
 
+#include <stdint.h>
+
 #if __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__
 #error "The ESP32-S3 engine requires a little-endian target"
 #endif
 
 #define SYS_LITTLE_ENDIAN
-#define SHORT(x) ((signed short)(x))
-#define LONG(x) ((signed int)(x))
-#define doom_wtohs(x) ((short int)(x))
+#define SHORT(x) ((int16_t)(x))
+#define LONG(x) ((int32_t)(x))
+#define doom_wtohs(x) ((int16_t)(x))
 
 #endif

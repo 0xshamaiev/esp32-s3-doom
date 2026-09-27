@@ -30,6 +30,7 @@
 //	
 //    
 
+#include <stdint.h>
 #include "tables.h"
 
 // to get a global angle from cartesian coordinates, the coordinates are
@@ -38,11 +39,11 @@
 // which is looked up in the tantoangle[] table.  The +1 size is to handle
 // the case when x==y without additional checking.
 
-int SlopeDiv(unsigned int num, unsigned int den) {
+int SlopeDiv(uint32_t num, uint32_t den) {
     if (den < 512) {
         return SLOPERANGE;
     }
-    const unsigned int ans = (num << 3) / (den >> 8);
+    const uint32_t ans = (num << 3) / (den >> 8);
 
     if (ans <= SLOPERANGE) {
         return ans;
@@ -50,7 +51,7 @@ int SlopeDiv(unsigned int num, unsigned int den) {
     return SLOPERANGE;
 }
 
-const int finetangent[4096] =
+const fixed_t finetangent[4096] =
 {
     -170910304, -56965752, -34178904, -24413316, -18988036, -15535599, -13145455, -11392683,
     -10052327, -8994149, -8137527, -7429880, -6835455, -6329090, -5892567, -5512368,
@@ -567,7 +568,7 @@ const int finetangent[4096] =
 };
 
 
-const int finesine[10240] =
+const fixed_t finesine[10240] =
 {
     25, 75, 125, 175, 226, 276, 326, 376,
     427, 477, 527, 578, 628, 678, 728, 779,
@@ -2115,7 +2116,7 @@ const angle_t tantoangle[2049] =
 };
 
 // Now where did these came from?
-const byte gammatable[5][256] =
+const uint8_t gammatable[5][256] =
 {
     {
         1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,

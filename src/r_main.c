@@ -18,6 +18,7 @@
 //	See tables.c, too.
 //
 
+#include <stdint.h>
 #include <math.h>
 #include <stdlib.h>
 
@@ -317,7 +318,7 @@ void R_InitPointToAngle(void) {
     // UNUSED - now getting from tables.c
 #if 0
     int i;
-    long t;
+    int32_t t;
     float f;
     //
     // slope (tangent) to angle lookup
@@ -498,7 +499,7 @@ void R_InitLightTables(void) {
 //  because it might be in the middle of a refresh.
 // The change will take effect next refresh.
 //
-boolean setsizeneeded;
+bool setsizeneeded;
 int setblocks;
 int setdetail;
 

@@ -6,7 +6,7 @@ find_program(DOOM_CLANG_TIDY NAMES clang-tidy
 if(DOOM_CLANG_TIDY)
     # Clang needs the GCC headers, but does not accept GCC's -mlongcalls.
     # Pass analysis arguments explicitly; the compilation database stays intact.
-    set(_doom_tidy_args --target=xtensa-esp32s3-elf -std=gnu99
+    set(_doom_tidy_args --target=xtensa-esp32s3-elf -std=gnu23
         "-I${CMAKE_CURRENT_SOURCE_DIR}/src")
     foreach(_doom_include IN LISTS CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES)
         list(APPEND _doom_tidy_args -isystem "${_doom_include}")

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.21)
 
 # Standalone engine archive:
 #   cmake --preset esp32s3
@@ -111,10 +111,11 @@ else()
 endif()
 
 set_target_properties(${DOOM_TARGET} PROPERTIES
-    C_STANDARD 99
+    C_STANDARD 23
     C_STANDARD_REQUIRED YES
     C_EXTENSIONS YES
 )
+target_compile_features(${DOOM_TARGET} PUBLIC c_std_23)
 target_compile_options(${DOOM_TARGET} PRIVATE
     -Os -ffunction-sections -fdata-sections -fno-strict-aliasing
     -Wall -Wextra -Wno-unused-parameter -Wno-error

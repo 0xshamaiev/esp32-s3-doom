@@ -17,6 +17,7 @@
 //
 
 
+#include <stdint.h>
 #include "stdlib.h"
 
 #include "doomtype.h"
@@ -27,10 +28,7 @@
 
 // Fixme. __USE_C_FIXED__ or something.
 
-fixed_t
-FixedMul
-(fixed_t a,
- fixed_t b) {
+fixed_t FixedMul(fixed_t a, fixed_t b) {
     return ((int64_t) a * (int64_t) b) >> FRACBITS;
 }
 
@@ -38,12 +36,11 @@ FixedMul
 //
 // FixedDiv, C version.
 //
-
 fixed_t FixedDiv(fixed_t a, fixed_t b) {
-    if ((abs(a) >> 14) >= abs(b)) {
-        return (a ^ b) < 0 ? INT_MIN : INT_MAX;
+    if (abs(a) >> 14 >= abs(b)) {
+        return (a ^ b) < 0 ? INT32_MIN : INT32_MAX;
     }
-    int64_t result = ((int64_t)a << 16) / b;
+    const int64_t result = ((int64_t)a << 16) / b;
 
     return (fixed_t)result;
 }

@@ -19,6 +19,8 @@
 #ifndef __R_THINGS__
 #define __R_THINGS__
 
+#include <stdint.h>
+
 #define MAXVISSPRITES 128
 
 extern vissprite_t vissprites[MAXVISSPRITES];
@@ -27,12 +29,12 @@ extern vissprite_t vsprsortedhead;
 
 // Constant arrays used for psprite clipping
 //  and initializing clipping.
-extern short negonearray[SCREENWIDTH];
-extern short screenheightarray[SCREENWIDTH];
+extern int16_t negonearray[SCREENWIDTH];
+extern int16_t screenheightarray[SCREENWIDTH];
 
 // vars for R_DrawMaskedColumn
-extern short *mfloorclip;
-extern short *mceilingclip;
+extern int16_t *mfloorclip;
+extern int16_t *mceilingclip;
 extern fixed_t spryscale;
 extern fixed_t sprtopscreen;
 

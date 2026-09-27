@@ -47,7 +47,7 @@
 //
 typedef enum { ps_weapon, ps_flash, NUMPSPRITES } psprnum_t;
 
-typedef struct {
+typedef struct pspdef_s {
     state_t *state; // a NULL state means not active
     int tics;
     fixed_t sx;

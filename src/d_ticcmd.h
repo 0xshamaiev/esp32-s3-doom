@@ -20,15 +20,16 @@
 #ifndef __D_TICCMD__
 #define __D_TICCMD__
 
+#include <stdint.h>
 #include "doomtype.h"
 
 // Local movement and button input sampled once per game tick.
 
 typedef struct {
-    signed char forwardmove; // *2048 for move
-    signed char sidemove;    // *2048 for move
-    short angleturn;         // <<16 for angle delta
-    byte buttons;
+    int8_t forwardmove; // *2048 for move
+    int8_t sidemove;    // *2048 for move
+    int16_t angleturn;         // <<16 for angle delta
+    uint8_t buttons;
 } ticcmd_t;
 
 #endif

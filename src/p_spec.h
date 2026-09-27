@@ -22,6 +22,8 @@
 #ifndef __P_SPEC__
 #define __P_SPEC__
 
+#include <stdint.h>
+
 //
 // End-level timer (-TIMER option)
 //
@@ -39,7 +41,7 @@ void P_SpawnSpecials(void);
 void P_UpdateSpecials(void);
 
 // when needed
-boolean P_UseSpecialLine(mobj_t *thing, line_t *line, int side);
+bool P_UseSpecialLine(mobj_t *thing, line_t *line, int side);
 
 void P_ShootSpecialLine(mobj_t *thing, line_t *line);
 
@@ -141,7 +143,7 @@ void P_SpawnGlowingLight(sector_t *sector);
 typedef struct {
     char name1[9];
     char name2[9];
-    short episode;
+    int16_t episode;
 } switchlist_t;
 
 typedef enum { top, middle, bottom } bwhere_e;
@@ -192,7 +194,7 @@ typedef struct {
     int count;
     plat_e status;
     plat_e oldstatus;
-    boolean crush;
+    bool crush;
     int tag;
     plattype_e type;
 } plat_t;
@@ -346,7 +348,7 @@ typedef struct {
     fixed_t bottomheight;
     fixed_t topheight;
     fixed_t speed;
-    boolean crush;
+    bool crush;
 
     // 1 = up, 0 = waiting, -1 = down
     int direction;
@@ -417,11 +419,11 @@ typedef enum {
 typedef struct {
     thinker_t thinker;
     floor_e type;
-    boolean crush;
+    bool crush;
     sector_t *sector;
     int direction;
     int newspecial;
-    short texture;
+    int16_t texture;
     fixed_t floordestheight;
     fixed_t speed;
 } floormove_t;
@@ -430,7 +432,7 @@ typedef struct {
 
 typedef enum { ok, crushed, pastdest } result_e;
 
-result_e T_MovePlane(sector_t *sector, fixed_t speed, fixed_t dest, boolean crush,
+result_e T_MovePlane(sector_t *sector, fixed_t speed, fixed_t dest, bool crush,
                      int floorOrCeiling, int direction);
 
 int EV_BuildStairs(line_t *line, stair_e type);

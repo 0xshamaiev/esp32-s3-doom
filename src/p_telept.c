@@ -17,6 +17,7 @@
 //
 
 
+#include <stdint.h>
 #include "doomdef.h"
 #include "doomstat.h"
 
@@ -82,7 +83,7 @@ int EV_Teleport(line_t *line, int side, mobj_t *thing) {
                 // spawn teleport fog at source and destination
                 mobj_t *fog = P_SpawnMobj(oldx, oldy, oldz, MT_TFOG);
                 S_StartSound(fog, sfx_telept);
-                unsigned int an = m->angle >> ANGLETOFINESHIFT;
+                uint32_t an = m->angle >> ANGLETOFINESHIFT;
                 fog = P_SpawnMobj(m->x + 20 * finecosine[an], m->y + 20 * finesine[an]
                                   , thing->z, MT_TFOG);
 

@@ -55,16 +55,16 @@ static player_t *plr;
 patch_t *hu_font[HU_FONTSIZE];
 static hu_textline_t w_title;
 
-static boolean message_on;
-boolean message_dontfuckwithme;
-static boolean message_nottobefuckedwith;
+static bool message_on;
+bool message_dontfuckwithme;
+static bool message_nottobefuckedwith;
 
 static hu_stext_t w_message;
 static int message_counter;
 
 extern int showMessages;
 
-static boolean headsupactive = false;
+static bool headsupactive = false;
 
 //
 // Builtin map names.
@@ -181,7 +181,7 @@ void HU_Ticker(void) {
     } // else message_on = false;
 }
 
-boolean HU_Responder(event_t *ev) {
+bool HU_Responder(event_t *ev) {
     if (ev->type == ev_keydown && ev->data1 == key_message_refresh) {
         message_on = true;
         message_counter = HU_MSGTIMEOUT;

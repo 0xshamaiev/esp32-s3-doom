@@ -18,6 +18,8 @@
 //
 
 
+#include <stdint.h>
+#include <inttypes.h>
 #include <math.h>
 
 #include "z_zone.h"
@@ -80,9 +82,9 @@ static int totallines;
 // Blockmap size.
 int bmapwidth;
 int bmapheight; // size in mapblocks
-short *blockmap; // int for larger maps
+int16_t *blockmap; // int for larger maps
 // offsets in blockmap are from here
-short *blockmaplump;
+int16_t *blockmaplump;
 // origin of block map
 fixed_t bmaporgx;
 fixed_t bmaporgy;
@@ -97,7 +99,7 @@ mobj_t **blocklinks;
 // Without special effect, this could be
 //  used as a PVS lookup as well.
 //
-byte *rejectmatrix;
+uint8_t *rejectmatrix;
 
 
 // Maintain single and multi player starting spots.
@@ -117,7 +119,7 @@ void P_LoadVertexes(int lump) {
     vertexes = Z_Malloc(numvertexes * sizeof(vertex_t), PU_LEVEL, 0);
 
     // Load data into cache.
-    byte *data = W_CacheLumpNum(lump, PU_STATIC);
+    uint8_t *data = W_CacheLumpNum(lump, PU_STATIC);
 
     mapvertex_t *ml = (mapvertex_t *)data;
     vertex_t *li = vertexes;
@@ -137,7 +139,7 @@ void P_LoadVertexes(int lump) {
 // GetSectorAtNullAddress
 //
 sector_t *GetSectorAtNullAddress(void) {
-    static boolean null_sector_is_initialized = false;
+    static bool null_sector_is_initialized = false;
     static sector_t null_sector;
 
     if (!null_sector_is_initialized) {
@@ -157,7 +159,7 @@ void P_LoadSegs(int lump) {
     numsegs = W_LumpLength(lump) / sizeof(mapseg_t);
     segs = Z_Malloc(numsegs * sizeof(seg_t), PU_LEVEL, 0);
     memset(segs, 0, numsegs * sizeof(seg_t));
-    byte *data = W_CacheLumpNum(lump, PU_STATIC);
+    uint8_t *data = W_CacheLumpNum(lump, PU_STATIC);
 
     mapseg_t *ml = (mapseg_t *)data;
     seg_t *li = segs;
@@ -203,7 +205,7 @@ void P_LoadSegs(int lump) {
 void P_LoadSubsectors(int lump) {
     numsubsectors = W_LumpLength(lump) / sizeof(mapsubsector_t);
     subsectors = Z_Malloc(numsubsectors * sizeof(subsector_t), PU_LEVEL, 0);
-    byte *data = W_CacheLumpNum(lump, PU_STATIC);
+    uint8_t *data = W_CacheLumpNum(lump, PU_STATIC);
 
     mapsubsector_t *ms = (mapsubsector_t *)data;
     memset(subsectors, 0, numsubsectors * sizeof(subsector_t));
@@ -225,7 +227,7 @@ void P_LoadSectors(int lump) {
     numsectors = W_LumpLength(lump) / sizeof(mapsector_t);
     sectors = Z_Malloc(numsectors * sizeof(sector_t), PU_LEVEL, 0);
     memset(sectors, 0, numsectors * sizeof(sector_t));
-    byte *data = W_CacheLumpNum(lump, PU_STATIC);
+    uint8_t *data = W_CacheLumpNum(lump, PU_STATIC);
 
     mapsector_t *ms = (mapsector_t *)data;
     sector_t *ss = sectors;
@@ -250,7 +252,7 @@ void P_LoadSectors(int lump) {
 void P_LoadNodes(int lump) {
     numnodes = W_LumpLength(lump) / sizeof(mapnode_t);
     nodes = Z_Malloc(numnodes * sizeof(node_t), PU_LEVEL, 0);
-    byte *data = W_CacheLumpNum(lump, PU_STATIC);
+    uint8_t *data = W_CacheLumpNum(lump, PU_STATIC);
 
     mapnode_t *mn = (mapnode_t *)data;
     node_t *no = nodes;
@@ -277,12 +279,12 @@ void P_LoadNodes(int lump) {
 void P_LoadThings(int lump) {
     mapthing_t spawnthing;
 
-    byte *data = W_CacheLumpNum(lump, PU_STATIC);
+    uint8_t *data = W_CacheLumpNum(lump, PU_STATIC);
     int numthings = W_LumpLength(lump) / sizeof(mapthing_t);
 
     mapthing_t *mt = (mapthing_t *)data;
     for (int i = 0; i < numthings; i++, mt++) {
-        boolean spawn = true;
+        bool spawn = true;
 
         // Do not spawn cool, new monsters if !commercial
         if (gamemode != commercial) {
@@ -326,7 +328,7 @@ void P_LoadLineDefs(int lump) {
     numlines = W_LumpLength(lump) / sizeof(maplinedef_t);
     lines = Z_Malloc(numlines * sizeof(line_t), PU_LEVEL, 0);
     memset(lines, 0, numlines * sizeof(line_t));
-    byte *data = W_CacheLumpNum(lump, PU_STATIC);
+    uint8_t *data = W_CacheLumpNum(lump, PU_STATIC);
 
     maplinedef_t *mld = (maplinedef_t *)data;
     line_t *ld = lines;
@@ -391,7 +393,7 @@ void P_LoadSideDefs(int lump) {
     numsides = W_LumpLength(lump) / sizeof(mapsidedef_t);
     sides = Z_Malloc(numsides * sizeof(side_t), PU_LEVEL, 0);
     memset(sides, 0, numsides * sizeof(side_t));
-    byte *data = W_CacheLumpNum(lump, PU_STATIC);
+    uint8_t *data = W_CacheLumpNum(lump, PU_STATIC);
 
     mapsidedef_t *msd = (mapsidedef_t *)data;
     side_t *sd = sides;
@@ -543,12 +545,12 @@ void P_GroupLines(void) {
 // Pad the REJECT lump with extra data when the lump is too small,
 // to simulate a REJECT buffer overflow in Vanilla Doom.
 
-static void PadRejectArray(byte *array, unsigned int len) {
-    unsigned int padvalue;
+static void PadRejectArray(uint8_t *array, uint32_t len) {
+    uint32_t padvalue;
 
     // Values to pad the REJECT array with:
 
-    unsigned int rejectpad[4] =
+    uint32_t rejectpad[4] =
     {
         ((totallines * 4 + 3) & ~3) + 24, // Size
         0, // Part of z_zone block header
@@ -558,10 +560,10 @@ static void PadRejectArray(byte *array, unsigned int len) {
 
     // Copy values from rejectpad into the destination array.
 
-    byte *dest = array;
+    uint8_t *dest = array;
 
-    for (unsigned int i = 0; i < len && i < sizeof(rejectpad); ++i) {
-        unsigned int byte_num = i % 4;
+    for (uint32_t i = 0; i < len && i < sizeof(rejectpad); ++i) {
+        uint32_t byte_num = i % 4;
         *dest = (rejectpad[i / 4] >> (byte_num * 8)) & 0xff;
         ++dest;
     }
@@ -570,8 +572,8 @@ static void PadRejectArray(byte *array, unsigned int len) {
     // REJECT lump is too small.
 
     if (len > sizeof(rejectpad)) {
-        fprintf(stderr, "PadRejectArray: REJECT lump too short to pad! (%i > %i)\n",
-                len, (int) sizeof(rejectpad));
+        fprintf(stderr, "PadRejectArray: REJECT lump too short to pad! (%" PRIu32 " > %zu)\n",
+                len, sizeof(rejectpad));
 
         // Pad remaining space with 0 (or 0xff, if specified on command line).
 

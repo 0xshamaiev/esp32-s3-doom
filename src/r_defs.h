@@ -20,6 +20,7 @@
 #define __R_DEFS__
 
 // Screenwidth.
+#include <stdint.h>
 #include "doomdef.h"
 
 // Some more or less basic data types
@@ -83,11 +84,11 @@ typedef struct {
 typedef struct {
     fixed_t floorheight;
     fixed_t ceilingheight;
-    short floorpic;
-    short ceilingpic;
-    short lightlevel;
-    short special;
-    short tag;
+    int16_t floorpic;
+    int16_t ceilingpic;
+    int16_t lightlevel;
+    int16_t special;
+    int16_t tag;
 
     // 0 = untraversed, 1,2 = sndlines -1
     int soundtraversed;
@@ -127,9 +128,9 @@ typedef struct {
 
     // Texture indices.
     // We do not maintain names here.
-    short toptexture;
-    short bottomtexture;
-    short midtexture;
+    int16_t toptexture;
+    int16_t bottomtexture;
+    int16_t midtexture;
 
     // Sector the SideDef is facing.
     sector_t *sector;
@@ -150,13 +151,13 @@ typedef struct line_s {
     fixed_t dy;
 
     // Animation related.
-    short flags;
-    short special;
-    short tag;
+    int16_t flags;
+    int16_t special;
+    int16_t tag;
 
     // Visual appearance: SideDefs.
     //  sidenum[1] will be -1 if one sided
-    short sidenum[2];
+    int16_t sidenum[2];
 
     // Neat. Another bounding box, for the extent
     //  of the LineDef.
@@ -186,8 +187,8 @@ typedef struct line_s {
 //
 typedef struct subsector_s {
     sector_t *sector;
-    short numlines;
-    short firstline;
+    int16_t numlines;
+    int16_t firstline;
 } subsector_t;
 
 //
@@ -225,7 +226,7 @@ typedef struct {
     fixed_t bbox[2][4];
 
     // If NF_SUBSECTOR its a subsector.
-    unsigned short children[2];
+    uint16_t children[2];
 } node_t;
 
 // PC direct to screen pointers
@@ -242,7 +243,7 @@ typedef struct {
 //  precalculating 24bpp lightmap/colormap LUT.
 //  from darkening PLAYPAL to all black.
 // Could even us emore than 32 levels.
-typedef byte lighttable_t;
+typedef uint8_t lighttable_t;
 
 //
 // ?
@@ -267,9 +268,9 @@ typedef struct drawseg_s {
 
     // Pointers to lists for sprite clipping,
     //  all three adjusted so [x1] is first value.
-    short *sprtopclip;
-    short *sprbottomclip;
-    short *maskedtexturecol;
+    int16_t *sprtopclip;
+    int16_t *sprbottomclip;
+    int16_t *maskedtexturecol;
 } drawseg_t;
 
 // A vissprite_t is a thing
@@ -324,17 +325,24 @@ typedef struct vissprite_s {
 // Some sprites will only have one picture used
 // for all views: NNNNF0
 //
+// Sprite loading needs an explicit third state before a frame is populated.
+typedef enum {
+    SPRITE_ROTATION_UNSET = -1,
+    SPRITE_ROTATION_NONE = 0,
+    SPRITE_ROTATION_EIGHT = 1,
+} sprite_rotation_t;
+
 typedef struct {
-    // If false use 0 for any position.
+    // With no rotation, use 0 for any position.
     // Note: as eight entries are available,
     //  we might as well insert the same name eight times.
-    boolean rotate;
+    sprite_rotation_t rotate;
 
     // Lump to use for view angles 0-7.
-    short lump[8];
+    int16_t lump[8];
 
     // Flip bit (1 = flip) to use for view angles 0-7.
-    byte flip[8];
+    uint8_t flip[8];
 } spriteframe_t;
 
 //
@@ -358,15 +366,15 @@ typedef struct {
 
     // leave pads for [minx-1]/[maxx+1]
 
-    byte pad1;
+    uint8_t pad1;
     // Here lies the rub for all
     //  dynamic resize/change of resolution.
-    byte top[SCREENWIDTH];
-    byte pad2;
-    byte pad3;
+    uint8_t top[SCREENWIDTH];
+    uint8_t pad2;
+    uint8_t pad3;
     // See above.
-    byte bottom[SCREENWIDTH];
-    byte pad4;
+    uint8_t bottom[SCREENWIDTH];
+    uint8_t pad4;
 } visplane_t;
 
 #endif

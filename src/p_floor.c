@@ -37,15 +37,14 @@
 //
 // Move a plane (floor or ceiling) and check for crushing
 //
-result_e
-T_MovePlane
+result_e T_MovePlane
 (sector_t *sector,
  fixed_t speed,
  fixed_t dest,
- boolean crush,
+ bool crush,
  int floorOrCeiling,
  int direction) {
-    boolean flag;
+    bool flag;
     fixed_t lastpos;
 
     switch (floorOrCeiling) {
@@ -53,6 +52,7 @@ T_MovePlane
             // FLOOR
             switch (direction) {
                 case -1:
+                {
                     // DOWN
                     if (sector->floorheight - speed < dest) {
                         lastpos = sector->floorheight;
@@ -64,19 +64,21 @@ T_MovePlane
                             //return crushed;
                         }
                         return pastdest;
-                    } else {
-                        lastpos = sector->floorheight;
-                        sector->floorheight -= speed;
-                        flag = P_ChangeSector(sector, crush);
-                        if (flag == true) {
-                            sector->floorheight = lastpos;
-                            P_ChangeSector(sector, crush);
-                            return crushed;
-                        }
                     }
-                    break;
+
+                    lastpos = sector->floorheight;
+                    sector->floorheight -= speed;
+                    flag = P_ChangeSector(sector, crush);
+                    if (flag == true) {
+                        sector->floorheight = lastpos;
+                        P_ChangeSector(sector, crush);
+                        return crushed;
+                    }
+                }
+                break;
 
                 case 1:
+                {
                     // UP
                     if (sector->floorheight + speed > dest) {
                         lastpos = sector->floorheight;
@@ -88,20 +90,20 @@ T_MovePlane
                             //return crushed;
                         }
                         return pastdest;
-                    } else {
-                        // COULD GET CRUSHED
-                        lastpos = sector->floorheight;
-                        sector->floorheight += speed;
-                        flag = P_ChangeSector(sector, crush);
-                        if (flag == true) {
-                            if (crush == true)
-                                return crushed;
-                            sector->floorheight = lastpos;
-                            P_ChangeSector(sector, crush);
-                            return crushed;
-                        }
                     }
-                    break;
+                    // COULD GET CRUSHED
+                    lastpos = sector->floorheight;
+                    sector->floorheight += speed;
+                    flag = P_ChangeSector(sector, crush);
+                    if (flag == true) {
+                        if (crush == true)
+                            return crushed;
+                        sector->floorheight = lastpos;
+                        P_ChangeSector(sector, crush);
+                        return crushed;
+                    }
+                }
+                break;
             }
             break;
 
@@ -109,6 +111,7 @@ T_MovePlane
             // CEILING
             switch (direction) {
                 case -1:
+                {
                     // DOWN
                     if (sector->ceilingheight - speed < dest) {
                         lastpos = sector->ceilingheight;
@@ -121,23 +124,24 @@ T_MovePlane
                             //return crushed;
                         }
                         return pastdest;
-                    } else {
-                        // COULD GET CRUSHED
-                        lastpos = sector->ceilingheight;
-                        sector->ceilingheight -= speed;
-                        flag = P_ChangeSector(sector, crush);
-
-                        if (flag == true) {
-                            if (crush == true)
-                                return crushed;
-                            sector->ceilingheight = lastpos;
-                            P_ChangeSector(sector, crush);
-                            return crushed;
-                        }
                     }
-                    break;
+                    // COULD GET CRUSHED
+                    lastpos = sector->ceilingheight;
+                    sector->ceilingheight -= speed;
+                    flag = P_ChangeSector(sector, crush);
+
+                    if (flag == true) {
+                        if (crush == true)
+                            return crushed;
+                        sector->ceilingheight = lastpos;
+                        P_ChangeSector(sector, crush);
+                        return crushed;
+                    }
+                }
+                break;
 
                 case 1:
+                {
                     // UP
                     if (sector->ceilingheight + speed > dest) {
                         lastpos = sector->ceilingheight;
@@ -149,20 +153,20 @@ T_MovePlane
                             //return crushed;
                         }
                         return pastdest;
-                    } else {
-                        lastpos = sector->ceilingheight;
-                        sector->ceilingheight += speed;
-                        flag = P_ChangeSector(sector, crush);
-                        // UNUSED
-#if 0
-                        if (flag == true) {
-                            sector->ceilingheight = lastpos;
-                            P_ChangeSector(sector, crush);
-                            return crushed;
-                        }
-#endif
                     }
-                    break;
+                    lastpos = sector->ceilingheight;
+                    sector->ceilingheight += speed;
+                    flag = P_ChangeSector(sector, crush);
+                    // UNUSED
+#if 0
+                    if (flag == true) {
+                        sector->ceilingheight = lastpos;
+                        P_ChangeSector(sector, crush);
+                        return crushed;
+                    }
+#endif
+                }
+                break;
             }
             break;
     }
@@ -209,10 +213,7 @@ void T_MoveFloor(floormove_t *floor) {
 //
 // HANDLE FLOOR TYPES
 //
-int
-EV_DoFloor
-(line_t *line,
- floor_e floortype) {
+int EV_DoFloor(line_t *line, floor_e floortype) {
     floormove_t *floor;
 
     int secnum = -1;
@@ -383,10 +384,7 @@ EV_DoFloor
 //
 // BUILD A STAIRCASE!
 //
-int
-EV_BuildStairs
-(line_t *line,
- stair_e type) {
+int EV_BuildStairs(line_t *line, stair_e type) {
     int ok;
 
     floormove_t *floor;
@@ -425,7 +423,7 @@ EV_BuildStairs
         int height = sec->floorheight + stairsize;
         floor->floordestheight = height;
 
-        int texture = sec->floorpic;
+        const int texture = sec->floorpic;
 
         // Find next sector to raise
         // 1.	Find 2-sided line with same sector side[0]

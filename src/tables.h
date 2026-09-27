@@ -34,6 +34,7 @@
 #ifndef __TABLES__
 #define __TABLES__
 
+#include <stdint.h>
 #include "doomtype.h"
 
 #include "m_fixed.h"
@@ -56,7 +57,7 @@ extern const fixed_t *finecosine;
 extern const fixed_t finetangent[FINEANGLES / 2];
 
 // Gamma correction tables.
-extern const byte gammatable[5][256];
+extern const uint8_t gammatable[5][256];
 
 // Binary Angle Measument, BAM.
 
@@ -73,7 +74,7 @@ extern const byte gammatable[5][256];
 #define SLOPEBITS		11
 #define DBITS			(FRACBITS-SLOPEBITS)
 
-typedef unsigned angle_t;
+typedef uint32_t angle_t;
 
 
 // Effective size is 2049;
@@ -84,7 +85,7 @@ extern const angle_t tantoangle[SLOPERANGE + 1];
 
 // Utility function,
 //  called by R_PointToAngle.
-int SlopeDiv(unsigned int num, unsigned int den);
+int SlopeDiv(uint32_t num, uint32_t den);
 
 
 #endif

@@ -22,6 +22,7 @@
 #ifndef __Z_ZONE__
 #define __Z_ZONE__
 
+#include <stdint.h>
 #include <stdio.h>
 
 //
@@ -66,7 +67,7 @@ void Z_ChangeUser(void *ptr, void **user);
 
 int Z_FreeMemory(void);
 
-unsigned int Z_ZoneSize(void);
+uint32_t Z_ZoneSize(void);
 
 //
 // This is used to get the local FILE:LINE info from CPP

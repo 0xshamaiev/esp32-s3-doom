@@ -19,6 +19,7 @@
 //	Functions to blit a block to the screen.
 //
 
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -45,9 +46,9 @@
 
 // The screen buffer that the v_video.c code draws to.
 
-static byte *dest_screen = NULL;
+static uint8_t *dest_screen = NULL;
 
-int dirtybox[4];
+fixed_t dirtybox[4];
 
 //
 // V_MarkRect
@@ -66,7 +67,7 @@ void V_MarkRect(int x, int y, int width, int height) {
 //
 // V_CopyRect
 //
-void V_CopyRect(int srcx, int srcy, byte *source,
+void V_CopyRect(int srcx, int srcy, uint8_t *source,
                 int width, int height,
                 int destx, int desty) {
 #ifdef RANGECHECK
@@ -84,8 +85,8 @@ void V_CopyRect(int srcx, int srcy, byte *source,
 
     V_MarkRect(destx, desty, width, height);
 
-    byte *src = source + SCREENWIDTH * srcy + srcx;
-    byte *dest = dest_screen + SCREENWIDTH * desty + destx;
+    uint8_t *src = source + SCREENWIDTH * srcy + srcx;
+    uint8_t *dest = dest_screen + SCREENWIDTH * desty + destx;
 
     for (; height > 0; height--) {
         memcpy(dest, src, width);
@@ -116,24 +117,24 @@ void V_DrawPatch(int x, int y, patch_t *patch) {
     V_MarkRect(x, y, SHORT(patch->width), SHORT(patch->height));
 
     int col = 0;
-    byte *desttop = dest_screen + y * SCREENWIDTH + x;
+    uint8_t *desttop = dest_screen + y * SCREENWIDTH + x;
 
     int w = SHORT(patch->width);
 
     for (; col < w; x++, col++, desttop++) {
-        column_t *column = (column_t *)((byte *)patch + LONG(patch->columnofs[col]));
+        column_t *column = (column_t *)((uint8_t *)patch + LONG(patch->columnofs[col]));
 
         // step through the posts in a column
         while (column->topdelta != 0xff) {
-            byte *source = (byte *)column + 3;
-            byte *dest = desttop + column->topdelta * SCREENWIDTH;
+            uint8_t *source = (uint8_t *)column + 3;
+            uint8_t *dest = desttop + column->topdelta * SCREENWIDTH;
             int count = column->length;
 
             while (count--) {
                 *dest = *source++;
                 dest += SCREENWIDTH;
             }
-            column = (column_t *) ((byte *) column + column->length + 4);
+            column = (column_t *) ((uint8_t *) column + column->length + 4);
         }
     }
 }
@@ -160,24 +161,24 @@ void V_DrawPatchFlipped(int x, int y, patch_t *patch) {
     V_MarkRect(x, y, SHORT(patch->width), SHORT(patch->height));
 
     int col = 0;
-    byte *desttop = dest_screen + y * SCREENWIDTH + x;
+    uint8_t *desttop = dest_screen + y * SCREENWIDTH + x;
 
     int w = SHORT(patch->width);
 
     for (; col < w; x++, col++, desttop++) {
-        column_t *column = (column_t *)((byte *)patch + LONG(patch->columnofs[w - 1 - col]));
+        column_t *column = (column_t *)((uint8_t *)patch + LONG(patch->columnofs[w - 1 - col]));
 
         // step through the posts in a column
         while (column->topdelta != 0xff) {
-            byte *source = (byte *)column + 3;
-            byte *dest = desttop + column->topdelta * SCREENWIDTH;
+            uint8_t *source = (uint8_t *)column + 3;
+            uint8_t *dest = desttop + column->topdelta * SCREENWIDTH;
             int count = column->length;
 
             while (count--) {
                 *dest = *source++;
                 dest += SCREENWIDTH;
             }
-            column = (column_t *) ((byte *) column + column->length + 4);
+            column = (column_t *) ((uint8_t *) column + column->length + 4);
         }
     }
 }
@@ -197,7 +198,7 @@ void V_DrawPatchDirect(int x, int y, patch_t *patch) {
 // Draw a linear block of pixels into the view buffer.
 //
 
-void V_DrawBlock(int x, int y, int width, int height, byte *src) {
+void V_DrawBlock(int x, int y, int width, int height, uint8_t *src) {
 #ifdef RANGECHECK
     if (x < 0
         || x + width > SCREENWIDTH
@@ -209,7 +210,7 @@ void V_DrawBlock(int x, int y, int width, int height, byte *src) {
 
     V_MarkRect(x, y, width, height);
 
-    byte *dest = dest_screen + y * SCREENWIDTH + x;
+    uint8_t *dest = dest_screen + y * SCREENWIDTH + x;
 
     while (height--) {
         memcpy(dest, src, width);
@@ -261,7 +262,7 @@ void V_DrawBox(int x, int y, int w, int h, int c) {
 // to the screen)
 //
 
-void V_DrawRawScreen(byte *raw) {
+void V_DrawRawScreen(uint8_t *raw) {
     memcpy(dest_screen, raw, SCREENWIDTH * SCREENHEIGHT);
 }
 
@@ -276,7 +277,7 @@ void V_Init(void) {
 
 // Set the buffer that the code draws to.
 
-void V_UseBuffer(byte *buffer) {
+void V_UseBuffer(uint8_t *buffer) {
     dest_screen = buffer;
 }
 
@@ -296,23 +297,23 @@ typedef struct {
     char encoding;
     char bits_per_pixel;
 
-    unsigned short xmin;
-    unsigned short ymin;
-    unsigned short xmax;
-    unsigned short ymax;
+    uint16_t xmin;
+    uint16_t ymin;
+    uint16_t xmax;
+    uint16_t ymax;
 
-    unsigned short hres;
-    unsigned short vres;
+    uint16_t hres;
+    uint16_t vres;
 
-    unsigned char palette[48];
+    uint8_t palette[48];
 
     char reserved;
     char color_planes;
-    unsigned short bytes_per_line;
-    unsigned short palette_type;
+    uint16_t bytes_per_line;
+    uint16_t palette_type;
 
     char filler[58];
-    unsigned char data; // unbounded
+    uint8_t data; // unbounded
 }
 
 PACKEDATTR pcx_t;
@@ -322,9 +323,9 @@ PACKEDATTR pcx_t;
 // WritePCXfile
 //
 
-void WritePCXfile(char *filename, byte *data,
+void WritePCXfile(char *filename, uint8_t *data,
                   int width, int height,
-                  byte *palette) {
+                  uint8_t *palette) {
     pcx_t *pcx = Z_Malloc(width * height * 2 + 1000, PU_STATIC, NULL);
 
     pcx->manufacturer = 0x0a; // PCX id
@@ -344,7 +345,7 @@ void WritePCXfile(char *filename, byte *data,
     memset(pcx->filler, 0, sizeof(pcx->filler));
 
     // pack the image
-    byte *pack = &pcx->data;
+    uint8_t *pack = &pcx->data;
 
     for (int i = 0; i < width * height; i++) {
         if ((*data & 0xc0) != 0xc0)
@@ -361,7 +362,7 @@ void WritePCXfile(char *filename, byte *data,
         *pack++ = *palette++;
 
     // write output file
-    int length = pack - (byte *)pcx;
+    int length = pack - (uint8_t *)pcx;
     M_WriteFile(filename, pcx, length);
 
     Z_Free(pcx);
@@ -380,9 +381,9 @@ static void warning_fn(png_structp p, png_const_charp s) {
     printf("libpng warning: %s\n", s);
 }
 
-void WritePNGfile(char *filename, byte *data,
+void WritePNGfile(char *filename, uint8_t *data,
                   int width, int height,
-                  byte *palette) {
+                  uint8_t *palette) {
     png_structp ppng;
     png_infop pinfo;
     png_colorp pcolor;

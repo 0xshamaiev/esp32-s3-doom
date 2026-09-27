@@ -16,12 +16,12 @@
 // DESCRIPTION:  the automap code
 //
 
+#include <stdint.h>
 #include <stdio.h>
 
 #include "deh_main.h"
 
 #include "doomdef.h"
-#include "doomkeys.h"
 #include "p_local.h"
 #include "st_stuff.h"
 #include "w_wad.h"
@@ -177,9 +177,7 @@ mline_t thintriangle_guy[] = {
 static int cheating = 0;
 static int grid = 0;
 
-static int leveljuststarted = 1; // kluge until AM_LevelInit() is called
-
-boolean automapactive = false;
+bool automapactive = false;
 static int finit_width = SCREENWIDTH;
 static int finit_height = SCREENHEIGHT - 32;
 
@@ -192,7 +190,7 @@ static int f_w;
 static int f_h;
 
 static int lightlev; // used for funky strobing effect
-static byte *fb;     // pseudo-frame buffer
+static uint8_t *fb;     // pseudo-frame buffer
 static int amclock;
 
 static mpoint_t m_paninc;    // how far the window pans each tic (map coords)
@@ -246,7 +244,7 @@ static int followplayer = 1; // specifies whether to follow the player around
 
 cheatseq_t cheat_amap = CHEAT("iddt", 0);
 
-static boolean stopped = true;
+static bool stopped = true;
 
 // Calculates the slope and slope according to the x-axis of a line
 // segment in map coordinates (with the upright y-axis n' all) so
@@ -459,8 +457,6 @@ void AM_clearMarks(void) {
 // right now, i figure it out myself
 //
 void AM_LevelInit(void) {
-    leveljuststarted = 0;
-
     f_x = f_y = 0;
     f_w = finit_width;
     f_h = finit_height;
@@ -526,7 +522,7 @@ void AM_maxOutWindowScale(void) {
 //
 // Handle events (user inputs) in automap mode
 //
-boolean AM_Responder(event_t *ev) {
+bool AM_Responder(event_t *ev) {
     static int bigstate = 0;
     static char buffer[20];
     int key;
@@ -728,7 +724,7 @@ void AM_clearFB(int color) { memset(fb, color, f_w * f_h); }
 // faster reject and precalculated slopes.  If the speed is needed,
 // use a hash algorithm to handle  the common cases.
 //
-boolean AM_clipMline(mline_t *ml, fline_t *fl) {
+bool AM_clipMline(mline_t *ml, fline_t *fl) {
     enum { LEFT = 1, RIGHT = 2, BOTTOM = 4, TOP = 8 };
 
     register int outcode1 = 0;

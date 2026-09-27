@@ -44,10 +44,7 @@ drawseg_t drawsegs[MAXDRAWSEGS];
 drawseg_t *ds_p;
 
 
-void
-R_StoreWallRange
-(int start,
- int stop);
+void R_StoreWallRange(int start, int stop);
 
 
 //
@@ -82,10 +79,7 @@ cliprange_t solidsegs[MAXSEGS];
 //  e.g. single sided LineDefs (middle texture)
 //  that entirely block the view.
 //
-void
-R_ClipSolidWallSegment
-(int first,
- int last) {
+void R_ClipSolidWallSegment(int first, int last) {
     cliprange_t *next;
     cliprange_t *start;
 
@@ -339,7 +333,7 @@ int checkcoord[12][4] =
 };
 
 
-boolean R_CheckBBox(fixed_t *bspcoord) {
+bool R_CheckBBox(fixed_t *bspcoord) {
     int boxx;
     int boxy;
 

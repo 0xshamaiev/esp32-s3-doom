@@ -52,7 +52,7 @@ int M_CheckParmWithArgs(const char *check, const int num_args) {
 // line arguments, false if not.
 //
 
-boolean M_ParmExists(char *check) { return M_CheckParm(check) != 0; }
+bool M_ParmExists(char *check) { return M_CheckParm(check) != 0; }
 
 int M_CheckParm(const char *check) { return M_CheckParmWithArgs(check, 0); }
 

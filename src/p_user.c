@@ -19,6 +19,7 @@
 //
 
 
+#include <stdint.h>
 #include "doomdef.h"
 #include "d_event.h"
 
@@ -38,18 +39,14 @@
 // 16 pixels of bob
 #define MAXBOB	0x100000
 
-boolean onground;
+bool onground;
 
 
 //
 // P_Thrust
 // Moves the given origin along a given angle.
 //
-void
-P_Thrust
-(player_t *player,
- angle_t angle,
- fixed_t move) {
+void P_Thrust(player_t *player, angle_t angle, fixed_t move) {
     angle >>= ANGLETOFINESHIFT;
 
     player->mo->momx += FixedMul(move, finecosine[angle]);
@@ -170,7 +167,7 @@ void P_DeathThink(player_t *player) {
 
         angle_t delta = angle - player->mo->angle;
 
-        if (delta < ANG5 || delta > (unsigned) -ANG5) {
+        if (delta < ANG5 || delta > (uint32_t) -ANG5) {
             // Looking at killer,
             //  so fade damage flash down.
             player->mo->angle = angle;

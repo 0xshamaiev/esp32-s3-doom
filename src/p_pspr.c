@@ -18,6 +18,7 @@
 //
 
 
+#include <stdint.h>
 #include "doomdef.h"
 #include "d_event.h"
 
@@ -67,8 +68,8 @@ void P_SetPsprite(player_t *player, int position, statenum_t stnum) {
 
         // Call action routine.
         // Modified handling.
-        if (state->action.acp2) {
-            state->action.acp2(player, psp);
+        if (state->action.pspr) {
+            state->action.pspr(player, psp);
             if (!psp->state)
                 break;
         }
@@ -126,7 +127,7 @@ void P_BringUpWeapon(player_t *player) {
 // Returns true if there is enough ammo to shoot.
 // If not, selects the next weapon to use.
 //
-boolean P_CheckAmmo(player_t *player) {
+bool P_CheckAmmo(player_t *player) {
     int count;
 
     ammotype_t ammo = weaponinfo[player->readyweapon].ammo;
@@ -417,7 +418,7 @@ A_Saw
     angle = R_PointToAngle2(player->mo->x, player->mo->y,
                             linetarget->x, linetarget->y);
     if (angle - player->mo->angle > ANG180) {
-        if ((signed int) (angle - player->mo->angle) < -ANG90 / 20)
+        if ((int32_t) (angle - player->mo->angle) < -ANG90 / 20)
             player->mo->angle = angle + ANG90 / 21;
         else
             player->mo->angle -= ANG90 / 20;
@@ -517,7 +518,7 @@ void P_BulletSlope(mobj_t *mo) {
 void
 P_GunShot
 (mobj_t *mo,
- boolean accurate) {
+ bool accurate) {
     int damage = 5 * (P_Random() % 3 + 1);
     angle_t angle = mo->angle;
 

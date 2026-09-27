@@ -16,6 +16,7 @@
 //	WAD I/O functions.
 //
 
+#include <stdint.h>
 #include <stdio.h>
 
 #include "m_misc.h"
@@ -28,7 +29,7 @@ wad_file_t *W_OpenFile(char *path) {
     if (stream == NULL)
         return NULL;
 
-    long length = M_FileLength(stream);
+    int32_t length = M_FileLength(stream);
     if (length < 0) {
         fclose(stream);
         return NULL;
@@ -36,7 +37,7 @@ wad_file_t *W_OpenFile(char *path) {
 
     wad_file_t *wad = Z_Malloc(sizeof(*wad), PU_STATIC, NULL);
     wad->stream = stream;
-    wad->length = (unsigned int)length;
+    wad->length = (uint32_t)length;
     return wad;
 }
 
@@ -45,7 +46,7 @@ void W_CloseFile(wad_file_t *wad) {
     Z_Free(wad);
 }
 
-size_t W_Read(wad_file_t *wad, unsigned int offset, void *buffer, size_t buffer_len) {
+size_t W_Read(wad_file_t *wad, uint32_t offset, void *buffer, size_t buffer_len) {
     if (fseek(wad->stream, offset, SEEK_SET) != 0)
         return 0;
     return fread(buffer, 1, buffer_len, wad->stream);

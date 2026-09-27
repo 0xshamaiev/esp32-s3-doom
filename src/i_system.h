@@ -20,6 +20,7 @@
 #ifndef __I_SYSTEM__
 #define __I_SYSTEM__
 
+#include <stdint.h>
 #include "d_ticcmd.h"
 #include "d_event.h"
 
@@ -32,9 +33,9 @@ void I_Init(void);
 // Called by startup code
 // to get the ammount of memory to malloc
 // for the zone management.
-byte *I_ZoneBase(int *size);
+uint8_t *I_ZoneBase(int *size);
 
-boolean I_ConsoleStdout(void);
+bool I_ConsoleStdout(void);
 
 
 // Asynchronous interrupt functions should maintain private queues
@@ -52,17 +53,17 @@ ticcmd_t *I_BaseTiccmd(void);
 // Clean exit, displays sell blurb.
 void I_Quit(void);
 
-void I_Error(char *error, ...);
+void I_Error(char *error, ...) __attribute__((format(printf, 1, 2)));
 
 void I_Tactile(int on, int off, int total);
 
-boolean I_GetMemoryValue(unsigned int offset, void *value, int size);
+bool I_GetMemoryValue(uint32_t offset, void *value, int size);
 
 // Schedule a function to be called when the program exits.
 // If run_if_error is true, the function is called if the exit
 // is due to an error (I_Error)
 
-void I_AtExit(atexit_func_t func, boolean run_if_error);
+void I_AtExit(atexit_func_t func, bool run_if_error);
 
 // Add all system-specific config file variable bindings.
 

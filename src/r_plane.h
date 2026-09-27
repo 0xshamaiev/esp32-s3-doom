@@ -19,18 +19,19 @@
 #ifndef __R_PLANE__
 #define __R_PLANE__
 
+#include <stdint.h>
 #include "r_data.h"
 
 // Visplane related.
-extern short *lastopening;
+extern int16_t *lastopening;
 
 typedef void (*planefunction_t)(int top, int bottom);
 
 extern planefunction_t floorfunc;
 extern planefunction_t ceilingfunc_t;
 
-extern short floorclip[SCREENWIDTH];
-extern short ceilingclip[SCREENWIDTH];
+extern int16_t floorclip[SCREENWIDTH];
+extern int16_t ceilingclip[SCREENWIDTH];
 
 extern fixed_t yslope[SCREENHEIGHT];
 extern fixed_t distscale[SCREENWIDTH];

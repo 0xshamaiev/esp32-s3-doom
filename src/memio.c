@@ -17,6 +17,8 @@
 // memory.
 //
 
+#include <stdint.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -31,10 +33,10 @@ typedef enum {
 } memfile_mode_t;
 
 struct _MEMFILE {
-    unsigned char *buf;
+    uint8_t *buf;
     size_t buflen;
     size_t alloced;
-    unsigned int position;
+    uint32_t position;
     memfile_mode_t mode;
 };
 
@@ -43,7 +45,7 @@ struct _MEMFILE {
 MEMFILE *mem_fopen_read(void *buf, size_t buflen) {
     MEMFILE *file = Z_Malloc(sizeof(MEMFILE), PU_STATIC, 0);
 
-    file->buf = (unsigned char *) buf;
+    file->buf = (uint8_t *) buf;
     file->buflen = buflen;
     file->position = 0;
     file->mode = MODE_READ;
@@ -105,7 +107,7 @@ size_t mem_fwrite(const void *ptr, size_t size, size_t nmemb, MEMFILE *stream) {
     size_t bytes = size * nmemb;
 
     while (bytes > stream->alloced - stream->position) {
-        unsigned char *newbuf = Z_Malloc(stream->alloced * 2, PU_STATIC, 0);
+        uint8_t *newbuf = Z_Malloc(stream->alloced * 2, PU_STATIC, 0);
         memcpy(newbuf, stream->buf, stream->alloced);
         Z_Free(stream->buf);
         stream->buf = newbuf;
@@ -136,12 +138,12 @@ void mem_fclose(MEMFILE *stream) {
     Z_Free(stream);
 }
 
-long mem_ftell(MEMFILE *stream) {
+int32_t mem_ftell(MEMFILE *stream) {
     return stream->position;
 }
 
-int mem_fseek(MEMFILE *stream, signed long position, mem_rel_t whence) {
-    unsigned int newpos;
+int mem_fseek(MEMFILE *stream, int32_t position, mem_rel_t whence) {
+    uint32_t newpos;
 
     switch (whence) {
         case MEM_SEEK_SET:
@@ -164,7 +166,7 @@ int mem_fseek(MEMFILE *stream, signed long position, mem_rel_t whence) {
         return 0;
     }
 
-    printf("Error seeking to %i\n", newpos);
+    printf("Error seeking to %" PRIu32 "\n", newpos);
     return -1;
 }
 

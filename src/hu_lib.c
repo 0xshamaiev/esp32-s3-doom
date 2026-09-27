@@ -16,6 +16,7 @@
 //
 
 
+#include <stdint.h>
 #include <ctype.h>
 
 #include "doomdef.h"
@@ -31,7 +32,7 @@
 // boolean : whether the screen is always erased
 #define noterased viewwindowx
 
-extern boolean automapactive; // in AM_map.c
+extern bool automapactive; // in AM_map.c
 
 void HUlib_init(void) {
 }
@@ -56,7 +57,7 @@ HUlib_initTextLine
     HUlib_clearTextLine(t);
 }
 
-boolean
+bool
 HUlib_addCharToTextLine
 (hu_textline_t *t,
  char ch) {
@@ -70,23 +71,18 @@ HUlib_addCharToTextLine
     }
 }
 
-boolean HUlib_delCharFromTextLine(hu_textline_t *t) {
+bool HUlib_delCharFromTextLine(hu_textline_t *t) {
     if (!t->len) return false;
-    else {
-        t->l[--t->len] = 0;
-        t->needsupdate = 4;
-        return true;
-    }
+    t->l[--t->len] = 0;
+    t->needsupdate = 4;
+    return true;
 }
 
-void
-HUlib_drawTextLine
-(hu_textline_t *l,
- boolean drawcursor) {
+void HUlib_drawTextLine(hu_textline_t *l, bool drawcursor) {
     // draw the new stuff
     int x = l->x;
     for (int i = 0; i < l->len; i++) {
-        unsigned char c = toupper((int)l->l[i]);
+        uint8_t c = toupper((int)l->l[i]);
         if (c != ' '
             && c >= l->sc
             && c <= '_') {
@@ -112,16 +108,15 @@ HUlib_drawTextLine
 
 // sorta called by HU_Erase and just better darn get things straight
 void HUlib_eraseTextLine(hu_textline_t *l) {
-    int y;
-    int yoffset;
-
     // Only erases when NOT in automap and the screen is reduced,
     // and the text must either need updating or refreshing
     // (because of a recent change back from the automap)
 
-    if (!automapactive &&
-        viewwindowx && l->needsupdate) {
+    if (!automapactive && viewwindowx && l->needsupdate) {
+        int yoffset;
+        int y;
         int lh = SHORT(l->f[0]->height) + 1;
+
         for (y = l->y, yoffset = y * SCREENWIDTH; y < l->y + lh; y++, yoffset += SCREENWIDTH) {
             if (y < viewwindowy || y >= viewwindowy + viewheight)
                 R_VideoErase(yoffset, SCREENWIDTH); // erase entire line
@@ -144,7 +139,7 @@ HUlib_initSText
  int h,
  patch_t **font,
  int startchar,
- boolean *on) {
+ bool *on) {
     s->h = h;
     s->on = on;
     s->laston = true;
@@ -166,11 +161,7 @@ void HUlib_addLineToSText(hu_stext_t *s) {
         s->l[i].needsupdate = 4;
 }
 
-void
-HUlib_addMessageToSText
-(hu_stext_t *s,
- char *prefix,
- char *msg) {
+void HUlib_addMessageToSText(hu_stext_t *s, char *prefix, char *msg) {
     HUlib_addLineToSText(s);
     if (prefix)
         while (*prefix)
@@ -213,7 +204,7 @@ HUlib_initIText
  int y,
  patch_t **font,
  int startchar,
- boolean *on) {
+ bool *on) {
     it->lm = 0; // default left margin is start of text
     it->on = on;
     it->laston = true;
@@ -249,10 +240,7 @@ HUlib_addPrefixToIText
 
 // wrapper function for handling general keyed input.
 // returns true if it ate the key
-boolean
-HUlib_keyInIText
-(hu_itext_t *it,
- unsigned char ch) {
+bool HUlib_keyInIText(hu_itext_t *it, uint8_t ch) {
     ch = toupper(ch);
 
     if (ch >= ' ' && ch <= '_')

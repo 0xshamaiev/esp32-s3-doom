@@ -19,6 +19,7 @@
 #ifndef __I_VIDEO__
 #define __I_VIDEO__
 
+#include <stdint.h>
 #include "doomtype.h"
 
 // Screen width and height.
@@ -47,12 +48,12 @@ typedef struct {
     //
     // If NULL, no init function is called.
 
-    void (*InitMode)(byte *palette);
+    void (*InitMode)(uint8_t *palette);
 
     // Function to call to draw the screen from the source buffer.
     // Return true if draw was successful.
 
-    boolean (*DrawScreen)(int x1, int y1, int x2, int y2);
+    bool (*DrawScreen)(int x1, int y1, int x2, int y2);
 
     // If true, this is a "poor quality" mode.  The autoadjust
     // code should always attempt to use a different mode to this
@@ -84,10 +85,10 @@ typedef struct {
     // that even higher resolutions would be needed before it would
     // look acceptable, but it turned out to be okay even at 640x480.
 
-    boolean poor_quality;
+    bool poor_quality;
 } screen_mode_t;
 
-typedef boolean (*grabmouse_callback_t)(void);
+typedef bool (*grabmouse_callback_t)(void);
 
 // Called by D_DoomMain,
 // determines the hardware configuration
@@ -99,7 +100,7 @@ void I_GraphicsCheckCommandLine(void);
 void I_ShutdownGraphics(void);
 
 // Takes full 8 bit values.
-void I_SetPalette(const byte *palette);
+void I_SetPalette(const uint8_t *palette);
 
 int I_GetPaletteIndex(int r, int g, int b);
 
@@ -107,7 +108,7 @@ void I_UpdateNoBlit(void);
 
 void I_FinishUpdate(void);
 
-void I_ReadScreen(byte *scr);
+void I_ReadScreen(uint8_t *scr);
 
 void I_BeginRead(void);
 
@@ -117,7 +118,7 @@ void I_CheckIsScreensaver(void);
 
 void I_SetGrabMouseCallback(grabmouse_callback_t func);
 
-void I_DisplayFPSDots(boolean dots_on);
+void I_DisplayFPSDots(bool dots_on);
 
 void I_BindVideoVariables(void);
 
@@ -149,14 +150,14 @@ struct color {
 };
 
 extern char *video_driver;
-extern boolean screenvisible;
+extern bool screenvisible;
 
 extern float mouse_acceleration;
 extern int mouse_threshold;
 extern int vanilla_keyboard_mapping;
-extern boolean screensaver_mode;
+extern bool screensaver_mode;
 extern int usegamma;
-extern byte *I_VideoBuffer;
+extern uint8_t *I_VideoBuffer;
 
 extern int screen_width;
 extern int screen_height;
@@ -169,7 +170,7 @@ extern int diskicon_readbytes;
 
 #ifdef CMAP256
 
-extern boolean palette_changed;
+extern bool palette_changed;
 extern struct color colors[256];
 
 #endif // CMAP256

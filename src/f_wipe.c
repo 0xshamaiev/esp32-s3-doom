@@ -16,6 +16,7 @@
 //	Mission begin melt/wipe screen special effect.
 //
 
+#include <stdint.h>
 #include <string.h>
 
 #include "i_video.h"
@@ -32,14 +33,14 @@
 //
 
 // when zero, stop the wipe
-static boolean go = 0;
+static bool go = false;
 
-static byte *wipe_scr_start;
-static byte *wipe_scr_end;
-static byte *wipe_scr;
+static uint8_t *wipe_scr_start;
+static uint8_t *wipe_scr_end;
+static uint8_t *wipe_scr;
 
-void wipe_shittyColMajorXform(short *array, const int width, const int height) {
-    short *dest = Z_Malloc(width * height * 2, PU_STATIC, 0);
+void wipe_shittyColMajorXform(int16_t *array, const int width, const int height) {
+    int16_t *dest = Z_Malloc(width * height * 2, PU_STATIC, 0);
 
     for (int y = 0; y < height; y++)
         for (int x = 0; x < width; x++)
@@ -58,9 +59,9 @@ int wipe_initColorXForm(int width, int height, int ticks) {
 int wipe_doColorXForm(int width, int height, int ticks) {
     int newval;
 
-    boolean changed = false;
-    byte *w = wipe_scr;
-    byte *e = wipe_scr_end;
+    bool changed = false;
+    uint8_t *w = wipe_scr;
+    uint8_t *e = wipe_scr_end;
 
     while (w != wipe_scr + width * height) {
         if (*w != *e) {
@@ -97,8 +98,8 @@ int wipe_initMelt(int width, int height, int ticks) {
 
     // makes this wipe faster (in theory)
     // to have stuff in column-major format
-    wipe_shittyColMajorXform((short *)wipe_scr_start, width / 2, height);
-    wipe_shittyColMajorXform((short *)wipe_scr_end, width / 2, height);
+    wipe_shittyColMajorXform((int16_t *)wipe_scr_start, width / 2, height);
+    wipe_shittyColMajorXform((int16_t *)wipe_scr_end, width / 2, height);
 
     // setup initial column positions
     // (y<0 => not ready to scroll yet)
@@ -117,7 +118,7 @@ int wipe_initMelt(int width, int height, int ticks) {
 }
 
 int wipe_doMelt(int width, int height, int ticks) {
-    boolean done = true;
+    bool done = true;
 
     width /= 2;
 
@@ -130,16 +131,16 @@ int wipe_doMelt(int width, int height, int ticks) {
                 int dy = (y[i] < 16) ? y[i] + 1 : 8;
                 if (y[i] + dy >= height)
                     dy = height - y[i];
-                short *s = &((short *)wipe_scr_end)[i * height + y[i]];
-                short *d = &((short *)wipe_scr)[y[i] * width + i];
+                int16_t *s = &((int16_t *)wipe_scr_end)[i * height + y[i]];
+                int16_t *d = &((int16_t *)wipe_scr)[y[i] * width + i];
                 int idx = 0;
                 for (int j = dy; j; j--) {
                     d[idx] = *(s++);
                     idx += width;
                 }
                 y[i] += dy;
-                s = &((short *)wipe_scr_start)[i * height];
-                d = &((short *)wipe_scr)[y[i] * width + i];
+                s = &((int16_t *)wipe_scr_start)[i * height];
+                d = &((int16_t *)wipe_scr)[y[i] * width + i];
                 idx = 0;
                 for (int j = height - y[i]; j; j--) {
                     d[idx] = *(s++);
@@ -180,7 +181,7 @@ int wipe_ScreenWipe(int wipeno, int x, int y, int width, int height, int ticks) 
 
     // initial stuff
     if (!go) {
-        go = 1;
+        go = true;
         // wipe_scr = (byte *) Z_Malloc(width*height, PU_STATIC, 0); // DEBUG
         wipe_scr = I_VideoBuffer;
         (*wipes[wipeno * 3])(width, height, ticks);
@@ -193,7 +194,7 @@ int wipe_ScreenWipe(int wipeno, int x, int y, int width, int height, int ticks) 
 
     // final stuff
     if (rc) {
-        go = 0;
+        go = false;
         (*wipes[wipeno * 3 + 2])(width, height, ticks);
     }
 

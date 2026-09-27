@@ -38,11 +38,11 @@
 // ------------------------
 // Command line parameters.
 //
-extern boolean nomonsters;  // checkparm of -nomonsters
-extern boolean respawnparm; // checkparm of -respawn
-extern boolean fastparm;    // checkparm of -fast
+extern bool nomonsters;  // checkparm of -nomonsters
+extern bool respawnparm; // checkparm of -respawn
+extern bool fastparm;    // checkparm of -fast
 
-extern boolean devparm; // DEBUG: launched with -devparm
+extern bool devparm; // DEBUG: launched with -devparm
 
 // -----------------------------------------------------
 // Game Mode - identify IWAD as shareware, retail etc.
@@ -53,7 +53,7 @@ extern GameVersion_t gameversion;
 extern char *gamedescription;
 
 // Set if homebrew PWAD stuff has been added.
-extern boolean modifiedgame;
+extern bool modifiedgame;
 
 // -------------------------------------------
 // Selected skill type, map etc.
@@ -69,7 +69,7 @@ extern int startmap;
 
 extern int startloadgame;
 
-extern boolean autostart;
+extern bool autostart;
 
 // Selected by user.
 extern skill_t gameskill;
@@ -79,7 +79,7 @@ extern int gamemap;
 // If non-zero, exit the level after this number of minutes
 
 // Nightmare mode flag, single player.
-extern boolean respawnmonsters;
+extern bool respawnmonsters;
 
 // -------------------------
 // Internal parameters for sound rendering.
@@ -111,17 +111,17 @@ extern int snd_DesiredSfxDevice;
 // Depending on view size - no status bar?
 // Note that there is no way to disable the
 //  status bar explicitely.
-extern boolean statusbaractive;
+extern bool statusbaractive;
 
-extern boolean automapactive; // In AutoMap mode?
-extern boolean menuactive;    // Menu overlayed?
-extern boolean paused;        // Game Pause?
+extern bool automapactive; // In AutoMap mode?
+extern bool menuactive;    // Menu overlayed?
+extern bool paused;        // Game Pause?
 
-extern boolean viewactive;
+extern bool viewactive;
 
-extern boolean nodrawers;
+extern bool nodrawers;
 
-extern boolean testcontrols;
+extern bool testcontrols;
 extern int testcontrols_mousespeed;
 
 // This one is related to the 3-screen display mode.
@@ -148,19 +148,19 @@ extern int leveltime;     // tics in game play for par
 // DEMO playback/recording related stuff.
 // No demo, there is a human player in charge?
 // Disable save/end game?
-extern boolean usergame;
+extern bool usergame;
 
 //?
-extern boolean demoplayback;
-extern boolean demorecording;
+extern bool demoplayback;
+extern bool demorecording;
 
 // Round angleturn in ticcmds to the nearest 256.  This is used when
 // recording Vanilla demos.
 
-extern boolean lowres_turn;
+extern bool lowres_turn;
 
 // Quit after playing a demo from cmdline.
-extern boolean singledemo;
+extern bool singledemo;
 
 //?
 extern gamestate_t gamestate;
@@ -175,7 +175,7 @@ extern gamestate_t gamestate;
 extern player_t players[MAXPLAYERS];
 
 // Alive? Disconnected?
-extern boolean playeringame[MAXPLAYERS];
+extern bool playeringame[MAXPLAYERS];
 
 // Player spawn spots.
 extern mapthing_t playerstarts[MAXPLAYERS];
@@ -193,7 +193,7 @@ extern char *savegamedir;
 extern char basedefault[1024];
 
 // if true, load all graphics at level load
-extern boolean precache;
+extern bool precache;
 
 // wipegamestate can be set to -1
 //  to force a wipe on the next draw

@@ -17,6 +17,7 @@
 //
 
 
+#include <stdint.h>
 #include <stdio.h>
 #include <ctype.h>
 
@@ -51,7 +52,7 @@ typedef enum {
 // Stage of animation:
 finalestage_t finalestage;
 
-unsigned int finalecount;
+uint32_t finalecount;
 
 #define	TEXTSPEED	3
 #define	TEXTWAIT	250
@@ -85,7 +86,7 @@ void F_StartCast(void);
 
 void F_CastTicker(void);
 
-boolean F_CastResponder(event_t * ev);
+bool F_CastResponder(event_t * ev);
 
 void F_CastDrawer(void);
 
@@ -127,7 +128,7 @@ void F_StartFinale(void) {
 }
 
 
-boolean F_Responder(event_t *event) {
+bool F_Responder(event_t *event) {
     if (finalestage == F_STAGE_CAST)
         return F_CastResponder(event);
 
@@ -189,8 +190,8 @@ extern patch_t *hu_font[HU_FONTSIZE];
 
 void F_TextWrite(void) {
     // erase the entire screen to a tiled background
-    byte *src = W_CacheLumpName(finaleflat, PU_CACHE);
-    byte *dest = I_VideoBuffer;
+    uint8_t *src = W_CacheLumpName(finaleflat, PU_CACHE);
+    uint8_t *dest = I_VideoBuffer;
 
     for (int y = 0; y < SCREENHEIGHT; y++) {
         for (int x = 0; x < SCREENWIDTH / 64; x++) {
@@ -210,7 +211,7 @@ void F_TextWrite(void) {
     int cy = 10;
     const char *ch = finaletext;
 
-    int count = ((signed int)finalecount - 10) / TEXTSPEED;
+    int count = ((int32_t)finalecount - 10) / TEXTSPEED;
     if (count < 0)
         count = 0;
     for (; count; count--) {
@@ -272,10 +273,10 @@ castinfo_t castorder[] = {
 int castnum;
 int casttics;
 state_t *caststate;
-boolean castdeath;
+bool castdeath;
 int castframes;
 int castonmelee;
-boolean castattacking;
+bool castattacking;
 
 
 //
@@ -414,7 +415,7 @@ void F_CastTicker(void) {
 // F_CastResponder
 //
 
-boolean F_CastResponder(event_t *ev) {
+bool F_CastResponder(event_t *ev) {
     if (ev->type != ev_keydown)
         return false;
 
@@ -490,7 +491,7 @@ void F_CastDrawer(void) {
     spritedef_t *sprdef = &sprites[caststate->sprite];
     spriteframe_t *sprframe = &sprdef->spriteframes[caststate->frame & FF_FRAMEMASK];
     int lump = sprframe->lump[0];
-    boolean flip = (boolean)sprframe->flip[0];
+    bool flip = (bool)sprframe->flip[0];
 
     patch_t *patch = W_CacheLumpNum(lump + firstspritelump, PU_CACHE);
     if (flip)
@@ -504,20 +505,20 @@ void F_CastDrawer(void) {
 // F_DrawPatchCol
 //
 void F_DrawPatchCol(int x, patch_t *patch, int col) {
-    column_t *column = (column_t *)((byte *)patch + LONG(patch->columnofs[col]));
-    byte *desttop = I_VideoBuffer + x;
+    column_t *column = (column_t *)((uint8_t *)patch + LONG(patch->columnofs[col]));
+    uint8_t *desttop = I_VideoBuffer + x;
 
     // step through the posts in a column
     while (column->topdelta != 0xff) {
-        byte *source = (byte *)column + 3;
-        byte *dest = desttop + column->topdelta * SCREENWIDTH;
+        uint8_t *source = (uint8_t *)column + 3;
+        uint8_t *dest = desttop + column->topdelta * SCREENWIDTH;
         int count = column->length;
 
         while (count--) {
             *dest = *source++;
             dest += SCREENWIDTH;
         }
-        column = (column_t *) ((byte *) column + column->length + 4);
+        column = (column_t *) ((uint8_t *) column + column->length + 4);
     }
 }
 
@@ -534,7 +535,7 @@ void F_BunnyScroll(void) {
 
     V_MarkRect(0, 0, SCREENWIDTH, SCREENHEIGHT);
 
-    int scrolled = (320 - ((signed int)finalecount - 230) / 2);
+    int scrolled = (320 - ((int32_t)finalecount - 230) / 2);
     if (scrolled > 320)
         scrolled = 320;
     if (scrolled < 0)

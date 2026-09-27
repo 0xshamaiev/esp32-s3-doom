@@ -17,6 +17,8 @@
 //
 
 
+#include <stdint.h>
+#include <inttypes.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,16 +39,16 @@
 typedef struct {
     // Should be "IWAD" or "PWAD".
     char identification[4];
-    int numlumps;
-    int infotableofs;
+    int32_t numlumps;
+    int32_t infotableofs;
 }
 
 PACKEDATTR wadinfo_t;
 
 
 typedef struct {
-    int filepos;
-    int size;
+    int32_t filepos;
+    int32_t size;
     char name[8];
 }
 
@@ -59,7 +61,7 @@ PACKEDATTR filelump_t;
 // Location of each lump on disk.
 
 lumpinfo_t *lumpinfo;
-unsigned int numlumps = 0;
+uint32_t numlumps = 0;
 
 // Hash table for fast lookups
 
@@ -67,13 +69,13 @@ static lumpinfo_t **lumphash;
 
 // Hash function used for lump names.
 
-unsigned int W_LumpNameHash(const char *s) {
+uint32_t W_LumpNameHash(const char *s) {
     // This is the djb2 string hash function, modded to work on strings
     // that have a maximum length of 8.
 
-    unsigned int result = 5381;
+    uint32_t result = 5381;
 
-    for (unsigned int i = 0; i < 8 && s[i] != '\0'; ++i) {
+    for (uint32_t i = 0; i < 8 && s[i] != '\0'; ++i) {
         result = ((result << 5) ^ result) ^ toupper((int) s[i]);
     }
 
@@ -91,7 +93,7 @@ static void ExtendLumpInfo(int newnumlumps) {
     // Copy over lumpinfo_t structures from the old array. If any of
     // these lumps have been cached, we need to update the user
     // pointers to the new location.
-    for (unsigned int i = 0; i < numlumps && i < newnumlumps; ++i) {
+    for (uint32_t i = 0; i < numlumps && i < newnumlumps; ++i) {
         memcpy(&newlumpinfo[i], &lumpinfo[i], sizeof(lumpinfo_t));
 
         if (newlumpinfo[i].cache != NULL) {
@@ -188,7 +190,7 @@ wad_file_t *W_AddFile(char *filename) {
 
     filelump_t *filerover = fileinfo;
 
-    for (unsigned int i = startlump; i < numlumps; ++i) {
+    for (uint32_t i = startlump; i < numlumps; ++i) {
         lump_p->wad_file = wad_file;
         lump_p->position = LONG(filerover->filepos);
         lump_p->size = LONG(filerover->size);
@@ -271,9 +273,9 @@ int W_GetNumForName(char *name) {
 // W_LumpLength
 // Returns the buffer size needed to load the given lump.
 //
-int W_LumpLength(unsigned int lump) {
+int W_LumpLength(uint32_t lump) {
     if (lump >= numlumps) {
-        I_Error("W_LumpLength: %i >= numlumps", lump);
+        I_Error("W_LumpLength: %" PRIu32 " >= numlumps", lump);
     }
 
     return lumpinfo[lump].size;
@@ -285,9 +287,9 @@ int W_LumpLength(unsigned int lump) {
 // Loads the lump into the given buffer,
 //  which must be >= W_LumpLength().
 //
-void W_ReadLump(unsigned int lump, void *dest) {
+void W_ReadLump(uint32_t lump, void *dest) {
     if (lump >= numlumps) {
-        I_Error("W_ReadLump: %i >= numlumps", lump);
+        I_Error("W_ReadLump: %" PRIu32 " >= numlumps", lump);
     }
 
     lumpinfo_t *l = lumpinfo + lump;
@@ -297,7 +299,7 @@ void W_ReadLump(unsigned int lump, void *dest) {
     const int c = W_Read(l->wad_file, l->position, dest, l->size);
 
     if (c < l->size) {
-        I_Error("W_ReadLump: only read %i of %i on lump %i",
+        I_Error("W_ReadLump: only read %i of %i on lump %" PRIu32,
                 c, l->size, lump);
     }
 
@@ -318,9 +320,9 @@ void W_ReadLump(unsigned int lump, void *dest) {
 //
 
 void *W_CacheLumpNum(int lumpnum, int tag) {
-    byte *result;
+    uint8_t *result;
 
-    if ((unsigned) lumpnum >= numlumps) {
+    if ((uint32_t) lumpnum >= numlumps) {
         I_Error("W_CacheLumpNum: %i >= numlumps", lumpnum);
     }
 
@@ -357,7 +359,7 @@ void *W_CacheLumpName(char *name, int tag) {
 //
 
 void W_ReleaseLumpNum(int lumpnum) {
-    if ((unsigned)lumpnum >= numlumps) {
+    if ((uint32_t)lumpnum >= numlumps) {
         I_Error("W_ReleaseLumpNum: %i >= numlumps", lumpnum);
     }
 
@@ -394,7 +396,7 @@ void W_Profile(void) {
             ch = ' ';
             continue;
         } else {
-            block = (memblock_t *) ((byte *) ptr - sizeof(memblock_t));
+            block = (memblock_t *) ((uint8_t *) ptr - sizeof(memblock_t));
             if (block->tag < PU_PURGELEVEL)
                 ch = 'S';
             else
@@ -422,8 +424,8 @@ void W_GenerateHashTable(void) {
         lumphash = Z_Malloc(sizeof(lumpinfo_t *) * numlumps, PU_STATIC, NULL);
         memset(lumphash, 0, sizeof(lumpinfo_t *) * numlumps);
 
-        for (unsigned int i = 0; i < numlumps; ++i) {
-            unsigned int hash = W_LumpNameHash(lumpinfo[i].name) % numlumps;
+        for (uint32_t i = 0; i < numlumps; ++i) {
+            uint32_t hash = W_LumpNameHash(lumpinfo[i].name) % numlumps;
 
             // Hook into the hash table
 

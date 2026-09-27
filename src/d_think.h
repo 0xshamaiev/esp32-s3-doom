@@ -27,16 +27,22 @@
 //  we will need to handle the various
 //  action functions cleanly.
 //
-typedef void (*actionf_v)();
+typedef void (*actionf_v)(void);
 
 typedef void (*actionf_p1)(void *);
 
-typedef void (*actionf_p2)(void *, void *);
+struct mobj_s;
+struct player_s;
+struct pspdef_s;
+
+typedef void (*actionf_mobj)(struct mobj_s *);
+typedef void (*actionf_pspr)(struct player_s *, struct pspdef_s *);
 
 typedef union {
     actionf_v acv;
     actionf_p1 acp1;
-    actionf_p2 acp2;
+    actionf_mobj mobj;
+    actionf_pspr pspr;
 } actionf_t;
 
 // Historically, "think_t" is yet another

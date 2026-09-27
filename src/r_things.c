@@ -17,6 +17,7 @@
 //
 
 
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -65,8 +66,8 @@ lighttable_t **spritelights;
 
 // constant arrays
 //  used for psprite clipping and initializing clipping
-short negonearray[SCREENWIDTH];
-short screenheightarray[SCREENWIDTH];
+int16_t negonearray[SCREENWIDTH];
+int16_t screenheightarray[SCREENWIDTH];
 
 
 //
@@ -90,9 +91,9 @@ char *spritename;
 void
 R_InstallSpriteLump
 (int lump,
- unsigned frame,
- unsigned rotation,
- boolean flipped) {
+ uint32_t frame,
+ uint32_t rotation,
+ bool flipped) {
     if (frame >= 29 || rotation > 8)
         I_Error("R_InstallSpriteLump: "
                 "Bad frame characters in lump %i", lump);
@@ -102,38 +103,38 @@ R_InstallSpriteLump
 
     if (rotation == 0) {
         // the lump should be used for all rotations
-        if (sprtemp[frame].rotate == false)
+        if (sprtemp[frame].rotate == SPRITE_ROTATION_NONE)
             I_Error("R_InitSprites: Sprite %s frame %c has "
-                    "multip rot=0 lump", spritename, 'A' + frame);
+                    "multip rot=0 lump", spritename, 'A' + (int)frame);
 
-        if (sprtemp[frame].rotate == true)
+        if (sprtemp[frame].rotate == SPRITE_ROTATION_EIGHT)
             I_Error("R_InitSprites: Sprite %s frame %c has rotations "
-                    "and a rot=0 lump", spritename, 'A' + frame);
+                    "and a rot=0 lump", spritename, 'A' + (int)frame);
 
-        sprtemp[frame].rotate = false;
+        sprtemp[frame].rotate = SPRITE_ROTATION_NONE;
         for (int r = 0; r < 8; r++) {
             sprtemp[frame].lump[r] = lump - firstspritelump;
-            sprtemp[frame].flip[r] = (byte) flipped;
+            sprtemp[frame].flip[r] = (uint8_t) flipped;
         }
         return;
     }
 
     // the lump is only used for one rotation
-    if (sprtemp[frame].rotate == false)
+    if (sprtemp[frame].rotate == SPRITE_ROTATION_NONE)
         I_Error("R_InitSprites: Sprite %s frame %c has rotations "
-                "and a rot=0 lump", spritename, 'A' + frame);
+                "and a rot=0 lump", spritename, 'A' + (int)frame);
 
-    sprtemp[frame].rotate = true;
+    sprtemp[frame].rotate = SPRITE_ROTATION_EIGHT;
 
     // make 0 based
     rotation--;
     if (sprtemp[frame].lump[rotation] != -1)
         I_Error("R_InitSprites: Sprite %s : %c : %c "
                 "has two lumps mapped to it",
-                spritename, 'A' + frame, '1' + rotation);
+                spritename, 'A' + (int)frame, '1' + (int)rotation);
 
     sprtemp[frame].lump[rotation] = lump - firstspritelump;
-    sprtemp[frame].flip[rotation] = (byte) flipped;
+    sprtemp[frame].flip[rotation] = (uint8_t) flipped;
 }
 
 
@@ -212,18 +213,18 @@ void R_InitSpriteDefs(char **namelist) {
         maxframe++;
 
         for (frame = 0; frame < maxframe; frame++) {
-            switch ((int) sprtemp[frame].rotate) {
-                case -1:
+            switch (sprtemp[frame].rotate) {
+                case SPRITE_ROTATION_UNSET:
                     // no rotations were found for that frame at all
                     I_Error("R_InitSprites: No patches found "
                             "for %s frame %c", spritename, frame + 'A');
                     break;
 
-                case 0:
+                case SPRITE_ROTATION_NONE:
                     // only the first rotation is needed
                     break;
 
-                case 1:
+                case SPRITE_ROTATION_EIGHT:
                     // must have all 8 frames
                     for (rotation = 0; rotation < 8; rotation++)
                         if (sprtemp[frame].lump[rotation] == -1)
@@ -293,8 +294,8 @@ vissprite_t *R_NewVisSprite(void) {
 // Masked means: partly transparent, i.e. stored
 //  in posts/runs of opaque pixels.
 //
-short *mfloorclip;
-short *mceilingclip;
+int16_t *mfloorclip;
+int16_t *mceilingclip;
 
 fixed_t spryscale;
 fixed_t sprtopscreen;
@@ -317,7 +318,7 @@ void R_DrawMaskedColumn(column_t *column) {
             dc_yl = mceilingclip[dc_x] + 1;
 
         if (dc_yl <= dc_yh) {
-            dc_source = (byte *) column + 3;
+            dc_source = (uint8_t *) column + 3;
             dc_texturemid = basetexturemid - (column->topdelta << FRACBITS);
             // dc_source = (byte *)column + 3 - column->topdelta;
 
@@ -325,7 +326,7 @@ void R_DrawMaskedColumn(column_t *column) {
             //  or (SHADOW) R_DrawFuzzColumn.
             colfunc();
         }
-        column = (column_t *) ((byte *) column + column->length + 4);
+        column = (column_t *) ((uint8_t *) column + column->length + 4);
     }
 
     dc_texturemid = basetexturemid;
@@ -366,7 +367,7 @@ R_DrawVisSprite
         if (texturecolumn < 0 || texturecolumn >= SHORT(patch->width))
             I_Error("R_DrawSpriteRange: bad texturecolumn");
 #endif
-        column_t *column = (column_t *)((byte *)patch + LONG(patch->columnofs[texturecolumn]));
+        column_t *column = (column_t *)((uint8_t *)patch + LONG(patch->columnofs[texturecolumn]));
         R_DrawMaskedColumn(column);
     }
 
@@ -382,7 +383,7 @@ R_DrawVisSprite
 void R_ProjectSprite(mobj_t *thing) {
     int lump;
 
-    boolean flip;
+    bool flip;
 
     // transform the origin point
     fixed_t tr_x = thing->x - viewx;
@@ -409,7 +410,7 @@ void R_ProjectSprite(mobj_t *thing) {
 
     // decide which patch to use for sprite relative to player
 #ifdef RANGECHECK
-    if ((unsigned int) thing->sprite >= (unsigned int) numsprites)
+    if ((uint32_t) thing->sprite >= (uint32_t) numsprites)
         I_Error("R_ProjectSprite: invalid sprite number %i ",
                 thing->sprite);
 #endif
@@ -421,16 +422,16 @@ void R_ProjectSprite(mobj_t *thing) {
 #endif
     spriteframe_t *sprframe = &sprdef->spriteframes[thing->frame & FF_FRAMEMASK];
 
-    if (sprframe->rotate) {
+    if (sprframe->rotate == SPRITE_ROTATION_EIGHT) {
         // choose a different rotation based on player view
         angle_t ang = R_PointToAngle(thing->x, thing->y);
-        unsigned int rot = (ang - thing->angle + (unsigned)(ANG45 / 2) * 9) >> 29;
+        uint32_t rot = (ang - thing->angle + (uint32_t)(ANG45 / 2) * 9) >> 29;
         lump = sprframe->lump[rot];
-        flip = (boolean) sprframe->flip[rot];
+        flip = (bool) sprframe->flip[rot];
     } else {
         // use single rotation for all views
         lump = sprframe->lump[0];
-        flip = (boolean) sprframe->flip[0];
+        flip = (bool) sprframe->flip[0];
     }
 
     // calculate edges of the shape
@@ -533,7 +534,7 @@ void R_DrawPSprite(pspdef_t *psp) {
 
     // decide which patch to use
 #ifdef RANGECHECK
-    if ((unsigned) psp->state->sprite >= (unsigned int) numsprites)
+    if ((uint32_t) psp->state->sprite >= (uint32_t) numsprites)
         I_Error("R_ProjectSprite: invalid sprite number %i ",
                 psp->state->sprite);
 #endif
@@ -546,7 +547,7 @@ void R_DrawPSprite(pspdef_t *psp) {
     spriteframe_t *sprframe = &sprdef->spriteframes[psp->state->frame & FF_FRAMEMASK];
 
     int lump = sprframe->lump[0];
-    boolean flip = (boolean)sprframe->flip[0];
+    bool flip = (bool)sprframe->flip[0];
 
     // calculate edges of the shape
     fixed_t tx = psp->sx - 160 * FRACUNIT;
@@ -687,8 +688,8 @@ void R_SortVisSprites(void) {
 //
 // R_DrawSprite
 //
-static short clipbot[SCREENWIDTH];
-static short cliptop[SCREENWIDTH];
+static int16_t clipbot[SCREENWIDTH];
+static int16_t cliptop[SCREENWIDTH];
 
 void R_DrawSprite(vissprite_t *spr) {
     fixed_t scale;

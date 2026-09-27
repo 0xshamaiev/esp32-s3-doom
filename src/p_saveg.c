@@ -17,6 +17,7 @@
 //
 
 
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -38,7 +39,7 @@
 
 FILE *save_stream;
 int savegamelength;
-boolean savegame_error;
+bool savegame_error;
 
 // Get the filename of a temporary file to write the savegame to.  After
 // the file has been successfully saved, it will be renamed to the
@@ -74,8 +75,8 @@ char *P_SaveGameFile(int slot) {
 
 // Endian-safe integer read/write functions
 
-static byte saveg_read8(void) {
-    byte result;
+static uint8_t saveg_read8(void) {
+    uint8_t result;
 
     if (fread(&result, 1, 1, save_stream) < 1) {
         if (!savegame_error) {
@@ -89,7 +90,7 @@ static byte saveg_read8(void) {
     return result;
 }
 
-static void saveg_write8(byte value) {
+static void saveg_write8(uint8_t value) {
     if (fwrite(&value, 1, 1, save_stream) < 1) {
         if (!savegame_error) {
             fprintf(stderr, "saveg_write8: Error while writing save game\n");
@@ -99,28 +100,28 @@ static void saveg_write8(byte value) {
     }
 }
 
-static short saveg_read16(void) {
-    int result = saveg_read8();
+static int16_t saveg_read16(void) {
+    uint32_t result = saveg_read8();
     result |= saveg_read8() << 8;
 
     return result;
 }
 
-static void saveg_write16(short value) {
+static void saveg_write16(int16_t value) {
     saveg_write8(value & 0xff);
     saveg_write8((value >> 8) & 0xff);
 }
 
-static int saveg_read32(void) {
-    int result = saveg_read8();
+static int32_t saveg_read32(void) {
+    uint32_t result = saveg_read8();
     result |= saveg_read8() << 8;
     result |= saveg_read8() << 16;
-    result |= saveg_read8() << 24;
+    result |= (uint32_t)saveg_read8() << 24;
 
     return result;
 }
 
-static void saveg_write32(int value) {
+static void saveg_write32(int32_t value) {
     saveg_write8(value & 0xff);
     saveg_write8((value >> 8) & 0xff);
     saveg_write8((value >> 16) & 0xff);
@@ -130,7 +131,7 @@ static void saveg_write32(int value) {
 // Pad to 4-byte boundaries
 
 static void saveg_read_pad(void) {
-    unsigned long pos = ftell(save_stream);
+    uint32_t pos = ftell(save_stream);
 
     int padding = (4 - (pos & 3)) & 3;
 
@@ -140,7 +141,7 @@ static void saveg_read_pad(void) {
 }
 
 static void saveg_write_pad(void) {
-    unsigned long pos = ftell(save_stream);
+    uint32_t pos = ftell(save_stream);
 
     int padding = (4 - (pos & 3)) & 3;
 
@@ -174,36 +175,36 @@ static void saveg_writep(void *p) {
 //
 
 static void saveg_read_mapthing_t(mapthing_t *str) {
-    // short x;
+    // int16_t x;
     str->x = saveg_read16();
 
-    // short y;
+    // int16_t y;
     str->y = saveg_read16();
 
-    // short angle;
+    // int16_t angle;
     str->angle = saveg_read16();
 
-    // short type;
+    // int16_t type;
     str->type = saveg_read16();
 
-    // short options;
+    // int16_t options;
     str->options = saveg_read16();
 }
 
 static void saveg_write_mapthing_t(mapthing_t *str) {
-    // short x;
+    // int16_t x;
     saveg_write16(str->x);
 
-    // short y;
+    // int16_t y;
     saveg_write16(str->y);
 
-    // short angle;
+    // int16_t angle;
     saveg_write16(str->angle);
 
-    // short type;
+    // int16_t type;
     saveg_write16(str->type);
 
-    // short options;
+    // int16_t options;
     saveg_write16(str->options);
 }
 
@@ -491,13 +492,13 @@ static void saveg_write_mobj_t(mobj_t *str) {
 //
 
 static void saveg_read_ticcmd_t(ticcmd_t *str) {
-    // signed char forwardmove;
+    // int8_t forwardmove;
     str->forwardmove = saveg_read8();
 
-    // signed char sidemove;
+    // int8_t sidemove;
     str->sidemove = saveg_read8();
 
-    // short angleturn;
+    // int16_t angleturn;
     str->angleturn = saveg_read16();
 
     // Reserved consistency field in the original save format.
@@ -506,18 +507,18 @@ static void saveg_read_ticcmd_t(ticcmd_t *str) {
     // Reserved chat field in the original save format.
     (void) saveg_read8();
 
-    // byte buttons;
+    // uint8_t buttons;
     str->buttons = saveg_read8();
 }
 
 static void saveg_write_ticcmd_t(ticcmd_t *str) {
-    // signed char forwardmove;
+    // int8_t forwardmove;
     saveg_write8(str->forwardmove);
 
-    // signed char sidemove;
+    // int8_t sidemove;
     saveg_write8(str->sidemove);
 
-    // short angleturn;
+    // int16_t angleturn;
     saveg_write16(str->angleturn);
 
     // Reserved consistency field in the original save format.
@@ -526,7 +527,7 @@ static void saveg_write_ticcmd_t(ticcmd_t *str) {
     // Reserved chat field in the original save format.
     saveg_write8(0);
 
-    // byte buttons;
+    // uint8_t buttons;
     saveg_write8(str->buttons);
 }
 
@@ -612,12 +613,12 @@ static void saveg_read_player_t(player_t *str) {
         str->powers[i] = saveg_read32();
     }
 
-    // boolean cards[NUMCARDS];
+    // bool cards[NUMCARDS];
     for (int i = 0; i < NUMCARDS; ++i) {
         str->cards[i] = saveg_read32();
     }
 
-    // boolean backpack;
+    // bool backpack;
     str->backpack = saveg_read32();
 
     // int frags[MAXPLAYERS];
@@ -631,7 +632,7 @@ static void saveg_read_player_t(player_t *str) {
     // weapontype_t pendingweapon;
     str->pendingweapon = saveg_read_enum();
 
-    // boolean weaponowned[NUMWEAPONS];
+    // bool weaponowned[NUMWEAPONS];
     for (int i = 0; i < NUMWEAPONS; ++i) {
         str->weaponowned[i] = saveg_read32();
     }
@@ -693,7 +694,7 @@ static void saveg_read_player_t(player_t *str) {
         saveg_read_pspdef_t(&str->psprites[i]);
     }
 
-    // boolean didsecret;
+    // bool didsecret;
     str->didsecret = saveg_read32();
 }
 
@@ -733,12 +734,12 @@ static void saveg_write_player_t(player_t *str) {
         saveg_write32(str->powers[i]);
     }
 
-    // boolean cards[NUMCARDS];
+    // bool cards[NUMCARDS];
     for (int i = 0; i < NUMCARDS; ++i) {
         saveg_write32(str->cards[i]);
     }
 
-    // boolean backpack;
+    // bool backpack;
     saveg_write32(str->backpack);
 
     // int frags[MAXPLAYERS];
@@ -752,7 +753,7 @@ static void saveg_write_player_t(player_t *str) {
     // weapontype_t pendingweapon;
     saveg_write_enum(str->pendingweapon);
 
-    // boolean weaponowned[NUMWEAPONS];
+    // bool weaponowned[NUMWEAPONS];
     for (int i = 0; i < NUMWEAPONS; ++i) {
         saveg_write32(str->weaponowned[i]);
     }
@@ -814,7 +815,7 @@ static void saveg_write_player_t(player_t *str) {
         saveg_write_pspdef_t(&str->psprites[i]);
     }
 
-    // boolean didsecret;
+    // bool didsecret;
     saveg_write32(str->didsecret);
 }
 
@@ -843,7 +844,7 @@ static void saveg_read_ceiling_t(ceiling_t *str) {
     // fixed_t speed;
     str->speed = saveg_read32();
 
-    // boolean crush;
+    // bool crush;
     str->crush = saveg_read32();
 
     // int direction;
@@ -875,7 +876,7 @@ static void saveg_write_ceiling_t(ceiling_t *str) {
     // fixed_t speed;
     saveg_write32(str->speed);
 
-    // boolean crush;
+    // bool crush;
     saveg_write32(str->crush);
 
     // int direction;
@@ -956,7 +957,7 @@ static void saveg_read_floormove_t(floormove_t *str) {
     // floor_e type;
     str->type = saveg_read_enum();
 
-    // boolean crush;
+    // bool crush;
     str->crush = saveg_read32();
 
     // sector_t* sector;
@@ -969,7 +970,7 @@ static void saveg_read_floormove_t(floormove_t *str) {
     // int newspecial;
     str->newspecial = saveg_read32();
 
-    // short texture;
+    // int16_t texture;
     str->texture = saveg_read16();
 
     // fixed_t floordestheight;
@@ -986,7 +987,7 @@ static void saveg_write_floormove_t(floormove_t *str) {
     // floor_e type;
     saveg_write_enum(str->type);
 
-    // boolean crush;
+    // bool crush;
     saveg_write32(str->crush);
 
     // sector_t* sector;
@@ -998,7 +999,7 @@ static void saveg_write_floormove_t(floormove_t *str) {
     // int newspecial;
     saveg_write32(str->newspecial);
 
-    // short texture;
+    // int16_t texture;
     saveg_write16(str->texture);
 
     // fixed_t floordestheight;
@@ -1041,7 +1042,7 @@ static void saveg_read_plat_t(plat_t *str) {
     // plat_e oldstatus;
     str->oldstatus = saveg_read_enum();
 
-    // boolean crush;
+    // bool crush;
     str->crush = saveg_read32();
 
     // int tag;
@@ -1079,7 +1080,7 @@ static void saveg_write_plat_t(plat_t *str) {
     // plat_e oldstatus;
     saveg_write_enum(str->oldstatus);
 
-    // boolean crush;
+    // bool crush;
     saveg_write32(str->crush);
 
     // int tag;
@@ -1265,7 +1266,7 @@ void P_WriteSaveGameHeader(char *description) {
 // Read the header for a savegame
 //
 
-boolean P_ReadSaveGameHeader(void) {
+bool P_ReadSaveGameHeader(void) {
     char vcheck[VERSIONSIZE];
     char read_vcheck[VERSIONSIZE];
 
@@ -1294,9 +1295,9 @@ boolean P_ReadSaveGameHeader(void) {
         I_Error("Multiplayer saves are not supported");
 
     // get the times
-    byte a = saveg_read8();
-    byte b = saveg_read8();
-    byte c = saveg_read8();
+    uint8_t a = saveg_read8();
+    uint8_t b = saveg_read8();
+    uint8_t c = saveg_read8();
     leveltime = (a << 16) + (b << 8) + c;
 
     return true;
@@ -1306,7 +1307,7 @@ boolean P_ReadSaveGameHeader(void) {
 // Read the end of file marker.  Returns true if read successfully.
 //
 
-boolean P_ReadSaveGameEOF(void) {
+bool P_ReadSaveGameEOF(void) {
     int value = saveg_read8();
 
     return value == SAVEGAME_EOF;
@@ -1489,7 +1490,7 @@ void P_UnArchiveThinkers(void) {
 
     // read in saved thinkers
     while (1) {
-        byte tclass = saveg_read8();
+        uint8_t tclass = saveg_read8();
         switch (tclass) {
             case tc_end:
                 return; // end of list
@@ -1630,7 +1631,7 @@ void P_UnArchiveSpecials(void) {
 
     // read in saved thinkers
     while (1) {
-        byte tclass = saveg_read8();
+        uint8_t tclass = saveg_read8();
 
         switch (tclass) {
             case tc_endspecials:

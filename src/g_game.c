@@ -16,6 +16,7 @@
 //
 
 
+#include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
@@ -100,28 +101,28 @@ gamestate_t oldgamestate;
 gameaction_t gameaction;
 gamestate_t gamestate;
 skill_t gameskill;
-boolean respawnmonsters;
+bool respawnmonsters;
 int gameepisode;
 int gamemap;
 
 // If non-zero, exit the level after this number of minutes.
 
 
-boolean paused;
-boolean sendpause; // send a pause event next tic
-boolean sendsave; // send a save event next tic
-boolean usergame; // ok to save / end game
+bool paused;
+bool sendpause; // send a pause event next tic
+bool sendsave; // send a save event next tic
+bool usergame; // ok to save / end game
 
-boolean timingdemo; // if true, exit with report on completion
-boolean nodrawers; // for comparative timing purposes
+bool timingdemo; // if true, exit with report on completion
+bool nodrawers; // for comparative timing purposes
 int starttime; // for comparative timing purposes
 
-boolean viewactive;
+bool viewactive;
 
-boolean playeringame[MAXPLAYERS];
+bool playeringame[MAXPLAYERS];
 player_t players[MAXPLAYERS];
 
-boolean turbodetected[MAXPLAYERS];
+bool turbodetected[MAXPLAYERS];
 
 int consoleplayer; // player taking events and displaying
 int displayplayer; // view being displayed
@@ -129,18 +130,18 @@ int levelstarttic; // gametic at level start
 int totalkills, totalitems, totalsecret; // for intermission
 
 char *demoname;
-boolean demorecording;
-boolean longtics; // cph's doom 1.91 longtics hack
-boolean lowres_turn; // low resolution turning for longtics
-boolean demoplayback;
-byte *demobuffer;
-byte *demo_p;
-byte *demoend;
-boolean singledemo; // quit after playing a demo from cmdline
+bool demorecording;
+bool longtics; // cph's doom 1.91 longtics hack
+bool lowres_turn; // low resolution turning for longtics
+bool demoplayback;
+uint8_t *demobuffer;
+uint8_t *demo_p;
+uint8_t *demoend;
+bool singledemo; // quit after playing a demo from cmdline
 
-boolean precache = true; // if true, load all graphics at start
+bool precache = true; // if true, load all graphics at start
 
-boolean testcontrols = false; // Invoked by setup to test controls
+bool testcontrols = false; // Invoked by setup to test controls
 int testcontrols_mousespeed;
 
 
@@ -192,29 +193,29 @@ static const struct {
 #define NUMKEYS		256
 #define MAX_JOY_BUTTONS 20
 
-static boolean gamekeydown[NUMKEYS];
+static bool gamekeydown[NUMKEYS];
 static int turnheld; // for accelerative turning
 
-static boolean mousearray[MAX_MOUSE_BUTTONS + 1];
-static boolean *mousebuttons = &mousearray[1]; // allow [-1]
+static bool mousearray[MAX_MOUSE_BUTTONS + 1];
+static bool *mousebuttons = &mousearray[1]; // allow [-1]
 
 // mouse values are used once
 int mousex;
 int mousey;
 
 static int dclicktime;
-static boolean dclickstate;
+static bool dclickstate;
 static int dclicks;
 static int dclicktime2;
-static boolean dclickstate2;
+static bool dclickstate2;
 static int dclicks2;
 
 // joystick values are repeated
 static int joyxmove;
 static int joyymove;
 static int joystrafemove;
-static boolean joyarray[MAX_JOY_BUTTONS + 1];
-static boolean *joybuttons = &joyarray[1]; // allow [-1]
+static bool joyarray[MAX_JOY_BUTTONS + 1];
+static bool *joybuttons = &joyarray[1]; // allow [-1]
 
 static int savegameslot;
 static char savedescription[32];
@@ -232,7 +233,7 @@ int G_CmdChecksum(ticcmd_t *cmd) {
     return sum;
 }
 
-static boolean WeaponSelectable(weapontype_t weapon) {
+static bool WeaponSelectable(weapontype_t weapon) {
     // Can't select the super shotgun in Doom 1.
 
     if (weapon == wp_supershotgun && gamemission == doom) {
@@ -305,7 +306,7 @@ void G_BuildTiccmd(ticcmd_t *cmd, int maketic) {
 
     memset(cmd, 0, sizeof(ticcmd_t));
 
-    boolean strafe =
+    bool strafe =
         gamekeydown[key_strafe] || mousebuttons[mousebstrafe] || joybuttons[joybstrafe];
 
     // fraggle: support the old "joyb_speed = 31" hack which
@@ -450,7 +451,7 @@ void G_BuildTiccmd(ticcmd_t *cmd, int maketic) {
         }
 
         // strafe double click
-        boolean bstrafe = mousebuttons[mousebstrafe] || joybuttons[joybstrafe];
+        bool bstrafe = mousebuttons[mousebstrafe] || joybuttons[joybstrafe];
         if (bstrafe != dclickstate2 && dclicktime2 > 1) {
             dclickstate2 = bstrafe;
             if (dclickstate2)
@@ -510,9 +511,9 @@ void G_BuildTiccmd(ticcmd_t *cmd, int maketic) {
     // low-res turning
 
     if (lowres_turn) {
-        static signed short carry = 0;
+        static int16_t carry = 0;
 
-        short desired_angleturn = cmd->angleturn + carry;
+        int16_t desired_angleturn = cmd->angleturn + carry;
 
         // round angleturn to the nearest 256 unit boundary
         // for recording demos with single byte values for turn
@@ -572,7 +573,7 @@ void G_DoLoadLevel(void) {
     }
 }
 
-static void SetJoyButtons(unsigned int buttons_mask) {
+static void SetJoyButtons(uint32_t buttons_mask) {
     for (int i = 0; i < MAX_JOY_BUTTONS; ++i) {
         const int button_on = (buttons_mask & (1 << i)) != 0;
 
@@ -590,9 +591,9 @@ static void SetJoyButtons(unsigned int buttons_mask) {
     }
 }
 
-static void SetMouseButtons(unsigned int buttons_mask) {
+static void SetMouseButtons(uint32_t buttons_mask) {
     for (int i = 0; i < MAX_MOUSE_BUTTONS; ++i) {
-        unsigned int button_on = (buttons_mask & (1 << i)) != 0;
+        uint32_t button_on = (buttons_mask & (1 << i)) != 0;
 
         // Detect button press:
 
@@ -612,7 +613,7 @@ static void SetMouseButtons(unsigned int buttons_mask) {
 // G_Responder
 // Get info needed to make ticcmd_ts for the players.
 //
-boolean G_Responder(event_t *ev) {
+bool G_Responder(event_t *ev) {
     // any other key pops up menu if in demos
     if (gameaction == ga_nothing && !singledemo &&
         (demoplayback || gamestate == GS_DEMOSCREEN)
@@ -947,7 +948,7 @@ int cpars[32] =
 //
 // G_DoCompleted
 //
-boolean secretexit;
+bool secretexit;
 extern char *pagename;
 
 void G_ExitLevel(void) {
@@ -1122,7 +1123,7 @@ void G_DoWorldDone(void) {
 // G_InitFromSavegame
 // Can be called by the startup code or the menu task.
 //
-extern boolean setsizeneeded;
+extern bool setsizeneeded;
 
 void R_ExecuteSetViewSize(void);
 
@@ -1461,8 +1462,8 @@ void G_ReadDemoTiccmd(ticcmd_t *cmd) {
         G_CheckDemoStatus();
         return;
     }
-    cmd->forwardmove = ((signed char) *demo_p++);
-    cmd->sidemove = ((signed char) *demo_p++);
+    cmd->forwardmove = ((int8_t) *demo_p++);
+    cmd->sidemove = ((int8_t) *demo_p++);
 
     // If this is a longtics demo, read back in higher resolution
 
@@ -1470,10 +1471,10 @@ void G_ReadDemoTiccmd(ticcmd_t *cmd) {
         cmd->angleturn = *demo_p++;
         cmd->angleturn |= (*demo_p++) << 8;
     } else {
-        cmd->angleturn = ((unsigned char) *demo_p++) << 8;
+        cmd->angleturn = ((uint8_t) *demo_p++) << 8;
     }
 
-    cmd->buttons = (unsigned char) *demo_p++;
+    cmd->buttons = (uint8_t) *demo_p++;
 }
 
 // Increase the size of the demo buffer to allow unlimited demos
@@ -1486,8 +1487,8 @@ static void IncreaseDemoBuffer(void) {
     // Generate a new buffer twice the size
     int new_length = current_length * 2;
 
-    byte *new_demobuffer = Z_Malloc(new_length, PU_STATIC, 0);
-    byte *new_demop = new_demobuffer + (demo_p - demobuffer);
+    uint8_t *new_demobuffer = Z_Malloc(new_length, PU_STATIC, 0);
+    uint8_t *new_demop = new_demobuffer + (demo_p - demobuffer);
 
     // Copy over the old data
 
@@ -1506,7 +1507,7 @@ void G_WriteDemoTiccmd(ticcmd_t *cmd) {
     if (gamekeydown[key_demo_quit]) // press q to end demo recording
         G_CheckDemoStatus();
 
-    byte *demo_start = demo_p;
+    uint8_t *demo_start = demo_p;
 
     *demo_p++ = cmd->forwardmove;
     *demo_p++ = cmd->sidemove;
@@ -1751,7 +1752,7 @@ void G_TimeDemo(char *name) {
 ===================
 */
 
-boolean G_CheckDemoStatus(void) {
+bool G_CheckDemoStatus(void) {
     if (timingdemo) {
         int endtime = I_GetTime();
         int realtics = endtime - starttime;

@@ -17,6 +17,7 @@
 //	Sliders and icons. Kinda widget stuff.
 //
 
+#include <stdint.h>
 #include <ctype.h>
 #include <stdlib.h>
 
@@ -56,7 +57,7 @@
 #include "m_menu.h"
 
 extern patch_t *hu_font[HU_FONTSIZE];
-extern boolean message_dontfuckwithme;
+extern bool message_dontfuckwithme;
 
 //
 // defaulted values
@@ -87,7 +88,7 @@ int messy;
 int messageLastMenuActive;
 
 // timed message = no input from user
-boolean messageNeedsInput;
+bool messageNeedsInput;
 
 void (*messageRoutine)(int response);
 
@@ -100,13 +101,13 @@ int saveCharIndex; // which char we're editing
 // old save description before edit
 char saveOldString[SAVESTRINGSIZE];
 
-boolean inhelpscreens;
-boolean menuactive;
+bool inhelpscreens;
+bool menuactive;
 
 #define SKULLXOFF -32
 #define LINEHEIGHT 16
 
-extern boolean sendpause;
+extern bool sendpause;
 char savegamestrings[10][SAVESTRINGSIZE];
 
 char endstring[160];
@@ -118,7 +119,7 @@ char endstring[160];
 //
 typedef struct {
     // 0 = no cursor here, 1 = ok, 2 = arrows ok
-    short status;
+    int16_t status;
 
     char name[10];
 
@@ -132,18 +133,18 @@ typedef struct {
 } menuitem_t;
 
 typedef struct menu_s {
-    short numitems;          // # of menu items
+    int16_t numitems;          // # of menu items
     struct menu_s *prevMenu; // previous menu
     menuitem_t *menuitems;   // menu items
-    void (*routine)();       // draw routine
-    short x;
-    short y;      // x,y of menu
-    short lastOn; // last item user was on in menu
+    void (*routine)(void);       // draw routine
+    int16_t x;
+    int16_t y;      // x,y of menu
+    int16_t lastOn; // last item user was on in menu
 } menu_t;
 
-short itemOn;           // menu item skull is on
-short skullAnimCounter; // skull animation counter
-short whichSkull;       // which skull to draw
+int16_t itemOn;           // menu item skull is on
+int16_t skullAnimCounter; // skull animation counter
+int16_t whichSkull;       // which skull to draw
 
 // graphic name of skulls
 // warning: initializer-string for array of chars is too long
@@ -237,7 +238,7 @@ int M_StringWidth(char *string);
 
 int M_StringHeight(char *string);
 
-void M_StartMessage(char *string, void *routine, boolean input);
+void M_StartMessage(char *string, void *routine, bool input);
 
 void M_StopMessage(void);
 
@@ -926,7 +927,7 @@ void M_DrawSelCell(menu_t *menu, int item) {
                       W_CacheLumpName(DEH_String("M_CELL2"), PU_CACHE));
 }
 
-void M_StartMessage(char *string, void *routine, boolean input) {
+void M_StartMessage(char *string, void *routine, bool input) {
     messageLastMenuActive = menuactive;
     messageToPrint = 1;
     messageString = string;
@@ -962,7 +963,7 @@ int M_StringWidth(char *string) {
 //      Find string height from hu_font chars
 //
 int M_StringHeight(char *string) {
-    int height = SHORT(hu_font[0]->height);
+    const int height = SHORT(hu_font[0]->height);
 
     int h = height;
     for (size_t i = 0; i < strlen(string); i++)
@@ -1007,7 +1008,7 @@ void M_WriteText(int x, int y, char *string) {
 // These keys evaluate to a "null" key in Vanilla Doom that allows weird
 // jumping in the menus. Preserve this behavior for accuracy.
 
-static boolean IsNullKey(int key) {
+static bool IsNullKey(int key) {
     return key == KEY_PAUSE || key == KEY_CAPSLOCK || key == KEY_SCRLCK || key == KEY_NUMLOCK;
 }
 
@@ -1018,7 +1019,7 @@ static boolean IsNullKey(int key) {
 //
 // M_Responder
 //
-boolean M_Responder(event_t *ev) {
+bool M_Responder(event_t *ev) {
     static int joywait = 0;
     static int mousewait = 0;
     static int mousey = 0;
@@ -1454,8 +1455,8 @@ static void M_DrawOPLDev(void) {
 // but before it has been blitted.
 //
 void M_Drawer(void) {
-    static short x;
-    static short y;
+    static int16_t x;
+    static int16_t y;
     char string[80];
 
     inhelpscreens = false;
@@ -1467,7 +1468,7 @@ void M_Drawer(void) {
         while (messageString[start] != '\0') {
             int foundnewline = 0;
 
-            for (unsigned int i = 0; i < strlen(messageString + start); i++) {
+            for (uint32_t i = 0; i < strlen(messageString + start); i++) {
                 if (messageString[start + i] == '\n') {
                     M_StringCopy(string, messageString + start, sizeof(string));
                     if (i < sizeof(string)) {
@@ -1507,9 +1508,9 @@ void M_Drawer(void) {
     // DRAW MENU
     x = currentMenu->x;
     y = currentMenu->y;
-    unsigned int max = currentMenu->numitems;
+    uint32_t max = currentMenu->numitems;
 
-    for (unsigned int i = 0; i < max; i++) {
+    for (uint32_t i = 0; i < max; i++) {
         char *name = DEH_String(currentMenu->menuitems[i].name);
 
         if (name[0]) {

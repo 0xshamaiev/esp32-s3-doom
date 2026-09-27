@@ -20,6 +20,7 @@
 //	Line Tag handling. Line and Sector triggers.
 //
 
+#include <stdint.h>
 #include <stdlib.h>
 
 #include "doomdef.h"
@@ -51,7 +52,7 @@
 // There is another anim_t used in wi_stuff, unrelated.
 //
 typedef struct {
-    boolean istexture;
+    bool istexture;
     int picnum;
     int basepic;
     int numpics;
@@ -126,7 +127,7 @@ anim_t *lastanim;
 //
 #define MAXLINEANIMS 64
 
-extern short numlinespecials;
+extern int16_t numlinespecials;
 extern line_t *linespeciallist[MAXLINEANIMS];
 
 void P_InitPicAnims(void) {
@@ -306,7 +307,7 @@ fixed_t P_FindNextHighestFloor(sector_t *sec, int currentheight) {
 // FIND LOWEST CEILING IN THE SURROUNDING SECTORS
 //
 fixed_t P_FindLowestCeilingSurrounding(sector_t *sec) {
-    fixed_t height = INT_MAX;
+    fixed_t height = INT32_MAX;
 
     for (int i = 0; i < sec->linecount; i++) {
         line_t *check = sec->lines[i];
@@ -992,7 +993,7 @@ void P_UpdateSpecials(void) {
 #define DONUT_FLOORHEIGHT_DEFAULT 0x00000000
 #define DONUT_FLOORPIC_DEFAULT 0x16
 
-static void DonutOverrun(fixed_t *s3_floorheight, short *s3_floorpic, line_t *line,
+static void DonutOverrun(fixed_t *s3_floorheight, int16_t *s3_floorpic, line_t *line,
                          sector_t *pillar_sector) {
     static int first = 1;
     static int tmp_s3_floorheight;
@@ -1058,7 +1059,7 @@ static void DonutOverrun(fixed_t *s3_floorheight, short *s3_floorpic, line_t *li
      */
 
     *s3_floorheight = (fixed_t)tmp_s3_floorheight;
-    *s3_floorpic = (short)tmp_s3_floorpic;
+    *s3_floorpic = (int16_t)tmp_s3_floorpic;
 }
 
 //
@@ -1067,7 +1068,7 @@ static void DonutOverrun(fixed_t *s3_floorheight, short *s3_floorpic, line_t *li
 int EV_DoDonut(line_t *line) {
     floormove_t *floor;
     fixed_t s3_floorheight;
-    short s3_floorpic;
+    int16_t s3_floorpic;
 
     int secnum = -1;
     int rtn = 0;
@@ -1159,7 +1160,7 @@ int EV_DoDonut(line_t *line) {
 // After the map has been loaded, scan for specials
 //  that spawn thinkers
 //
-short numlinespecials;
+int16_t numlinespecials;
 line_t *linespeciallist[MAXLINEANIMS];
 
 // Parses command line parameters.

@@ -37,7 +37,7 @@ static struct {
 
 // Check the supported Doom game modes.
 
-boolean D_ValidGameMode(GameMission_t mission, GameMode_t mode) {
+bool D_ValidGameMode(GameMission_t mission, GameMode_t mode) {
     for (int i = 0; i < arrlen(valid_modes); ++i) {
         if (valid_modes[i].mode == mode && valid_modes[i].mission == mission) {
             return true;
@@ -47,7 +47,7 @@ boolean D_ValidGameMode(GameMission_t mission, GameMode_t mode) {
     return false;
 }
 
-boolean D_ValidEpisodeMap(GameMission_t mission, GameMode_t mode,
+bool D_ValidEpisodeMap(GameMission_t mission, GameMode_t mode,
                           int episode, int map) {
     // Find the table entry for this mission/mode combination.
 
@@ -86,7 +86,7 @@ static struct {
     {doom, exe_ultimate},
 };
 
-boolean D_ValidGameVersion(GameMission_t mission, GameVersion_t version) {
+bool D_ValidGameVersion(GameMission_t mission, GameVersion_t version) {
     // All Doom variants can use the Doom versions.
 
     if (mission == doom2) {
@@ -105,7 +105,7 @@ boolean D_ValidGameVersion(GameMission_t mission, GameVersion_t version) {
 
 // Does this mission type use ExMy form, rather than MAPxy form?
 
-boolean D_IsEpisodeMap(GameMission_t mission) {
+bool D_IsEpisodeMap(GameMission_t mission) {
     switch (mission) {
         case doom:
             return true;

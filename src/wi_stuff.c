@@ -333,7 +333,7 @@ void WI_slamBackground(void) { V_DrawPatch(0, 0, background); }
 
 // The ticker is used to detect keys
 //  while intermission input is handled by WI_checkForAccelerate.
-boolean WI_Responder(event_t *ev) { return false; }
+bool WI_Responder(event_t *ev) { return false; }
 
 // Draws "<Levelname> Finished!"
 void WI_drawLF(void) {
@@ -361,7 +361,7 @@ void WI_drawEL(void) {
 }
 
 void WI_drawOnLnode(int n, patch_t *c[]) {
-    boolean fits = false;
+    bool fits = false;
 
     int i = 0;
     do {
@@ -570,7 +570,7 @@ void WI_updateNoState(void) {
     }
 }
 
-static boolean snl_pointeron = false;
+static bool snl_pointeron = false;
 
 void WI_initShowNextLoc(void) {
     state = ShowNextLoc;

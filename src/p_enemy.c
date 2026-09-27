@@ -18,6 +18,7 @@
 //	that are associated with states/frames.
 //
 
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -126,7 +127,7 @@ void P_NoiseAlert(mobj_t *target, mobj_t *emmiter) {
 //
 // P_CheckMeleeRange
 //
-boolean P_CheckMeleeRange(mobj_t *actor) {
+bool P_CheckMeleeRange(mobj_t *actor) {
     if (!actor->target)
         return false;
 
@@ -145,7 +146,7 @@ boolean P_CheckMeleeRange(mobj_t *actor) {
 //
 // P_CheckMissileRange
 //
-boolean P_CheckMissileRange(mobj_t *actor) {
+bool P_CheckMissileRange(mobj_t *actor) {
     if (!P_CheckSight(actor, actor->target))
         return false;
 
@@ -203,11 +204,11 @@ boolean P_CheckMissileRange(mobj_t *actor) {
 fixed_t xspeed[8] = {FRACUNIT, 47000, 0, -47000, -FRACUNIT, -47000, 0, 47000};
 fixed_t yspeed[8] = {0, 47000, FRACUNIT, 47000, 0, -47000, -FRACUNIT, -47000};
 
-boolean P_Move(mobj_t *actor) {
+bool P_Move(mobj_t *actor) {
     if (actor->movedir == DI_NODIR)
         return false;
 
-    if ((unsigned)actor->movedir >= 8)
+    if ((uint32_t)actor->movedir >= 8)
         I_Error("Weird actor->movedir!");
 
     fixed_t tryx = actor->x + actor->info->speed * xspeed[actor->movedir];
@@ -215,7 +216,7 @@ boolean P_Move(mobj_t *actor) {
 
     // warning: 'catch', 'throw', and 'try'
     // are all C++ reserved words
-    boolean try_ok = P_TryMove(actor, tryx, tryy);
+    bool try_ok = P_TryMove(actor, tryx, tryy);
 
     if (!try_ok) {
         // open any specials
@@ -234,7 +235,7 @@ boolean P_Move(mobj_t *actor) {
             return false;
 
         actor->movedir = DI_NODIR;
-        boolean good = false;
+        bool good = false;
         while (numspechit--) {
             line_t *ld = spechit[numspechit];
             // if the special is not a door
@@ -264,7 +265,7 @@ boolean P_Move(mobj_t *actor) {
 // If a door is in the way,
 // an OpenDoor call is made to start it opening.
 //
-boolean P_TryWalk(mobj_t *actor) {
+bool P_TryWalk(mobj_t *actor) {
     if (!P_Move(actor)) {
         return false;
     }
@@ -379,7 +380,7 @@ void P_NewChaseDir(mobj_t *actor) {
 // If allaround is false, only look 180 degrees in front.
 // Returns true if a player is targeted.
 //
-boolean P_LookForPlayers(mobj_t *actor, boolean allaround) {
+bool P_LookForPlayers(mobj_t *actor, bool allaround) {
     int c = 0;
     int stop = (actor->lastlook - 1) & 3;
 
@@ -854,7 +855,7 @@ mobj_t *vileobj;
 fixed_t viletryx;
 fixed_t viletryy;
 
-boolean PIT_VileCheck(mobj_t *thing) {
+bool PIT_VileCheck(mobj_t *thing) {
     if (!(thing->flags & MF_CORPSE))
         return true; // not a monster
 
@@ -872,7 +873,7 @@ boolean PIT_VileCheck(mobj_t *thing) {
     corpsehit = thing;
     corpsehit->momx = corpsehit->momy = 0;
     corpsehit->height <<= 2;
-    boolean check = P_CheckPosition(corpsehit, corpsehit->x, corpsehit->y);
+    bool check = P_CheckPosition(corpsehit, corpsehit->x, corpsehit->y);
     corpsehit->height >>= 2;
 
     if (!check)
@@ -883,7 +884,7 @@ boolean PIT_VileCheck(mobj_t *thing) {
 
 //
 // A_VileChase
-// Check for ressurecting a body
+// Check for resurrecting a body
 //
 void A_VileChase(mobj_t *actor) {
     if (actor->movedir != DI_NODIR) {
@@ -901,7 +902,7 @@ void A_VileChase(mobj_t *actor) {
             for (int by = yl; by <= yh; by++) {
                 // Call PIT_VileCheck to check
                 // whether object is a corpse
-                // that canbe raised.
+                // that can be raised.
                 if (!P_BlockThingsIterator(bx, by, PIT_VileCheck)) {
                     // got one!
                     mobj_t *temp = actor->target;
@@ -961,7 +962,7 @@ void A_Fire(mobj_t *actor) {
     if (!P_CheckSight(target, dest))
         return;
 
-    unsigned int an = dest->angle >> ANGLETOFINESHIFT;
+    uint32_t an = dest->angle >> ANGLETOFINESHIFT;
 
     P_UnsetThingPosition(actor);
     actor->x = dest->x + FixedMul(24 * FRACUNIT, finecosine[an]);
@@ -1119,7 +1120,7 @@ void A_PainShootSkull(mobj_t *actor, angle_t angle) {
         currentthinker = currentthinker->next;
     }
 
-    // if there are allready 20 skulls on the level,
+    // if there are already 20 skulls on the level,
     // don't spit another one
     if (count > 20)
         return;
@@ -1222,7 +1223,7 @@ void A_Explode(mobj_t *thingy) { P_RadiusAttack(thingy, thingy->target, 128); }
 // This behavior changed in v1.9, the most notable effect of which
 // was to break uac_dead.wad
 
-static boolean CheckBossEnd(mobjtype_t motype) {
+static bool CheckBossEnd(mobjtype_t motype) {
     if (gameversion < exe_ultimate) {
         if (gamemap != 8) {
             return false;
@@ -1235,28 +1236,27 @@ static boolean CheckBossEnd(mobjtype_t motype) {
         }
 
         return true;
-    } else {
-        // New logic that appeared in Ultimate Doom.
-        // Looks like the logic was overhauled while adding in the
-        // episode 4 support.  Now bosses only trigger on their
-        // specific episode.
+    }
+    // New logic that appeared in Ultimate Doom.
+    // Looks like the logic was overhauled while adding in the
+    // episode 4 support.  Now bosses only trigger on their
+    // specific episode.
 
-        switch (gameepisode) {
-        case 1:
-            return gamemap == 8 && motype == MT_BRUISER;
+    switch (gameepisode) {
+    case 1:
+        return gamemap == 8 && motype == MT_BRUISER;
 
-        case 2:
-            return gamemap == 8 && motype == MT_CYBORG;
+    case 2:
+        return gamemap == 8 && motype == MT_CYBORG;
 
-        case 3:
-            return gamemap == 8 && motype == MT_SPIDER;
+    case 3:
+        return gamemap == 8 && motype == MT_SPIDER;
 
-        case 4:
-            return (gamemap == 6 && motype == MT_CYBORG) || (gamemap == 8 && motype == MT_SPIDER);
+    case 4:
+        return (gamemap == 6 && motype == MT_CYBORG) || (gamemap == 8 && motype == MT_SPIDER);
 
-        default:
-            return gamemap == 8;
-        }
+    default:
+        return gamemap == 8;
     }
 }
 

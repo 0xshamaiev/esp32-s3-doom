@@ -31,7 +31,7 @@ void M_SetConfigDir(char *dir);
 
 void M_BindVariable(char *name, void *variable);
 
-boolean M_SetVariable(char *name, char *value);
+bool M_SetVariable(char *name, char *value);
 
 int M_GetIntVariable(char *name);
 

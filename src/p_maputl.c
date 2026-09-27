@@ -21,6 +21,7 @@
 //
 
 
+#include <stdint.h>
 #include <stdlib.h>
 
 
@@ -379,7 +380,7 @@ void P_SetThingPosition(mobj_t *thing) {
 // to P_BlockLinesIterator, then make one or more calls
 // to it.
 //
-boolean P_BlockLinesIterator(int x, int y, boolean (*func)(line_t *)) {
+bool P_BlockLinesIterator(int x, int y, bool (*func)(line_t *)) {
     if (x < 0 || y < 0 || x >= bmapwidth || y >= bmapheight) {
         return true;
     }
@@ -388,7 +389,7 @@ boolean P_BlockLinesIterator(int x, int y, boolean (*func)(line_t *)) {
 
     offset = *(blockmap + offset);
 
-    for (short *list = blockmaplump + offset; *list != -1; list++) {
+    for (int16_t *list = blockmaplump + offset; *list != -1; list++) {
         line_t *ld = &lines[*list];
 
         if (ld->validcount == validcount)
@@ -406,7 +407,7 @@ boolean P_BlockLinesIterator(int x, int y, boolean (*func)(line_t *)) {
 //
 // P_BlockThingsIterator
 //
-boolean P_BlockThingsIterator(int x, int y, boolean (*func)(mobj_t *)) {
+bool P_BlockThingsIterator(int x, int y, bool (*func)(mobj_t *)) {
     if (x < 0 || y < 0 || x >= bmapwidth || y >= bmapheight) {
         return true;
     }
@@ -426,7 +427,7 @@ intercept_t intercepts[MAXINTERCEPTS];
 intercept_t *intercept_p;
 
 divline_t trace;
-boolean earlyout;
+bool earlyout;
 int ptflags;
 
 static void InterceptsOverrun(int num_intercepts, intercept_t *intercept);
@@ -441,7 +442,7 @@ static void InterceptsOverrun(int num_intercepts, intercept_t *intercept);
 // are on opposite sides of the trace.
 // Returns true if earlyout and a solid line hit.
 //
-boolean PIT_AddLineIntercepts(line_t *ld) {
+bool PIT_AddLineIntercepts(line_t *ld) {
     int s1;
     int s2;
     divline_t dl;
@@ -489,7 +490,7 @@ boolean PIT_AddLineIntercepts(line_t *ld) {
 //
 // PIT_AddThingIntercepts
 //
-boolean PIT_AddThingIntercepts(mobj_t *thing) {
+bool PIT_AddThingIntercepts(mobj_t *thing) {
     fixed_t x1;
     fixed_t y1;
     fixed_t x2;
@@ -497,7 +498,7 @@ boolean PIT_AddThingIntercepts(mobj_t *thing) {
 
     divline_t dl;
 
-    boolean tracepositive = (trace.dx ^ trace.dy) > 0;
+    bool tracepositive = (trace.dx ^ trace.dy) > 0;
 
     // check a corner to corner crossection for hit
     if (tracepositive) {
@@ -545,7 +546,7 @@ boolean PIT_AddThingIntercepts(mobj_t *thing) {
 // Returns true if the traverser function returns true
 // for all lines.
 //
-boolean P_TraverseIntercepts(traverser_t func, fixed_t maxfrac) {
+bool P_TraverseIntercepts(traverser_t func, fixed_t maxfrac) {
     intercept_t *scan;
 
     int count = intercept_p - intercepts;
@@ -595,7 +596,7 @@ extern fixed_t bulletslope;
 typedef struct {
     int len;
     void *addr;
-    boolean int16_array;
+    bool int16_array;
 } intercepts_overrun_t;
 
 // Intercepts memory table.  This is where various variables are located
@@ -653,8 +654,8 @@ static void InterceptsMemoryOverrun(int location, int value) {
             if (addr != NULL) {
                 if (intercepts_overrun[i].int16_array) {
                     index = (location - offset) / 2;
-                    ((short *) addr)[index] = value & 0xffff;
-                    ((short *) addr)[index + 1] = (value >> 16) & 0xffff;
+                    ((int16_t *) addr)[index] = value & 0xffff;
+                    ((int16_t *) addr)[index + 1] = (value >> 16) & 0xffff;
                 } else {
                     index = (location - offset) / 4;
                     ((int *) addr)[index] = value;
@@ -700,13 +701,13 @@ static void InterceptsOverrun(int num_intercepts, intercept_t *intercept) {
 // Returns true if the traverser function returns true
 // for all lines.
 //
-boolean P_PathTraverse(
+bool P_PathTraverse(
     fixed_t x1,
     fixed_t y1,
     fixed_t x2,
     fixed_t y2,
     int flags,
-    boolean (*trav)(intercept_t *)
+    bool (*trav)(intercept_t *)
     ) {
     fixed_t xstep;
     fixed_t ystep;

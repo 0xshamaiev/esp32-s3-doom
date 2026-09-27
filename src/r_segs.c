@@ -17,6 +17,7 @@
 //
 
 
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -32,13 +33,13 @@
 // OPTIMIZE: closed two sided lines as single sided
 
 // True if any of the segs textures might be visible.
-boolean segtextured;
+bool segtextured;
 
 // False if the back side is the same plane.
-boolean markfloor;
-boolean markceiling;
+bool markfloor;
+bool markceiling;
 
-boolean maskedtexture;
+bool maskedtexture;
 int toptexture;
 int bottomtexture;
 int midtexture;
@@ -81,7 +82,7 @@ fixed_t bottomstep;
 
 lighttable_t **walllights;
 
-short *maskedtexturecol;
+int16_t *maskedtexturecol;
 
 
 //
@@ -140,7 +141,7 @@ void R_RenderMaskedSegRange(drawseg_t *ds, int x1, int x2) {
         // calculate lighting
         if (maskedtexturecol[dc_x] != SHRT_MAX) {
             if (!fixedcolormap) {
-                unsigned int index = spryscale >> LIGHTSCALESHIFT;
+                uint32_t index = spryscale >> LIGHTSCALESHIFT;
 
                 if (index >= MAXLIGHTSCALE)
                     index = MAXLIGHTSCALE - 1;
@@ -149,7 +150,7 @@ void R_RenderMaskedSegRange(drawseg_t *ds, int x1, int x2) {
             }
 
             sprtopscreen = centeryfrac - FixedMul(dc_texturemid, spryscale);
-            dc_iscale = 0xffffffffu / (unsigned) spryscale;
+            dc_iscale = 0xffffffffu / (uint32_t) spryscale;
 
             // draw the texture
             column_t *col = (column_t *)(R_GetColumn(texnum, maskedtexturecol[dc_x]) - 3);
@@ -223,14 +224,14 @@ void R_RenderSegLoop(void) {
             texturecolumn = rw_offset - FixedMul(finetangent[angle], rw_distance);
             texturecolumn >>= FRACBITS;
             // calculate lighting
-            unsigned int index = rw_scale >> LIGHTSCALESHIFT;
+            uint32_t index = rw_scale >> LIGHTSCALESHIFT;
 
             if (index >= MAXLIGHTSCALE)
                 index = MAXLIGHTSCALE - 1;
 
             dc_colormap = walllights[index];
             dc_x = rw_x;
-            dc_iscale = 0xffffffffu / (unsigned) rw_scale;
+            dc_iscale = 0xffffffffu / (uint32_t) rw_scale;
         } else {
             // purely to shut up the compiler
 

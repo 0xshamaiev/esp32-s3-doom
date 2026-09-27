@@ -21,6 +21,7 @@
 #ifndef __STSTUFF_H__
 #define __STSTUFF_H__
 
+#include <stdint.h>
 #include "d_event.h"
 #include "doomtype.h"
 #include "m_cheat.h"
@@ -36,13 +37,13 @@
 //
 
 // Called by main loop.
-boolean ST_Responder(event_t *ev);
+bool ST_Responder(event_t *ev);
 
 // Called by main loop.
 void ST_Ticker(void);
 
 // Called by main loop.
-void ST_Drawer(boolean fullscreen, boolean refresh);
+void ST_Drawer(bool fullscreen, bool refresh);
 
 // Called when the console player is spawned on each level.
 void ST_Start(void);
@@ -53,7 +54,7 @@ void ST_Init(void);
 // States for status bar code.
 typedef enum { AutomapState, FirstPersonState } st_stateenum_t;
 
-extern byte *st_backing_screen;
+extern uint8_t *st_backing_screen;
 extern cheatseq_t cheat_mus;
 extern cheatseq_t cheat_god;
 extern cheatseq_t cheat_ammo;

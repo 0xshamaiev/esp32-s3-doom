@@ -24,6 +24,8 @@
 
 static const char rcsid[] = "$Id: i_x.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 
+#include <stdint.h>
+#include <inttypes.h>
 #include "i_video.h"
 #include "config.h"
 #include "d_event.h"
@@ -38,7 +40,6 @@ static const char rcsid[] = "$Id: i_x.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 
 #include "doomgeneric.h"
 
-#include <stdbool.h>
 #include <stdlib.h>
 
 #include <fcntl.h>
@@ -75,7 +76,7 @@ int usemouse = 0;
 
 #ifdef CMAP256
 
-boolean palette_changed;
+bool palette_changed;
 struct color colors[256];
 
 #else // CMAP256
@@ -88,16 +89,16 @@ void I_GetEvent(void);
 
 // The screen buffer; this is modified to draw things to the screen
 
-byte *I_VideoBuffer = NULL;
+uint8_t *I_VideoBuffer = NULL;
 
 // If true, game is running as a screensaver
 
-boolean screensaver_mode = false;
+bool screensaver_mode = false;
 
 // Flag indicating whether the screen is currently visible:
 // when the screen isnt visible, don't render the screen
 
-boolean screenvisible;
+bool screenvisible;
 
 // Mouse acceleration
 //
@@ -116,9 +117,9 @@ int mouse_threshold = 10;
 int usegamma = 0;
 
 typedef struct {
-    byte r;
-    byte g;
-    byte b;
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
 } col_t;
 
 // Palette converted to RGB565
@@ -169,7 +170,7 @@ void cmap_to_fb(uint8_t *out, uint8_t *in, int in_pixels) {
             }
         } else {
             // no clue how to convert this
-            I_Error("No idea how to convert %d bpp pixels", s_Fb.bits_per_pixel);
+            I_Error("No idea how to convert %" PRIu32 " bpp pixels", s_Fb.bits_per_pixel);
         }
 
         in++;
@@ -232,12 +233,12 @@ void I_InitGraphics(void) {
 
 #endif // CMAP256
 
-    printf("I_InitGraphics: framebuffer: x_res: %d, y_res: %d, x_virtual: %d, y_virtual: %d, bpp: "
-           "%d\n",
+    printf("I_InitGraphics: framebuffer: x_res: %" PRIu32 ", y_res: %" PRIu32 ", x_virtual: %" PRIu32 ", y_virtual: %" PRIu32 ", bpp: "
+           "%" PRIu32 "\n",
            s_Fb.xres, s_Fb.yres, s_Fb.xres_virtual, s_Fb.yres_virtual, s_Fb.bits_per_pixel);
 
-    printf("I_InitGraphics: framebuffer: RGBA: %d%d%d%d, red_off: %d, green_off: %d, blue_off: %d, "
-           "transp_off: %d\n",
+    printf("I_InitGraphics: framebuffer: RGBA: %" PRIu32 "%" PRIu32 "%" PRIu32 "%" PRIu32 ", red_off: %" PRIu32 ", green_off: %" PRIu32 ", blue_off: %" PRIu32 ", "
+           "transp_off: %" PRIu32 "\n",
            s_Fb.red.length, s_Fb.green.length, s_Fb.blue.length, s_Fb.transp.length,
            s_Fb.red.offset, s_Fb.green.offset, s_Fb.blue.offset, s_Fb.transp.offset);
 
@@ -250,13 +251,13 @@ void I_InitGraphics(void) {
         printf("I_InitGraphics: Scaling factor: %d\n", fb_scaling);
     } else {
         fb_scaling = s_Fb.xres / SCREENWIDTH;
-        if (s_Fb.yres / SCREENHEIGHT < fb_scaling)
+        if ((int)(s_Fb.yres / SCREENHEIGHT) < fb_scaling)
             fb_scaling = s_Fb.yres / SCREENHEIGHT;
         printf("I_InitGraphics: Auto-scaling factor: %d\n", fb_scaling);
     }
 
     /* Allocate screen to draw to */
-    I_VideoBuffer = (byte *)Z_Malloc(SCREENWIDTH * SCREENHEIGHT, PU_STATIC, NULL);
+    I_VideoBuffer = (uint8_t *)Z_Malloc(SCREENWIDTH * SCREENHEIGHT, PU_STATIC, NULL);
     // For DOOM to draw on
 
     screenvisible = true;
@@ -291,8 +292,8 @@ void I_FinishUpdate(void) {
         ((s_Fb.xres - (SCREENWIDTH * fb_scaling)) * s_Fb.bits_per_pixel / 8) - x_offset;
 
     /* DRAW SCREEN */
-    unsigned char *line_in = (unsigned char *)I_VideoBuffer;
-    unsigned char *line_out = (unsigned char *)DG_ScreenBuffer;
+    uint8_t *line_in = (uint8_t *)I_VideoBuffer;
+    uint8_t *line_out = (uint8_t *)DG_ScreenBuffer;
 
     int y = SCREENHEIGHT;
 
@@ -328,7 +329,7 @@ void I_FinishUpdate(void) {
 //
 // I_ReadScreen
 //
-void I_ReadScreen(byte *scr) { memcpy(scr, I_VideoBuffer, SCREENWIDTH * SCREENHEIGHT); }
+void I_ReadScreen(uint8_t *scr) { memcpy(scr, I_VideoBuffer, SCREENWIDTH * SCREENHEIGHT); }
 
 //
 // I_SetPalette
@@ -339,7 +340,7 @@ void I_ReadScreen(byte *scr) { memcpy(scr, I_VideoBuffer, SCREENWIDTH * SCREENHE
 #define GFX_RGB565_G(color) ((0x07E0 & color) >> 5)
 #define GFX_RGB565_B(color) (0x001F & color)
 
-void I_SetPalette(const byte *palette) {
+void I_SetPalette(const uint8_t *palette) {
     // col_t* c;
 
     // for (i = 0; i < 256; i++)
@@ -415,6 +416,6 @@ void I_EnableLoadingDisk(void) {}
 
 void I_BindVideoVariables(void) {}
 
-void I_DisplayFPSDots(boolean dots_on) {}
+void I_DisplayFPSDots(bool dots_on) {}
 
 void I_CheckIsScreensaver(void) {}

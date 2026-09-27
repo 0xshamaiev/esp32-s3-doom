@@ -17,6 +17,7 @@
 //	Shooting and aiming.
 //
 
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -69,7 +70,7 @@ fixed_t tmy;
 
 // If "floatok" true, move would be ok
 // if within "tmfloorz - tmceilingz".
-boolean floatok;
+bool floatok;
 
 fixed_t tmfloorz;
 fixed_t tmceilingz;
@@ -93,7 +94,7 @@ int numspechit;
 //
 // PIT_StompThing
 //
-boolean PIT_StompThing(mobj_t *thing) {
+bool PIT_StompThing(mobj_t *thing) {
     if (!(thing->flags & MF_SHOOTABLE))
         return true;
 
@@ -122,7 +123,7 @@ boolean PIT_StompThing(mobj_t *thing) {
 //
 // P_TeleportMove
 //
-boolean P_TeleportMove(mobj_t *thing, fixed_t x, fixed_t y) {
+bool P_TeleportMove(mobj_t *thing, fixed_t x, fixed_t y) {
     // kill anything occupying the position
     tmthing = thing;
     tmflags = thing->flags;
@@ -184,7 +185,7 @@ static void SpechitOverrun(line_t * ld);
 // PIT_CheckLine
 // Adjusts tmfloorz and tmceilingz as lines are contacted
 //
-boolean PIT_CheckLine(line_t *ld) {
+bool PIT_CheckLine(line_t *ld) {
     if (tmbbox[BOXRIGHT] <= ld->bbox[BOXLEFT]
         || tmbbox[BOXLEFT] >= ld->bbox[BOXRIGHT]
         || tmbbox[BOXTOP] <= ld->bbox[BOXBOTTOM]
@@ -248,7 +249,7 @@ boolean PIT_CheckLine(line_t *ld) {
 //
 // PIT_CheckThing
 //
-boolean PIT_CheckThing(mobj_t *thing) {
+bool PIT_CheckThing(mobj_t *thing) {
     int damage;
 
     if (!(thing->flags & (MF_SOLID | MF_SPECIAL | MF_SHOOTABLE)))
@@ -323,7 +324,7 @@ boolean PIT_CheckThing(mobj_t *thing) {
 
     // check for special pickup
     if (thing->flags & MF_SPECIAL) {
-        boolean solid = thing->flags & MF_SOLID;
+        bool solid = thing->flags & MF_SOLID;
         if (tmflags & MF_PICKUP) {
             // can remove thing
             P_TouchSpecialThing(thing, tmthing);
@@ -363,7 +364,7 @@ boolean PIT_CheckThing(mobj_t *thing) {
 //  speciallines[]
 //  numspeciallines
 //
-boolean P_CheckPosition(mobj_t *thing, fixed_t x, fixed_t y) {
+bool P_CheckPosition(mobj_t *thing, fixed_t x, fixed_t y) {
     tmthing = thing;
     tmflags = thing->flags;
 
@@ -426,7 +427,7 @@ boolean P_CheckPosition(mobj_t *thing, fixed_t x, fixed_t y) {
 // Attempt to move to a new position,
 // crossing special lines unless MF_TELEPORT is set.
 //
-boolean P_TryMove(mobj_t *thing, fixed_t x, fixed_t y) {
+bool P_TryMove(mobj_t *thing, fixed_t x, fixed_t y) {
     floatok = false;
     if (!P_CheckPosition(thing, x, y))
         return false; // solid wall or thing
@@ -491,8 +492,8 @@ boolean P_TryMove(mobj_t *thing, fixed_t x, fixed_t y) {
 // the z will be set to the lowest value
 // and false will be returned.
 //
-boolean P_ThingHeightClip(mobj_t *thing) {
-    boolean onfloor = (thing->z == thing->floorz);
+bool P_ThingHeightClip(mobj_t *thing) {
+    bool onfloor = (thing->z == thing->floorz);
 
     P_CheckPosition(thing, thing->x, thing->y);
     // what about stranding a monster partially off an edge?
@@ -576,7 +577,7 @@ void P_HitSlideLine(line_t *ld) {
 //
 // PTR_SlideTraverse
 //
-boolean PTR_SlideTraverse(intercept_t *in) {
+bool PTR_SlideTraverse(intercept_t *in) {
     if (!in->isaline)
         I_Error("PTR_SlideTraverse: not a line?");
 
@@ -737,7 +738,7 @@ extern fixed_t bottomslope;
 // PTR_AimTraverse
 // Sets linetaget and aimslope when a target is aimed at.
 //
-boolean PTR_AimTraverse(intercept_t *in) {
+bool PTR_AimTraverse(intercept_t *in) {
     fixed_t slope;
     fixed_t dist;
 
@@ -814,7 +815,7 @@ boolean PTR_AimTraverse(intercept_t *in) {
 //
 // PTR_ShootTraverse
 //
-boolean PTR_ShootTraverse(intercept_t *in) {
+bool PTR_ShootTraverse(intercept_t *in) {
     fixed_t x;
     fixed_t y;
     fixed_t z;
@@ -1000,7 +1001,7 @@ void P_LineAttack(mobj_t *t1, angle_t angle, fixed_t distance, fixed_t slope, in
 //
 mobj_t *usething;
 
-boolean PTR_UseTraverse(intercept_t *in) {
+bool PTR_UseTraverse(intercept_t *in) {
     if (!in->d.line->special) {
         P_LineOpening(in->d.line);
         if (openrange <= 0) {
@@ -1057,7 +1058,7 @@ int bombdamage;
 // "bombsource" is the creature
 // that caused the explosion at "bombspot".
 //
-boolean PIT_RadiusAttack(mobj_t *thing) {
+bool PIT_RadiusAttack(mobj_t *thing) {
     if (!(thing->flags & MF_SHOOTABLE))
         return true;
 
@@ -1121,14 +1122,14 @@ void P_RadiusAttack(mobj_t *spot, mobj_t *source, int damage) {
 //  the way it was and call P_ChangeSector again
 //  to undo the changes.
 //
-boolean crushchange;
-boolean nofit;
+bool crushchange;
+bool nofit;
 
 
 //
 // PIT_ChangeSector
 //
-boolean PIT_ChangeSector(mobj_t *thing) {
+bool PIT_ChangeSector(mobj_t *thing) {
     if (P_ThingHeightClip(thing)) {
         // keep checking
         return true;
@@ -1179,7 +1180,7 @@ boolean PIT_ChangeSector(mobj_t *thing) {
 //
 // P_ChangeSector
 //
-boolean P_ChangeSector(sector_t *sector, boolean crunch) {
+bool P_ChangeSector(sector_t *sector, bool crunch) {
     nofit = false;
     crushchange = crunch;
 
@@ -1197,7 +1198,7 @@ boolean P_ChangeSector(sector_t *sector, boolean crunch) {
 // PrBoom plus port.  A big thanks to Andrey for this.
 
 static void SpechitOverrun(line_t *ld) {
-    static unsigned int baseaddr = 0;
+    static uint32_t baseaddr = 0;
 
     if (baseaddr == 0) {
         // This is the first time we have had an overrun.  Work out
@@ -1222,7 +1223,7 @@ static void SpechitOverrun(line_t *ld) {
 
     // Calculate address used in doom2.exe
 
-    unsigned int addr = baseaddr + (ld - lines) * 0x3E;
+    uint32_t addr = baseaddr + (ld - lines) * 0x3E;
 
     switch (numspechit) {
         case 9:

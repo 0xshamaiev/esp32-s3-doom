@@ -18,6 +18,7 @@
 
 
 // Data.
+#include <stdint.h>
 #include "doomdef.h"
 #include "dstrings.h"
 #include "sounds.h"
@@ -58,11 +59,7 @@ int clipammo[NUMAMMO] = {10, 4, 20, 1};
 // Returns false if the ammo can't be picked up at all
 //
 
-boolean
-P_GiveAmmo
-(player_t *player,
- ammotype_t ammo,
- int num) {
+bool P_GiveAmmo(player_t *player, ammotype_t ammo, int num) {
     if (ammo == am_noammo)
         return false;
 
@@ -142,13 +139,13 @@ P_GiveAmmo
 // P_GiveWeapon
 // The weapon name may have a MF_DROPPED flag ored in.
 //
-boolean
+bool
 P_GiveWeapon
 (player_t *player,
  weapontype_t weapon,
- boolean dropped) {
-    boolean gaveammo;
-    boolean gaveweapon;
+ bool dropped) {
+    bool gaveammo;
+    bool gaveweapon;
 
     if (weaponinfo[weapon].ammo != am_noammo) {
         // give one clip with a dropped weapon,
@@ -177,10 +174,7 @@ P_GiveWeapon
 // P_GiveBody
 // Returns false if the body isn't needed at all
 //
-boolean
-P_GiveBody
-(player_t *player,
- int num) {
+bool P_GiveBody(player_t *player, int num) {
     if (player->health >= MAXHEALTH)
         return false;
 
@@ -198,10 +192,7 @@ P_GiveBody
 // Returns false if the armor is worse
 // than the current armor.
 //
-boolean
-P_GiveArmor
-(player_t *player,
- int armortype) {
+bool P_GiveArmor(player_t *player, int armortype) {
     int hits = armortype * 100;
     if (player->armorpoints >= hits)
         return false; // don't pick up
@@ -231,10 +222,7 @@ P_GiveCard
 //
 // P_GivePower
 //
-boolean
-P_GivePower
-(player_t *player,
- int /*powertype_t*/ power) {
+bool P_GivePower(player_t *player, int /*powertype_t*/ power) {
     if (power == pw_invulnerability) {
         player->powers[power] = INVULNTICS;
         return true;
@@ -273,10 +261,7 @@ P_GivePower
 //
 // P_TouchSpecialThing
 //
-void
-P_TouchSpecialThing
-(mobj_t *special,
- mobj_t *toucher) {
+void P_TouchSpecialThing(mobj_t *special, mobj_t *toucher) {
     fixed_t delta = special->z - toucher->z;
 
     if (delta > toucher->height
@@ -686,12 +671,7 @@ P_KillMobj
 // Source can be NULL for slime, barrel explosions
 // and other environmental stuff.
 //
-void
-P_DamageMobj
-(mobj_t *target,
- mobj_t *inflictor,
- mobj_t *source,
- int damage) {
+void P_DamageMobj(mobj_t *target, mobj_t *inflictor, mobj_t *source, int damage) {
     int saved;
 
     if (!(target->flags & MF_SHOOTABLE))
@@ -717,7 +697,7 @@ P_DamageMobj
         && (!source
             || !source->player
             || source->player->readyweapon != wp_chainsaw)) {
-        unsigned int ang = R_PointToAngle2(inflictor->x, inflictor->y, target->x, target->y);
+        uint32_t ang = R_PointToAngle2(inflictor->x, inflictor->y, target->x, target->y);
 
         fixed_t thrust = damage * (FRACUNIT >> 3) * 100 / target->info->mass;
 
@@ -789,7 +769,7 @@ P_DamageMobj
         return;
     }
 
-    if ((P_Random() < target->info->painchance)
+    if (P_Random() < target->info->painchance
         && !(target->flags & MF_SKULLFLY)) {
         target->flags |= MF_JUSTHIT; // fight back!
 
