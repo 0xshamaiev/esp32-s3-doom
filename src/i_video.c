@@ -292,7 +292,7 @@ void I_FinishUpdate(void) {
         ((s_Fb.xres - (SCREENWIDTH * fb_scaling)) * s_Fb.bits_per_pixel / 8) - x_offset;
 
     /* DRAW SCREEN */
-    uint8_t *line_in = (uint8_t *)I_VideoBuffer;
+    uint8_t *line_in = I_VideoBuffer;
     uint8_t *line_out = (uint8_t *)DG_ScreenBuffer;
 
     int y = SCREENHEIGHT;
@@ -316,7 +316,7 @@ void I_FinishUpdate(void) {
             }
 #else
             // cmap_to_rgb565((void*)line_out, (void*)line_in, SCREENWIDTH);
-            cmap_to_fb((void *)line_out, (void *)line_in, SCREENWIDTH);
+            cmap_to_fb(line_out, line_in, SCREENWIDTH);
 #endif
             line_out += (SCREENWIDTH * fb_scaling * (s_Fb.bits_per_pixel / 8)) + x_offset_end;
         }
@@ -405,12 +405,6 @@ int I_GetPaletteIndex(int r, int g, int b) {
 void I_BeginRead(void) {}
 
 void I_EndRead(void) {}
-
-void I_SetWindowTitle(const char *title) { DG_SetWindowTitle(title); }
-
-void I_GraphicsCheckCommandLine(void) {}
-
-void I_SetGrabMouseCallback(grabmouse_callback_t func) {}
 
 void I_EnableLoadingDisk(void) {}
 

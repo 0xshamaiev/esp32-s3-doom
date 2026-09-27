@@ -5,11 +5,11 @@
 #include <stdlib.h>
 
 #ifndef DOOMGENERIC_RESX
-#define DOOMGENERIC_RESX 320
+#define DOOMGENERIC_RESX 240
 #endif // DOOMGENERIC_RESX
 
 #ifndef DOOMGENERIC_RESY
-#define DOOMGENERIC_RESY 200
+#define DOOMGENERIC_RESY 135
 #endif // DOOMGENERIC_RESY
 
 #ifdef CMAP256
@@ -42,8 +42,6 @@ void DG_SleepMs(uint32_t ms);
 uint32_t DG_GetTicksMs(void);
 
 int DG_GetKey(int *pressed, uint8_t *key);
-
-void DG_SetWindowTitle(const char *title);
 
 #ifdef __cplusplus
 }
