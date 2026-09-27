@@ -22,8 +22,8 @@
 #define __DOOMDATA__
 
 // The most basic types we use, portability.
-#include <stdint.h>
 #include "doomtype.h"
+#include <stdint.h>
 
 // Some global defines, that configure the game.
 #include "doomdef.h"

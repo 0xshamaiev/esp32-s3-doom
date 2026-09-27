@@ -25,7 +25,7 @@
 // The "mission" controls what game we are playing.
 
 typedef enum {
-    doom, // Doom 1
+    doom,  // Doom 1
     doom2, // Doom 2
 
     none
@@ -36,22 +36,22 @@ typedef enum {
 // same mission, but a different mode.
 
 typedef enum {
-    shareware, // Doom shareware
-    registered, // Doom registered
-    commercial, // Doom II
-    retail, // Ultimate Doom
+    shareware,   // Doom shareware
+    registered,  // Doom registered
+    commercial,  // Doom II
+    retail,      // Ultimate Doom
     indetermined // Unknown.
 } GameMode_t;
 
 // What version are we emulating?
 
 typedef enum {
-    exe_doom_1_2, // Doom 1.2: shareware and registered
+    exe_doom_1_2,   // Doom 1.2: shareware and registered
     exe_doom_1_666, // Doom 1.666: for shareware, registered and commercial
-    exe_doom_1_7, // Doom 1.7/1.7a: "
-    exe_doom_1_8, // Doom 1.8: "
-    exe_doom_1_9, // Doom 1.9: "
-    exe_ultimate, // Ultimate Doom (retail)
+    exe_doom_1_7,   // Doom 1.7/1.7a: "
+    exe_doom_1_8,   // Doom 1.8: "
+    exe_doom_1_9,   // Doom 1.9: "
+    exe_ultimate,   // Ultimate Doom (retail)
 } GameVersion_t;
 
 // Skill level.
@@ -69,8 +69,7 @@ bool D_ValidGameMode(GameMission_t mission, GameMode_t mode);
 
 bool D_ValidGameVersion(GameMission_t mission, GameVersion_t version);
 
-bool D_ValidEpisodeMap(GameMission_t mission, GameMode_t mode,
-                          int episode, int map);
+bool D_ValidEpisodeMap(GameMission_t mission, GameMode_t mode, int episode, int map);
 
 int D_GetNumEpisodes(GameMission_t mission, GameMode_t mode);
 

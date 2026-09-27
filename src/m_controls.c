@@ -16,8 +16,8 @@
 
 #include <stdio.h>
 
-#include "doomtype.h"
 #include "doomkeys.h"
+#include "doomtype.h"
 
 #include "m_config.h"
 #include "m_misc.h"
@@ -36,7 +36,6 @@ int key_fire = KEY_FIRE;
 int key_use = KEY_USE;
 int key_strafe = KEY_RALT;
 int key_speed = KEY_RSHIFT;
-
 
 int key_message_refresh = KEY_ENTER;
 int key_pause = KEY_PAUSE;

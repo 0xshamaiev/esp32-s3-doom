@@ -18,8 +18,8 @@
 //	See tables.c, too.
 //
 
-#include <stdint.h>
 #include <math.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 #include "d_loop.h"

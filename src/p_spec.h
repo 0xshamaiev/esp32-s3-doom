@@ -432,8 +432,8 @@ typedef struct {
 
 typedef enum { ok, crushed, pastdest } result_e;
 
-result_e T_MovePlane(sector_t *sector, fixed_t speed, fixed_t dest, bool crush,
-                     int floorOrCeiling, int direction);
+result_e T_MovePlane(sector_t *sector, fixed_t speed, fixed_t dest, bool crush, int floorOrCeiling,
+                     int direction);
 
 int EV_BuildStairs(line_t *line, stair_e type);
 

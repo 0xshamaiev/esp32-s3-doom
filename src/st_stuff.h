@@ -21,10 +21,10 @@
 #ifndef __STSTUFF_H__
 #define __STSTUFF_H__
 
-#include <stdint.h>
 #include "d_event.h"
 #include "doomtype.h"
 #include "m_cheat.h"
+#include <stdint.h>
 
 // Size of statusbar.
 // Now sensitive for scaling.

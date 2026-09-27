@@ -17,8 +17,8 @@
 //	Sliders and icons. Kinda widget stuff.
 //
 
-#include <stdint.h>
 #include <ctype.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 #include "doomdef.h"
@@ -128,10 +128,10 @@ typedef struct {
 } menuitem_t;
 
 typedef struct menu_s {
-    int16_t numitems;          // # of menu items
+    int16_t numitems;        // # of menu items
     struct menu_s *prevMenu; // previous menu
     menuitem_t *menuitems;   // menu items
-    void (*routine)(void);       // draw routine
+    void (*routine)(void);   // draw routine
     int16_t x;
     int16_t y;      // x,y of menu
     int16_t lastOn; // last item user was on in menu
@@ -785,9 +785,7 @@ void M_EndGame(int choice) {
 //
 // M_ReadThis
 //
-void M_ReadThis(int choice) {
-    M_SetupNextMenu(&ReadDef1);
-}
+void M_ReadThis(int choice) { M_SetupNextMenu(&ReadDef1); }
 
 void M_ReadThis2(int choice) {
     // Doom 1.9 had two menus when playing Doom 1
@@ -801,9 +799,7 @@ void M_ReadThis2(int choice) {
     }
 }
 
-void M_FinishReadThis(int choice) {
-    M_SetupNextMenu(&MainDef);
-}
+void M_FinishReadThis(int choice) { M_SetupNextMenu(&MainDef); }
 
 //
 // M_QuitDOOM

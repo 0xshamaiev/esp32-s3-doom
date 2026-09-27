@@ -14,16 +14,14 @@
 //
 // DESCRIPTION:
 //   Duh.
-// 
-
+//
 
 #ifndef __G_GAME__
 #define __G_GAME__
 
-#include "doomdef.h"
 #include "d_event.h"
 #include "d_ticcmd.h"
-
+#include "doomdef.h"
 
 //
 // GAME
@@ -70,7 +68,7 @@ void G_BuildTiccmd(ticcmd_t *cmd, int maketic);
 
 void G_Ticker(void);
 
-bool G_Responder(event_t * ev);
+bool G_Responder(event_t *ev);
 
 void G_ScreenShot(void);
 
@@ -79,4 +77,3 @@ int G_VanillaVersionCode(void);
 extern int vanilla_savegame_limit;
 extern int vanilla_demo_limit;
 #endif
-

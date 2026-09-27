@@ -20,8 +20,8 @@
 #define __P_LOCAL__
 
 #ifndef __R_LOCAL__
-#include <stdint.h>
 #include "r_local.h"
+#include <stdint.h>
 #endif
 
 #define FLOATSPEED (FRACUNIT * 4)
@@ -169,7 +169,7 @@ bool P_BlockThingsIterator(int x, int y, bool (*func)(mobj_t *));
 extern divline_t trace;
 
 bool P_PathTraverse(fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2, int flags,
-                       bool (*trav)(intercept_t *));
+                    bool (*trav)(intercept_t *));
 
 void P_UnsetThingPosition(mobj_t *thing);
 void P_SetThingPosition(mobj_t *thing);
@@ -223,7 +223,7 @@ void P_RadiusAttack(mobj_t *spot, mobj_t *source, int damage);
 //
 // P_SETUP
 //
-extern uint8_t *rejectmatrix;  // for fast sight rejection
+extern uint8_t *rejectmatrix; // for fast sight rejection
 extern int16_t *blockmaplump; // offsets in blockmap are from here
 extern int16_t *blockmap;
 extern int bmapwidth;

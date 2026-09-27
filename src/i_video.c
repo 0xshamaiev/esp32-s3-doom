@@ -24,8 +24,6 @@
 
 static const char rcsid[] = "$Id: i_x.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 
-#include <stdint.h>
-#include <inttypes.h>
 #include "i_video.h"
 #include "config.h"
 #include "d_event.h"
@@ -34,6 +32,8 @@ static const char rcsid[] = "$Id: i_x.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 #include "m_argv.h"
 #include "v_video.h"
 #include "z_zone.h"
+#include <inttypes.h>
+#include <stdint.h>
 
 #include "doomkeys.h"
 #include "tables.h"
@@ -220,11 +220,13 @@ void I_InitGraphics(void) {
 
 #endif // CMAP256
 
-    printf("I_InitGraphics: framebuffer: x_res: %" PRIu32 ", y_res: %" PRIu32 ", x_virtual: %" PRIu32 ", y_virtual: %" PRIu32 ", bpp: "
+    printf("I_InitGraphics: framebuffer: x_res: %" PRIu32 ", y_res: %" PRIu32
+           ", x_virtual: %" PRIu32 ", y_virtual: %" PRIu32 ", bpp: "
            "%" PRIu32 "\n",
            s_Fb.xres, s_Fb.yres, s_Fb.xres_virtual, s_Fb.yres_virtual, s_Fb.bits_per_pixel);
 
-    printf("I_InitGraphics: framebuffer: RGBA: %" PRIu32 "%" PRIu32 "%" PRIu32 "%" PRIu32 ", red_off: %" PRIu32 ", green_off: %" PRIu32 ", blue_off: %" PRIu32 ", "
+    printf("I_InitGraphics: framebuffer: RGBA: %" PRIu32 "%" PRIu32 "%" PRIu32 "%" PRIu32
+           ", red_off: %" PRIu32 ", green_off: %" PRIu32 ", blue_off: %" PRIu32 ", "
            "transp_off: %" PRIu32 "\n",
            s_Fb.red.length, s_Fb.green.length, s_Fb.blue.length, s_Fb.transp.length,
            s_Fb.red.offset, s_Fb.green.offset, s_Fb.blue.offset, s_Fb.transp.offset);

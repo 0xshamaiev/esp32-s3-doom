@@ -16,10 +16,9 @@
 //	Handles WAD file header, directory, lump I/O.
 //
 
-
-#include <stdint.h>
-#include <inttypes.h>
 #include <ctype.h>
+#include <inttypes.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -44,7 +43,6 @@ typedef struct {
 }
 
 PACKEDATTR wadinfo_t;
-
 
 typedef struct {
     int32_t filepos;
@@ -76,7 +74,7 @@ uint32_t W_LumpNameHash(const char *s) {
     uint32_t result = 5381;
 
     for (uint32_t i = 0; i < 8 && s[i] != '\0'; ++i) {
-        result = ((result << 5) ^ result) ^ toupper((int) s[i]);
+        result = ((result << 5) ^ result) ^ toupper((int)s[i]);
     }
 
     return result;
@@ -167,7 +165,8 @@ wad_file_t *W_AddFile(char *filename) {
             // Homebrew levels?
             if (strncmp(header.identification, "PWAD", 4) != 0) {
                 I_Error("Wad file %s doesn't have IWAD "
-                        "or PWAD id\n", filename);
+                        "or PWAD id\n",
+                        filename);
             }
 
             // ???modifiedgame = true;
@@ -211,14 +210,10 @@ wad_file_t *W_AddFile(char *filename) {
     return wad_file;
 }
 
-
 //
 // W_NumLumps
 //
-int W_NumLumps(void) {
-    return numlumps;
-}
-
+int W_NumLumps(void) { return numlumps; }
 
 //
 // W_CheckNumForName
@@ -253,7 +248,6 @@ int W_CheckNumForName(char *name) {
     return -1;
 }
 
-
 //
 // W_GetNumForName
 // Calls W_CheckNumForName, but bombs out if not found.
@@ -268,7 +262,6 @@ int W_GetNumForName(char *name) {
     return i;
 }
 
-
 //
 // W_LumpLength
 // Returns the buffer size needed to load the given lump.
@@ -280,7 +273,6 @@ int W_LumpLength(uint32_t lump) {
 
     return lumpinfo[lump].size;
 }
-
 
 //
 // W_ReadLump
@@ -299,13 +291,11 @@ void W_ReadLump(uint32_t lump, void *dest) {
     const int c = W_Read(l->wad_file, l->position, dest, l->size);
 
     if (c < l->size) {
-        I_Error("W_ReadLump: only read %i of %i on lump %" PRIu32,
-                c, l->size, lump);
+        I_Error("W_ReadLump: only read %i of %i on lump %" PRIu32, c, l->size, lump);
     }
 
     I_EndRead();
 }
-
 
 //
 // W_CacheLumpNum
@@ -322,7 +312,7 @@ void W_ReadLump(uint32_t lump, void *dest) {
 void *W_CacheLumpNum(int lumpnum, int tag) {
     uint8_t *result;
 
-    if ((uint32_t) lumpnum >= numlumps) {
+    if ((uint32_t)lumpnum >= numlumps) {
         I_Error("W_CacheLumpNum: %i >= numlumps", lumpnum);
     }
 
@@ -344,13 +334,10 @@ void *W_CacheLumpNum(int lumpnum, int tag) {
     return result;
 }
 
-
 //
 // W_CacheLumpName
 //
-void *W_CacheLumpName(char *name, int tag) {
-    return W_CacheLumpNum(W_GetNumForName(name), tag);
-}
+void *W_CacheLumpName(char *name, int tag) { return W_CacheLumpNum(W_GetNumForName(name), tag); }
 
 //
 // Release a lump back to the cache, so that it can be reused later
@@ -368,9 +355,7 @@ void W_ReleaseLumpNum(int lumpnum) {
     Z_ChangeTag(lump->cache, PU_CACHE);
 }
 
-void W_ReleaseLumpName(char *name) {
-    W_ReleaseLumpNum(W_GetNumForName(name));
-}
+void W_ReleaseLumpName(char *name) { W_ReleaseLumpNum(W_GetNumForName(name)); }
 
 #if 0
 
@@ -406,7 +391,6 @@ void W_Profile(void) {
     }
     profilecount++;
 }
-
 
 #endif
 

@@ -20,8 +20,8 @@
 #define __R_DEFS__
 
 // Screenwidth.
-#include <stdint.h>
 #include "doomdef.h"
+#include <stdint.h>
 
 // Some more or less basic data types
 // we depend on.

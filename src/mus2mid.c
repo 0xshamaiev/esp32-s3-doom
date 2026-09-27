@@ -62,23 +62,19 @@ typedef struct {
 } musheader;
 
 // Standard MIDI type 0 header + track header
-static const uint8_t midiheader[] =
-{
-    'M', 'T', 'h', 'd', // Main header
+static const uint8_t midiheader[] = {
+    'M',  'T',  'h',  'd',  // Main header
     0x00, 0x00, 0x00, 0x06, // Header size
-    0x00, 0x00, // MIDI type (0)
-    0x00, 0x01, // Number of tracks
-    0x00, 0x46, // Resolution
-    'M', 'T', 'r', 'k', // Start of track
-    0x00, 0x00, 0x00, 0x00 // Placeholder for track length
+    0x00, 0x00,             // MIDI type (0)
+    0x00, 0x01,             // Number of tracks
+    0x00, 0x46,             // Resolution
+    'M',  'T',  'r',  'k',  // Start of track
+    0x00, 0x00, 0x00, 0x00  // Placeholder for track length
 };
 
 // Cached channel velocities
-static uint8_t channelvelocities[] =
-{
-    127, 127, 127, 127, 127, 127, 127, 127,
-    127, 127, 127, 127, 127, 127, 127, 127
-};
+static uint8_t channelvelocities[] = {127, 127, 127, 127, 127, 127, 127, 127,
+                                      127, 127, 127, 127, 127, 127, 127, 127};
 
 // Timestamps between sequences of MUS events
 
@@ -88,11 +84,8 @@ static uint32_t queuedtime = 0;
 
 static uint32_t tracksize;
 
-static const uint8_t controller_map[] =
-{
-    0x00, 0x20, 0x01, 0x07, 0x0A, 0x0B, 0x5B, 0x5D,
-    0x40, 0x43, 0x78, 0x7B, 0x7E, 0x7F, 0x79
-};
+static const uint8_t controller_map[] = {0x00, 0x20, 0x01, 0x07, 0x0A, 0x0B, 0x5B, 0x5D,
+                                         0x40, 0x43, 0x78, 0x7B, 0x7E, 0x7F, 0x79};
 
 static int channel_map[NUM_CHANNELS];
 
@@ -125,7 +118,6 @@ static bool WriteTime(uint32_t time, MEMFILE *midioutput) {
     }
 }
 
-
 // Write the end of track marker
 static bool WriteEndTrack(MEMFILE *midioutput) {
     uint8_t endtrack[] = {0xFF, 0x2F, 0x00};
@@ -143,8 +135,7 @@ static bool WriteEndTrack(MEMFILE *midioutput) {
 }
 
 // Write a key press event
-static bool WritePressKey(uint8_t channel, uint8_t key,
-                             uint8_t velocity, MEMFILE *midioutput) {
+static bool WritePressKey(uint8_t channel, uint8_t key, uint8_t velocity, MEMFILE *midioutput) {
     uint8_t working = midi_presskey | channel;
 
     if (WriteTime(queuedtime, midioutput)) {
@@ -173,8 +164,7 @@ static bool WritePressKey(uint8_t channel, uint8_t key,
 }
 
 // Write a key release event
-static bool WriteReleaseKey(uint8_t channel, uint8_t key,
-                               MEMFILE *midioutput) {
+static bool WriteReleaseKey(uint8_t channel, uint8_t key, MEMFILE *midioutput) {
     uint8_t working = midi_releasekey | channel;
 
     if (WriteTime(queuedtime, midioutput)) {
@@ -203,8 +193,7 @@ static bool WriteReleaseKey(uint8_t channel, uint8_t key,
 }
 
 // Write a pitch wheel/bend event
-static bool WritePitchWheel(uint8_t channel, int16_t wheel,
-                               MEMFILE *midioutput) {
+static bool WritePitchWheel(uint8_t channel, int16_t wheel, MEMFILE *midioutput) {
     uint8_t working = midi_pitchwheel | channel;
 
     if (WriteTime(queuedtime, midioutput)) {
@@ -232,8 +221,7 @@ static bool WritePitchWheel(uint8_t channel, int16_t wheel,
 }
 
 // Write a patch change event
-static bool WriteChangePatch(uint8_t channel, uint8_t patch,
-                                MEMFILE *midioutput) {
+static bool WriteChangePatch(uint8_t channel, uint8_t patch, MEMFILE *midioutput) {
     uint8_t working = midi_changepatch | channel;
 
     if (WriteTime(queuedtime, midioutput)) {
@@ -257,10 +245,8 @@ static bool WriteChangePatch(uint8_t channel, uint8_t patch,
 
 // Write a valued controller change event
 
-static bool WriteChangeController_Valued(uint8_t channel,
-                                            uint8_t control,
-                                            uint8_t value,
-                                            MEMFILE *midioutput) {
+static bool WriteChangeController_Valued(uint8_t channel, uint8_t control, uint8_t value,
+                                         MEMFILE *midioutput) {
     uint8_t working = midi_changecontroller | channel;
 
     if (WriteTime(queuedtime, midioutput)) {
@@ -299,11 +285,8 @@ static bool WriteChangeController_Valued(uint8_t channel,
 }
 
 // Write a valueless controller change event
-static bool WriteChangeController_Valueless(uint8_t channel,
-                                               uint8_t control,
-                                               MEMFILE *midioutput) {
-    return WriteChangeController_Valued(channel, control, 0,
-                                        midioutput);
+static bool WriteChangeController_Valueless(uint8_t channel, uint8_t control, MEMFILE *midioutput) {
+    return WriteChangeController_Valued(channel, control, 0, midioutput);
 }
 
 // Allocate a free MIDI channel.
@@ -353,8 +336,7 @@ static int GetMIDIChannel(int mus_channel, MEMFILE *midioutput) {
             // First time using the channel, send an "all notes off"
             // event. This fixes "The D_DDTBLU disease" described here:
             // https://www.doomworld.com/vb/source-ports/66802-the
-            WriteChangeController_Valueless(channel_map[mus_channel], 0x7b,
-                                            midioutput);
+            WriteChangeController_Valueless(channel_map[mus_channel], 0x7b, midioutput);
         }
 
         return channel_map[mus_channel];
@@ -363,11 +345,11 @@ static int GetMIDIChannel(int mus_channel, MEMFILE *midioutput) {
 
 static bool ReadMusHeader(MEMFILE *file, musheader *header) {
     bool result = mem_fread(&header->id, sizeof(uint8_t), 4, file) == 4 &&
-                     mem_fread(&header->scorelength, sizeof(int16_t), 1, file) == 1 &&
-                     mem_fread(&header->scorestart, sizeof(int16_t), 1, file) == 1 &&
-                     mem_fread(&header->primarychannels, sizeof(int16_t), 1, file) == 1 &&
-                     mem_fread(&header->secondarychannels, sizeof(int16_t), 1, file) == 1 &&
-                     mem_fread(&header->instrumentcount, sizeof(int16_t), 1, file) == 1;
+                  mem_fread(&header->scorelength, sizeof(int16_t), 1, file) == 1 &&
+                  mem_fread(&header->scorestart, sizeof(int16_t), 1, file) == 1 &&
+                  mem_fread(&header->primarychannels, sizeof(int16_t), 1, file) == 1 &&
+                  mem_fread(&header->secondarychannels, sizeof(int16_t), 1, file) == 1 &&
+                  mem_fread(&header->instrumentcount, sizeof(int16_t), 1, file) == 1;
 
     if (result) {
         header->scorelength = SHORT(header->scorelength);
@@ -379,7 +361,6 @@ static bool ReadMusHeader(MEMFILE *file, musheader *header) {
 
     return result;
 }
-
 
 // Read a MUS file from a stream (musinput) and output a MIDI file to
 // a stream (midioutput).
@@ -424,17 +405,14 @@ bool mus2mid(MEMFILE *musinput, MEMFILE *midioutput) {
 #define CHECK_MUS_HEADER
 #ifdef CHECK_MUS_HEADER
     // Check MUS header
-    if (musfileheader.id[0] != 'M'
-        || musfileheader.id[1] != 'U'
-        || musfileheader.id[2] != 'S'
-        || musfileheader.id[3] != 0x1A) {
+    if (musfileheader.id[0] != 'M' || musfileheader.id[1] != 'U' || musfileheader.id[2] != 'S' ||
+        musfileheader.id[3] != 0x1A) {
         return true;
     }
 #endif
 
     // Seek to where the data is held
-    if (mem_fseek(musinput, (int32_t) musfileheader.scorestart,
-                  MEM_SEEK_SET) != 0) {
+    if (mem_fseek(musinput, (int32_t)musfileheader.scorestart, MEM_SEEK_SET) != 0) {
         return true;
     }
 
@@ -459,99 +437,94 @@ bool mus2mid(MEMFILE *musinput, MEMFILE *midioutput) {
             musevent event = eventdescriptor & 0x70;
 
             switch (event) {
-                case mus_releasekey:
-                    if (mem_fread(&key, 1, 1, musinput) != 1) {
-                        return true;
-                    }
-
-                    if (WriteReleaseKey(channel, key, midioutput)) {
-                        return true;
-                    }
-
-                    break;
-
-                case mus_presskey:
-                    if (mem_fread(&key, 1, 1, musinput) != 1) {
-                        return true;
-                    }
-
-                    if (key & 0x80) {
-                        if (mem_fread(&channelvelocities[channel], 1, 1, musinput) != 1) {
-                            return true;
-                        }
-
-                        channelvelocities[channel] &= 0x7F;
-                    }
-
-                    if (WritePressKey(channel, key,
-                                      channelvelocities[channel], midioutput)) {
-                        return true;
-                    }
-
-                    break;
-
-                case mus_pitchwheel:
-                    if (mem_fread(&key, 1, 1, musinput) != 1) {
-                        break;
-                    }
-                    if (WritePitchWheel(channel, (int16_t) (key * 64), midioutput)) {
-                        return true;
-                    }
-
-                    break;
-
-                case mus_systemevent:
-                    if (mem_fread(&controllernumber, 1, 1, musinput) != 1) {
-                        return true;
-                    }
-                    if (controllernumber < 10 || controllernumber > 14) {
-                        return true;
-                    }
-
-                    if (WriteChangeController_Valueless(channel,
-                                                        controller_map[controllernumber],
-                                                        midioutput)) {
-                        return true;
-                    }
-
-                    break;
-
-                case mus_changecontroller:
-                    if (mem_fread(&controllernumber, 1, 1, musinput) != 1) {
-                        return true;
-                    }
-
-                    if (mem_fread(&controllervalue, 1, 1, musinput) != 1) {
-                        return true;
-                    }
-
-                    if (controllernumber == 0) {
-                        if (WriteChangePatch(channel, controllervalue,
-                                             midioutput)) {
-                            return true;
-                        }
-                    } else {
-                        if (controllernumber < 1 || controllernumber > 9) {
-                            return true;
-                        }
-
-                        if (WriteChangeController_Valued(channel,
-                                                         controller_map[controllernumber],
-                                                         controllervalue,
-                                                         midioutput)) {
-                            return true;
-                        }
-                    }
-
-                    break;
-
-                case mus_scoreend:
-                    hitscoreend = 1;
-                    break;
-
-                default:
+            case mus_releasekey:
+                if (mem_fread(&key, 1, 1, musinput) != 1) {
                     return true;
+                }
+
+                if (WriteReleaseKey(channel, key, midioutput)) {
+                    return true;
+                }
+
+                break;
+
+            case mus_presskey:
+                if (mem_fread(&key, 1, 1, musinput) != 1) {
+                    return true;
+                }
+
+                if (key & 0x80) {
+                    if (mem_fread(&channelvelocities[channel], 1, 1, musinput) != 1) {
+                        return true;
+                    }
+
+                    channelvelocities[channel] &= 0x7F;
+                }
+
+                if (WritePressKey(channel, key, channelvelocities[channel], midioutput)) {
+                    return true;
+                }
+
+                break;
+
+            case mus_pitchwheel:
+                if (mem_fread(&key, 1, 1, musinput) != 1) {
                     break;
+                }
+                if (WritePitchWheel(channel, (int16_t)(key * 64), midioutput)) {
+                    return true;
+                }
+
+                break;
+
+            case mus_systemevent:
+                if (mem_fread(&controllernumber, 1, 1, musinput) != 1) {
+                    return true;
+                }
+                if (controllernumber < 10 || controllernumber > 14) {
+                    return true;
+                }
+
+                if (WriteChangeController_Valueless(channel, controller_map[controllernumber],
+                                                    midioutput)) {
+                    return true;
+                }
+
+                break;
+
+            case mus_changecontroller:
+                if (mem_fread(&controllernumber, 1, 1, musinput) != 1) {
+                    return true;
+                }
+
+                if (mem_fread(&controllervalue, 1, 1, musinput) != 1) {
+                    return true;
+                }
+
+                if (controllernumber == 0) {
+                    if (WriteChangePatch(channel, controllervalue, midioutput)) {
+                        return true;
+                    }
+                } else {
+                    if (controllernumber < 1 || controllernumber > 9) {
+                        return true;
+                    }
+
+                    if (WriteChangeController_Valued(channel, controller_map[controllernumber],
+                                                     controllervalue, midioutput)) {
+                        return true;
+                    }
+                }
+
+                break;
+
+            case mus_scoreend:
+                hitscoreend = 1;
+                break;
+
+            default:
+                return true;
+                break;
             }
 
             if (eventdescriptor & 0x80) {

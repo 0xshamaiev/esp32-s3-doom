@@ -19,10 +19,10 @@
 //	Functions to blit a block to the screen.
 //
 
+#include <math.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include <math.h>
 
 #include "i_system.h"
 
@@ -63,22 +63,13 @@ void V_MarkRect(int x, int y, int width, int height) {
     }
 }
 
-
 //
 // V_CopyRect
 //
-void V_CopyRect(int srcx, int srcy, uint8_t *source,
-                int width, int height,
-                int destx, int desty) {
+void V_CopyRect(int srcx, int srcy, uint8_t *source, int width, int height, int destx, int desty) {
 #ifdef RANGECHECK
-    if (srcx < 0
-        || srcx + width > SCREENWIDTH
-        || srcy < 0
-        || srcy + height > SCREENHEIGHT
-        || destx < 0
-        || destx + width > SCREENWIDTH
-        || desty < 0
-        || desty + height > SCREENHEIGHT) {
+    if (srcx < 0 || srcx + width > SCREENWIDTH || srcy < 0 || srcy + height > SCREENHEIGHT ||
+        destx < 0 || destx + width > SCREENWIDTH || desty < 0 || desty + height > SCREENHEIGHT) {
         I_Error("Bad V_CopyRect");
     }
 #endif
@@ -105,12 +96,11 @@ void V_DrawPatch(int x, int y, patch_t *patch) {
     x -= SHORT(patch->leftoffset);
 
 #ifdef RANGECHECK
-    if (x < 0
-        || x + SHORT(patch->width) > SCREENWIDTH
-        || y < 0
-        || y + SHORT(patch->height) > SCREENHEIGHT) {
-        I_Error("Bad V_DrawPatch x=%i y=%i patch.width=%i patch.height=%i topoffset=%i leftoffset=%i", x, y,
-                patch->width, patch->height, patch->topoffset, patch->leftoffset);
+    if (x < 0 || x + SHORT(patch->width) > SCREENWIDTH || y < 0 ||
+        y + SHORT(patch->height) > SCREENHEIGHT) {
+        I_Error(
+            "Bad V_DrawPatch x=%i y=%i patch.width=%i patch.height=%i topoffset=%i leftoffset=%i",
+            x, y, patch->width, patch->height, patch->topoffset, patch->leftoffset);
     }
 #endif
 
@@ -134,7 +124,7 @@ void V_DrawPatch(int x, int y, patch_t *patch) {
                 *dest = *source++;
                 dest += SCREENWIDTH;
             }
-            column = (column_t *) ((uint8_t *) column + column->length + 4);
+            column = (column_t *)((uint8_t *)column + column->length + 4);
         }
     }
 }
@@ -150,10 +140,8 @@ void V_DrawPatchFlipped(int x, int y, patch_t *patch) {
     x -= SHORT(patch->leftoffset);
 
 #ifdef RANGECHECK
-    if (x < 0
-        || x + SHORT(patch->width) > SCREENWIDTH
-        || y < 0
-        || y + SHORT(patch->height) > SCREENHEIGHT) {
+    if (x < 0 || x + SHORT(patch->width) > SCREENWIDTH || y < 0 ||
+        y + SHORT(patch->height) > SCREENHEIGHT) {
         I_Error("Bad V_DrawPatchFlipped");
     }
 #endif
@@ -178,20 +166,17 @@ void V_DrawPatchFlipped(int x, int y, patch_t *patch) {
                 *dest = *source++;
                 dest += SCREENWIDTH;
             }
-            column = (column_t *) ((uint8_t *) column + column->length + 4);
+            column = (column_t *)((uint8_t *)column + column->length + 4);
         }
     }
 }
-
 
 //
 // V_DrawPatchDirect
 // Draws directly to the screen on the pc.
 //
 
-void V_DrawPatchDirect(int x, int y, patch_t *patch) {
-    V_DrawPatch(x, y, patch);
-}
+void V_DrawPatchDirect(int x, int y, patch_t *patch) { V_DrawPatch(x, y, patch); }
 
 //
 // V_DrawBlock
@@ -200,10 +185,7 @@ void V_DrawPatchDirect(int x, int y, patch_t *patch) {
 
 void V_DrawBlock(int x, int y, int width, int height, uint8_t *src) {
 #ifdef RANGECHECK
-    if (x < 0
-        || x + width > SCREENWIDTH
-        || y < 0
-        || y + height > SCREENHEIGHT) {
+    if (x < 0 || x + width > SCREENWIDTH || y < 0 || y + height > SCREENHEIGHT) {
         I_Error("Bad V_DrawBlock");
     }
 #endif
@@ -262,9 +244,7 @@ void V_DrawBox(int x, int y, int w, int h, int c) {
 // to the screen)
 //
 
-void V_DrawRawScreen(uint8_t *raw) {
-    memcpy(dest_screen, raw, SCREENWIDTH * SCREENHEIGHT);
-}
+void V_DrawRawScreen(uint8_t *raw) { memcpy(dest_screen, raw, SCREENWIDTH * SCREENHEIGHT); }
 
 //
 // V_Init
@@ -277,15 +257,11 @@ void V_Init(void) {
 
 // Set the buffer that the code draws to.
 
-void V_UseBuffer(uint8_t *buffer) {
-    dest_screen = buffer;
-}
+void V_UseBuffer(uint8_t *buffer) { dest_screen = buffer; }
 
 // Restore screen buffer to the i_video screen buffer.
 
-void V_RestoreBuffer(void) {
-    dest_screen = I_VideoBuffer;
-}
+void V_RestoreBuffer(void) { dest_screen = I_VideoBuffer; }
 
 //
 // SCREEN SHOTS
@@ -318,20 +294,17 @@ typedef struct {
 
 PACKEDATTR pcx_t;
 
-
 //
 // WritePCXfile
 //
 
-void WritePCXfile(char *filename, uint8_t *data,
-                  int width, int height,
-                  uint8_t *palette) {
+void WritePCXfile(char *filename, uint8_t *data, int width, int height, uint8_t *palette) {
     pcx_t *pcx = Z_Malloc(width * height * 2 + 1000, PU_STATIC, NULL);
 
     pcx->manufacturer = 0x0a; // PCX id
-    pcx->version = 5; // 256 color
-    pcx->encoding = 1; // uncompressed
-    pcx->bits_per_pixel = 8; // 256 color
+    pcx->version = 5;         // 256 color
+    pcx->encoding = 1;        // uncompressed
+    pcx->bits_per_pixel = 8;  // 256 color
     pcx->xmin = 0;
     pcx->ymin = 0;
     pcx->xmax = SHORT(width - 1);
@@ -373,17 +346,11 @@ void WritePCXfile(char *filename, uint8_t *data,
 // WritePNGfile
 //
 
-static void error_fn(png_structp p, png_const_charp s) {
-    printf("libpng error: %s\n", s);
-}
+static void error_fn(png_structp p, png_const_charp s) { printf("libpng error: %s\n", s); }
 
-static void warning_fn(png_structp p, png_const_charp s) {
-    printf("libpng warning: %s\n", s);
-}
+static void warning_fn(png_structp p, png_const_charp s) { printf("libpng warning: %s\n", s); }
 
-void WritePNGfile(char *filename, uint8_t *data,
-                  int width, int height,
-                  uint8_t *palette) {
+void WritePNGfile(char *filename, uint8_t *data, int width, int height, uint8_t *palette) {
     png_structp ppng;
     png_infop pinfo;
     png_colorp pcolor;
@@ -395,8 +362,7 @@ void WritePNGfile(char *filename, uint8_t *data,
         return;
     }
 
-    ppng = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL,
-                                   error_fn, warning_fn);
+    ppng = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, error_fn, warning_fn);
     if (!ppng) {
         return;
     }
@@ -409,8 +375,7 @@ void WritePNGfile(char *filename, uint8_t *data,
 
     png_init_io(ppng, handle);
 
-    png_set_IHDR(ppng, pinfo, width, height,
-                 8, PNG_COLOR_TYPE_PALETTE, PNG_INTERLACE_NONE,
+    png_set_IHDR(ppng, pinfo, width, height, 8, PNG_COLOR_TYPE_PALETTE, PNG_INTERLACE_NONE,
                  PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 
     pcolor = malloc(sizeof(*pcolor) * 256);
@@ -475,15 +440,13 @@ void V_ScreenShot(char *format) {
 
 #ifdef HAVE_LIBPNG
     if (png_screenshots) {
-        WritePNGfile(lbmname, I_VideoBuffer,
-                     SCREENWIDTH, SCREENHEIGHT,
+        WritePNGfile(lbmname, I_VideoBuffer, SCREENWIDTH, SCREENHEIGHT,
                      W_CacheLumpName(DEH_String("PLAYPAL"), PU_CACHE));
     } else
 #endif
     {
         // save the pcx file
-        WritePCXfile(lbmname, I_VideoBuffer,
-                     SCREENWIDTH, SCREENHEIGHT,
+        WritePCXfile(lbmname, I_VideoBuffer, SCREENWIDTH, SCREENHEIGHT,
                      W_CacheLumpName(DEH_String("PLAYPAL"), PU_CACHE));
     }
 }

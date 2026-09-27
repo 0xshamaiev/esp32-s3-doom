@@ -19,8 +19,8 @@
 #ifndef __I_VIDEO__
 #define __I_VIDEO__
 
-#include <stdint.h>
 #include "doomtype.h"
+#include <stdint.h>
 
 // Screen width and height.
 

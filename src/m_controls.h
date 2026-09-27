@@ -108,4 +108,3 @@ void M_BindMapControls(void);
 void M_BindMenuControls(void);
 
 #endif /* #ifndef __M_CONTROLS_H__ */
-

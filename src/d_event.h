@@ -14,15 +14,12 @@
 //
 // DESCRIPTION:
 //
-//    
-
+//
 
 #ifndef __D_EVENT__
 #define __D_EVENT__
 
-
 #include "doomtype.h"
-
 
 //
 // Event handling.
@@ -57,7 +54,6 @@ typedef struct {
 
     int data1, data2, data3, data4;
 } event_t;
-
 
 //
 // Button/action code definitions.
@@ -97,6 +93,4 @@ void D_PostEvent(event_t *ev);
 
 event_t *D_PopEvent(void);
 
-
 #endif
-

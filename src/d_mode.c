@@ -17,8 +17,8 @@
 //   mode.
 //
 
-#include "doomtype.h"
 #include "d_mode.h"
+#include "doomtype.h"
 
 // Valid game mode/mission combinations, with the number of
 // episodes/maps for each.
@@ -47,15 +47,13 @@ bool D_ValidGameMode(GameMission_t mission, GameMode_t mode) {
     return false;
 }
 
-bool D_ValidEpisodeMap(GameMission_t mission, GameMode_t mode,
-                          int episode, int map) {
+bool D_ValidEpisodeMap(GameMission_t mission, GameMode_t mode, int episode, int map) {
     // Find the table entry for this mission/mode combination.
 
     for (int i = 0; i < arrlen(valid_modes); ++i) {
-        if (mission == valid_modes[i].mission
-            && mode == valid_modes[i].mode) {
-            return episode >= 1 && episode <= valid_modes[i].episode
-                   && map >= 1 && map <= valid_modes[i].map;
+        if (mission == valid_modes[i].mission && mode == valid_modes[i].mode) {
+            return episode >= 1 && episode <= valid_modes[i].episode && map >= 1 &&
+                   map <= valid_modes[i].map;
         }
     }
 
@@ -94,8 +92,7 @@ bool D_ValidGameVersion(GameMission_t mission, GameVersion_t version) {
     }
 
     for (int i = 0; i < arrlen(valid_versions); ++i) {
-        if (valid_versions[i].mission == mission
-            && valid_versions[i].version == version) {
+        if (valid_versions[i].mission == mission && valid_versions[i].version == version) {
             return true;
         }
     }
@@ -107,25 +104,24 @@ bool D_ValidGameVersion(GameMission_t mission, GameVersion_t version) {
 
 bool D_IsEpisodeMap(GameMission_t mission) {
     switch (mission) {
-        case doom:
-            return true;
+    case doom:
+        return true;
 
-        case none:
-        case doom2:
-        default:
-            return false;
+    case none:
+    case doom2:
+    default:
+        return false;
     }
 }
 
 char *D_GameMissionString(GameMission_t mission) {
     switch (mission) {
-        case none:
-        default:
-            return "none";
-        case doom:
-            return "doom";
-        case doom2:
-            return "doom2";
+    case none:
+    default:
+        return "none";
+    case doom:
+        return "doom";
+    case doom2:
+        return "doom2";
     }
 }
-

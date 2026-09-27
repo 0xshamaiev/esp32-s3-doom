@@ -15,11 +15,10 @@
 // DESCRIPTION:  none
 //
 
-
-#include <stdint.h>
-#include <string.h>
-#include <stdlib.h>
 #include <math.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "doomdef.h"
 #include "doomkeys.h"
@@ -28,27 +27,27 @@
 #include "deh_main.h"
 #include "deh_misc.h"
 
-#include "z_zone.h"
 #include "f_finale.h"
-#include "m_argv.h"
-#include "m_controls.h"
-#include "m_misc.h"
-#include "m_menu.h"
-#include "m_random.h"
 #include "i_system.h"
 #include "i_timer.h"
 #include "i_video.h"
+#include "m_argv.h"
+#include "m_controls.h"
+#include "m_menu.h"
+#include "m_misc.h"
+#include "m_random.h"
+#include "z_zone.h"
 
-#include "p_setup.h"
 #include "p_saveg.h"
+#include "p_setup.h"
 #include "p_tick.h"
 
 #include "d_main.h"
 
-#include "wi_stuff.h"
+#include "am_map.h"
 #include "hu_stuff.h"
 #include "st_stuff.h"
-#include "am_map.h"
+#include "wi_stuff.h"
 
 // Needs access to LFB.
 #include "v_video.h"
@@ -67,14 +66,12 @@
 #include "r_data.h"
 #include "r_sky.h"
 
-
 #include "g_game.h"
 
+#define SAVEGAMESIZE 0x2c000
 
-#define SAVEGAMESIZE	0x2c000
-
-void G_ReadDemoTiccmd(ticcmd_t * cmd);
-void G_WriteDemoTiccmd(ticcmd_t * cmd);
+void G_ReadDemoTiccmd(ticcmd_t *cmd);
+void G_WriteDemoTiccmd(ticcmd_t *cmd);
 
 void G_PlayerReborn(int player);
 
@@ -107,15 +104,14 @@ int gamemap;
 
 // If non-zero, exit the level after this number of minutes.
 
-
 bool paused;
 bool sendpause; // send a pause event next tic
-bool sendsave; // send a save event next tic
-bool usergame; // ok to save / end game
+bool sendsave;  // send a save event next tic
+bool usergame;  // ok to save / end game
 
 bool timingdemo; // if true, exit with report on completion
-bool nodrawers; // for comparative timing purposes
-int starttime; // for comparative timing purposes
+bool nodrawers;  // for comparative timing purposes
+int starttime;   // for comparative timing purposes
 
 bool viewactive;
 
@@ -124,14 +120,14 @@ player_t players[MAXPLAYERS];
 
 bool turbodetected[MAXPLAYERS];
 
-int consoleplayer; // player taking events and displaying
-int displayplayer; // view being displayed
-int levelstarttic; // gametic at level start
+int consoleplayer;                       // player taking events and displaying
+int displayplayer;                       // view being displayed
+int levelstarttic;                       // gametic at level start
 int totalkills, totalitems, totalsecret; // for intermission
 
 char *demoname;
 bool demorecording;
-bool longtics; // cph's doom 1.91 longtics hack
+bool longtics;    // cph's doom 1.91 longtics hack
 bool lowres_turn; // low resolution turning for longtics
 bool demoplayback;
 uint8_t *demobuffer;
@@ -143,28 +139,18 @@ bool precache = true; // if true, load all graphics at start
 
 bool testcontrols = false; // Invoked by setup to test controls
 
-
 wbstartstruct_t wminfo; // parms for world map / intermission
 
+#define MAXPLMOVE (forwardmove[1])
 
-#define MAXPLMOVE		(forwardmove[1])
-
-#define TURBOTHRESHOLD	0x32
+#define TURBOTHRESHOLD 0x32
 
 fixed_t forwardmove[2] = {0x19, 0x32};
 fixed_t sidemove[2] = {0x18, 0x28};
 fixed_t angleturn[3] = {640, 1280, 320}; // + slow turn
 
-static int *weapon_keys[] = {
-    &key_weapon1,
-    &key_weapon2,
-    &key_weapon3,
-    &key_weapon4,
-    &key_weapon5,
-    &key_weapon6,
-    &key_weapon7,
-    &key_weapon8
-};
+static int *weapon_keys[] = {&key_weapon1, &key_weapon2, &key_weapon3, &key_weapon4,
+                             &key_weapon5, &key_weapon6, &key_weapon7, &key_weapon8};
 
 // Set to -1 or +1 to switch to the previous or next weapon.
 
@@ -176,20 +162,13 @@ static const struct {
     weapontype_t weapon;
     weapontype_t weapon_num;
 } weapon_order_table[] = {
-    {wp_fist, wp_fist},
-    {wp_chainsaw, wp_fist},
-    {wp_pistol, wp_pistol},
-    {wp_shotgun, wp_shotgun},
-    {wp_supershotgun, wp_shotgun},
-    {wp_chaingun, wp_chaingun},
-    {wp_missile, wp_missile},
-    {wp_plasma, wp_plasma},
-    {wp_bfg, wp_bfg}
-};
+    {wp_fist, wp_fist},       {wp_chainsaw, wp_fist},        {wp_pistol, wp_pistol},
+    {wp_shotgun, wp_shotgun}, {wp_supershotgun, wp_shotgun}, {wp_chaingun, wp_chaingun},
+    {wp_missile, wp_missile}, {wp_plasma, wp_plasma},        {wp_bfg, wp_bfg}};
 
-#define SLOWTURNTICS	6
+#define SLOWTURNTICS 6
 
-#define NUMKEYS		256
+#define NUMKEYS 256
 #define MAX_JOY_BUTTONS 20
 
 static bool gamekeydown[NUMKEYS];
@@ -205,7 +184,6 @@ static bool *joybuttons = &joyarray[1]; // allow [-1]
 static int savegameslot;
 static char savedescription[32];
 
-
 int vanilla_savegame_limit = 1;
 int vanilla_demo_limit = 1;
 
@@ -213,7 +191,7 @@ int G_CmdChecksum(ticcmd_t *cmd) {
     int sum = 0;
 
     for (size_t i = 0; i < sizeof(*cmd) / 4 - 1; i++)
-        sum += ((int *) cmd)[i];
+        sum += ((int *)cmd)[i];
 
     return sum;
 }
@@ -227,8 +205,7 @@ static bool WeaponSelectable(weapontype_t weapon) {
 
     // These weapons aren't available in shareware.
 
-    if ((weapon == wp_plasma || weapon == wp_bfg)
-        && gamemission == doom && gamemode == shareware) {
+    if ((weapon == wp_plasma || weapon == wp_bfg) && gamemission == doom && gamemode == shareware) {
         return false;
     }
 
@@ -241,9 +218,8 @@ static bool WeaponSelectable(weapontype_t weapon) {
     // Can't select the fist if we have the chainsaw, unless
     // we also have the berserk pack.
 
-    if (weapon == wp_fist
-        && players[consoleplayer].weaponowned[wp_chainsaw]
-        && !players[consoleplayer].powers[pw_strength]) {
+    if (weapon == wp_fist && players[consoleplayer].weaponowned[wp_chainsaw] &&
+        !players[consoleplayer].powers[pw_strength]) {
         return false;
     }
 
@@ -291,8 +267,7 @@ void G_BuildTiccmd(ticcmd_t *cmd, int maketic) {
 
     memset(cmd, 0, sizeof(ticcmd_t));
 
-    bool strafe =
-        gamekeydown[key_strafe] || joybuttons[joybstrafe];
+    bool strafe = gamekeydown[key_strafe] || joybuttons[joybstrafe];
 
     // fraggle: support the old "joyb_speed = 31" hack which
     // allowed an autorun effect
@@ -304,10 +279,7 @@ void G_BuildTiccmd(ticcmd_t *cmd, int maketic) {
 
     // use two stage accelerative turning
     // on the keyboard and joystick
-    if (joyxmove < 0
-        || joyxmove > 0
-        || gamekeydown[key_right]
-        || gamekeydown[key_left])
+    if (joyxmove < 0 || joyxmove > 0 || gamekeydown[key_right] || gamekeydown[key_left])
         turnheld += 1;
     else
         turnheld = 0;
@@ -356,15 +328,11 @@ void G_BuildTiccmd(ticcmd_t *cmd, int maketic) {
     if (joyymove > 0)
         forward -= forwardmove[speed];
 
-    if (gamekeydown[key_strafeleft]
-        || joybuttons[joybstrafeleft]
-        || joystrafemove < 0) {
+    if (gamekeydown[key_strafeleft] || joybuttons[joybstrafeleft] || joystrafemove < 0) {
         side -= sidemove[speed];
     }
 
-    if (gamekeydown[key_straferight]
-        || joybuttons[joybstraferight]
-        || joystrafemove > 0) {
+    if (gamekeydown[key_straferight] || joybuttons[joybstraferight] || joystrafemove > 0) {
         side += sidemove[speed];
     }
 
@@ -443,7 +411,6 @@ void G_BuildTiccmd(ticcmd_t *cmd, int maketic) {
     }
 }
 
-
 //
 // G_DoLoadLevel
 //
@@ -511,9 +478,7 @@ static void SetJoyButtons(uint32_t buttons_mask) {
 //
 bool G_Responder(event_t *ev) {
     // any other key pops up menu if in demos
-    if (gameaction == ga_nothing && !singledemo &&
-        (demoplayback || gamestate == GS_DEMOSCREEN)
-    ) {
+    if (gameaction == ga_nothing && !singledemo && (demoplayback || gamestate == GS_DEMOSCREEN)) {
         if (ev->type == ev_keydown || (ev->type == ev_joystick && ev->data1)) {
             M_StartControlPanel();
             return true;
@@ -552,34 +517,33 @@ bool G_Responder(event_t *ev) {
     }
 
     switch (ev->type) {
-        case ev_keydown:
-            if (ev->data1 == key_pause) {
-                sendpause = true;
-            } else if (ev->data1 < NUMKEYS) {
-                gamekeydown[ev->data1] = true;
-            }
+    case ev_keydown:
+        if (ev->data1 == key_pause) {
+            sendpause = true;
+        } else if (ev->data1 < NUMKEYS) {
+            gamekeydown[ev->data1] = true;
+        }
 
-            return true; // eat key down events
+        return true; // eat key down events
 
-        case ev_keyup:
-            if (ev->data1 < NUMKEYS)
-                gamekeydown[ev->data1] = false;
-            return false; // always let key up events filter down
+    case ev_keyup:
+        if (ev->data1 < NUMKEYS)
+            gamekeydown[ev->data1] = false;
+        return false; // always let key up events filter down
 
-        case ev_joystick:
-            SetJoyButtons(ev->data1);
-            joyxmove = ev->data2;
-            joyymove = ev->data3;
-            joystrafemove = ev->data4;
-            return true; // eat events
+    case ev_joystick:
+        SetJoyButtons(ev->data1);
+        joyxmove = ev->data2;
+        joyymove = ev->data3;
+        joystrafemove = ev->data4;
+        return true; // eat events
 
-        default:
-            break;
+    default:
+        break;
     }
 
     return false;
 }
-
 
 //
 // G_Ticker
@@ -594,37 +558,37 @@ void G_Ticker(void) {
     // do things to change the game state
     while (gameaction != ga_nothing) {
         switch (gameaction) {
-            case ga_loadlevel:
-                G_DoLoadLevel();
-                break;
-            case ga_newgame:
-                G_DoNewGame();
-                break;
-            case ga_loadgame:
-                G_DoLoadGame();
-                break;
-            case ga_savegame:
-                G_DoSaveGame();
-                break;
-            case ga_playdemo:
-                G_DoPlayDemo();
-                break;
-            case ga_completed:
-                G_DoCompleted();
-                break;
-            case ga_victory:
-                F_StartFinale();
-                break;
-            case ga_worlddone:
-                G_DoWorldDone();
-                break;
-            case ga_screenshot:
-                V_ScreenShot("DOOM%02i.%s");
-                players[consoleplayer].message = DEH_String("screen shot");
-                gameaction = ga_nothing;
-                break;
-            case ga_nothing:
-                break;
+        case ga_loadlevel:
+            G_DoLoadLevel();
+            break;
+        case ga_newgame:
+            G_DoNewGame();
+            break;
+        case ga_loadgame:
+            G_DoLoadGame();
+            break;
+        case ga_savegame:
+            G_DoSaveGame();
+            break;
+        case ga_playdemo:
+            G_DoPlayDemo();
+            break;
+        case ga_completed:
+            G_DoCompleted();
+            break;
+        case ga_victory:
+            F_StartFinale();
+            break;
+        case ga_worlddone:
+            G_DoWorldDone();
+            break;
+        case ga_screenshot:
+            V_ScreenShot("DOOM%02i.%s");
+            players[consoleplayer].message = DEH_String("screen shot");
+            gameaction = ga_nothing;
+            break;
+        case ga_nothing:
+            break;
         }
     }
 
@@ -653,13 +617,10 @@ void G_Ticker(void) {
                 turbodetected[i] = true;
             }
 
-            if ((gametic & 31) == 0
-                && ((gametic >> 5) % MAXPLAYERS) == i
-                && turbodetected[i]) {
+            if ((gametic & 31) == 0 && ((gametic >> 5) % MAXPLAYERS) == i && turbodetected[i]) {
                 static char turbomessage[80];
                 extern char *player_names[4];
-                M_snprintf(turbomessage, sizeof(turbomessage),
-                           "%s is turbo!", player_names[i]);
+                M_snprintf(turbomessage, sizeof(turbomessage), "%s is turbo!", player_names[i]);
                 players[consoleplayer].message = turbomessage;
                 turbodetected[i] = false;
             }
@@ -671,24 +632,22 @@ void G_Ticker(void) {
         if (playeringame[i]) {
             if (players[i].cmd.buttons & BT_SPECIAL) {
                 switch (players[i].cmd.buttons & BT_SPECIALMASK) {
-                    case BTS_PAUSE:
-                        paused ^= 1;
-                        if (paused)
-                            S_PauseSound();
-                        else
-                            S_ResumeSound();
-                        break;
+                case BTS_PAUSE:
+                    paused ^= 1;
+                    if (paused)
+                        S_PauseSound();
+                    else
+                        S_ResumeSound();
+                    break;
 
-                    case BTS_SAVEGAME:
-                        if (!savedescription[0]) {
-                            M_StringCopy(savedescription, "NET GAME",
-                                         sizeof(savedescription));
-                        }
+                case BTS_SAVEGAME:
+                    if (!savedescription[0]) {
+                        M_StringCopy(savedescription, "NET GAME", sizeof(savedescription));
+                    }
 
-                        savegameslot =
-                                (players[i].cmd.buttons & BTS_SAVEMASK) >> BTS_SAVESHIFT;
-                        gameaction = ga_savegame;
-                        break;
+                    savegameslot = (players[i].cmd.buttons & BTS_SAVEMASK) >> BTS_SAVESHIFT;
+                    gameaction = ga_savegame;
+                    break;
                 }
             }
         }
@@ -704,27 +663,26 @@ void G_Ticker(void) {
 
     // do main actions
     switch (gamestate) {
-        case GS_LEVEL:
-            P_Ticker();
-            ST_Ticker();
-            AM_Ticker();
-            HU_Ticker();
-            break;
+    case GS_LEVEL:
+        P_Ticker();
+        ST_Ticker();
+        AM_Ticker();
+        HU_Ticker();
+        break;
 
-        case GS_INTERMISSION:
-            WI_Ticker();
-            break;
+    case GS_INTERMISSION:
+        WI_Ticker();
+        break;
 
-        case GS_FINALE:
-            F_Ticker();
-            break;
+    case GS_FINALE:
+        F_Ticker();
+        break;
 
-        case GS_DEMOSCREEN:
-            D_PageTicker();
-            break;
+    case GS_DEMOSCREEN:
+        D_PageTicker();
+        break;
     }
 }
-
 
 //
 // PLAYER STRUCTURE FUNCTIONS
@@ -741,7 +699,6 @@ void G_InitPlayer(int player) {
     G_PlayerReborn(player);
 }
 
-
 //
 // G_PlayerFinishLevel
 // Can when a player completes a level.
@@ -749,15 +706,14 @@ void G_InitPlayer(int player) {
 void G_PlayerFinishLevel(int player) {
     player_t *p = &players[player];
 
-    memset(p->powers, 0, sizeof (p->powers));
-    memset(p->cards, 0, sizeof (p->cards));
+    memset(p->powers, 0, sizeof(p->powers));
+    memset(p->cards, 0, sizeof(p->cards));
     p->mo->flags &= ~MF_SHADOW; // cancel invisibility
-    p->extralight = 0; // cancel gun flashes
-    p->fixedcolormap = 0; // cancel ir gogles
-    p->damagecount = 0; // no palette changes
+    p->extralight = 0;          // cancel gun flashes
+    p->fixedcolormap = 0;       // cancel ir gogles
+    p->damagecount = 0;         // no palette changes
     p->bonuscount = 0;
 }
-
 
 //
 // G_PlayerReborn
@@ -795,34 +751,23 @@ void G_PlayerReborn(int player) {
 //
 // G_DoReborn
 //
-void G_DoReborn(int playernum) {
-    gameaction = ga_loadlevel;
-}
+void G_DoReborn(int playernum) { gameaction = ga_loadlevel; }
 
-
-void G_ScreenShot(void) {
-    gameaction = ga_screenshot;
-}
-
+void G_ScreenShot(void) { gameaction = ga_screenshot; }
 
 // DOOM Par Times
-int pars[4][10] =
-{
-    {0},
-    {0, 30, 75, 120, 90, 165, 180, 180, 30, 165},
-    {0, 90, 90, 90, 120, 90, 360, 240, 30, 170},
-    {0, 90, 45, 90, 150, 90, 90, 165, 30, 135}
-};
+int pars[4][10] = {{0},
+                   {0, 30, 75, 120, 90, 165, 180, 180, 30, 165},
+                   {0, 90, 90, 90, 120, 90, 360, 240, 30, 170},
+                   {0, 90, 45, 90, 150, 90, 90, 165, 30, 135}};
 
 // DOOM II Par Times
-int cpars[32] =
-{
-    30, 90, 120, 120, 90, 150, 120, 120, 270, 90, //  1-10
+int cpars[32] = {
+    30,  90,  120, 120, 90,  150, 120, 120, 270, 90,  //  1-10
     210, 150, 150, 150, 210, 150, 420, 150, 210, 150, // 11-20
     240, 150, 180, 150, 150, 300, 330, 420, 300, 180, // 21-30
-    120, 30 // 31-32
+    120, 30                                           // 31-32
 };
-
 
 //
 // G_DoCompleted
@@ -838,8 +783,7 @@ void G_ExitLevel(void) {
 // Here's for the german edition.
 void G_SecretExitLevel(void) {
     // IF NO WOLF3D LEVELS, NO SECRET EXIT!
-    if ((gamemode == commercial)
-        && (W_CheckNumForName("map31") < 0))
+    if ((gamemode == commercial) && (W_CheckNumForName("map31") < 0))
         secretexit = false;
     else
         secretexit = true;
@@ -858,32 +802,29 @@ void G_DoCompleted(void) {
 
     if (gamemode != commercial) {
         switch (gamemap) {
-            case 8:
-                gameaction = ga_victory;
-                return;
-            case 9:
-                for (int i = 0; i < MAXPLAYERS; i++)
-                    players[i].didsecret = true;
-                break;
+        case 8:
+            gameaction = ga_victory;
+            return;
+        case 9:
+            for (int i = 0; i < MAXPLAYERS; i++)
+                players[i].didsecret = true;
+            break;
         }
     }
 
-    //#if 0  Hmmm - why?
-    if (gamemap == 8
-        && (gamemode != commercial)) {
+    // #if 0  Hmmm - why?
+    if (gamemap == 8 && (gamemode != commercial)) {
         // victory
         gameaction = ga_victory;
         return;
     }
 
-    if (gamemap == 9
-        && (gamemode != commercial)) {
+    if (gamemap == 9 && (gamemode != commercial)) {
         // exit secret level
         for (int i = 0; i < MAXPLAYERS; i++)
             players[i].didsecret = true;
     }
-    //#endif
-
+    // #endif
 
     wminfo.didsecret = players[consoleplayer].didsecret;
     wminfo.epsd = gameepisode - 1;
@@ -893,17 +834,21 @@ void G_DoCompleted(void) {
     if (gamemode == commercial) {
         if (secretexit)
             switch (gamemap) {
-                case 15: wminfo.next = 30;
-                    break;
-                case 31: wminfo.next = 31;
-                    break;
+            case 15:
+                wminfo.next = 30;
+                break;
+            case 31:
+                wminfo.next = 31;
+                break;
             }
         else
             switch (gamemap) {
-                case 31:
-                case 32: wminfo.next = 15;
-                    break;
-                default: wminfo.next = gamemap;
+            case 31:
+            case 32:
+                wminfo.next = 15;
+                break;
+            default:
+                wminfo.next = gamemap;
             }
     } else {
         if (secretexit)
@@ -911,18 +856,18 @@ void G_DoCompleted(void) {
         else if (gamemap == 9) {
             // returning from secret level
             switch (gameepisode) {
-                case 1:
-                    wminfo.next = 3;
-                    break;
-                case 2:
-                    wminfo.next = 5;
-                    break;
-                case 3:
-                    wminfo.next = 6;
-                    break;
-                case 4:
-                    wminfo.next = 2;
-                    break;
+            case 1:
+                wminfo.next = 3;
+                break;
+            case 2:
+                wminfo.next = 5;
+                break;
+            case 3:
+                wminfo.next = 6;
+                break;
+            case 4:
+                wminfo.next = 2;
+                break;
             }
         } else
             wminfo.next = gamemap; // go to next level
@@ -951,18 +896,15 @@ void G_DoCompleted(void) {
         wminfo.plyr[i].sitems = players[i].itemcount;
         wminfo.plyr[i].ssecret = players[i].secretcount;
         wminfo.plyr[i].stime = leveltime;
-        memcpy(wminfo.plyr[i].frags, players[i].frags
-               , sizeof(wminfo.plyr[i].frags));
+        memcpy(wminfo.plyr[i].frags, players[i].frags, sizeof(wminfo.plyr[i].frags));
     }
 
     gamestate = GS_INTERMISSION;
     viewactive = false;
     automapactive = false;
 
-
     WI_Start(&wminfo);
 }
-
 
 //
 // G_WorldDone
@@ -975,16 +917,16 @@ void G_WorldDone(void) {
 
     if (gamemode == commercial) {
         switch (gamemap) {
-            case 15:
-            case 31:
-                if (!secretexit)
-                    break;
-            case 6:
-            case 11:
-            case 20:
-            case 30:
-                F_StartFinale();
+        case 15:
+        case 31:
+            if (!secretexit)
                 break;
+        case 6:
+        case 11:
+        case 20:
+        case 30:
+            F_StartFinale();
+            break;
         }
     }
 }
@@ -996,7 +938,6 @@ void G_DoWorldDone(void) {
     gameaction = ga_nothing;
     viewactive = true;
 }
-
 
 //
 // G_InitFromSavegame
@@ -1013,8 +954,7 @@ void G_LoadGame(char *name) {
     gameaction = ga_loadgame;
 }
 
-#define VERSIONSIZE		16
-
+#define VERSIONSIZE 16
 
 void G_DoLoadGame(void) {
     gameaction = ga_nothing;
@@ -1057,16 +997,12 @@ void G_DoLoadGame(void) {
     R_FillBackScreen();
 }
 
-
 //
 // G_SaveGame
 // Called by the menu task.
 // Description is a 24 byte text string
 //
-void
-G_SaveGame
-(int slot,
- char *description) {
+void G_SaveGame(int slot, char *description) {
     savegameslot = slot;
     M_StringCopy(savedescription, description, sizeof(savedescription));
     sendsave = true;
@@ -1089,8 +1025,8 @@ void G_DoSaveGame(void) {
         recovery_savegame_file = M_TempFile("recovery.dsg");
         save_stream = fopen(recovery_savegame_file, "wb");
         if (save_stream == NULL) {
-            I_Error("Failed to open either '%s' or '%s' to write savegame.",
-                    temp_savegame_file, recovery_savegame_file);
+            I_Error("Failed to open either '%s' or '%s' to write savegame.", temp_savegame_file,
+                    recovery_savegame_file);
         }
     }
 
@@ -1140,7 +1076,6 @@ void G_DoSaveGame(void) {
     R_FillBackScreen();
 }
 
-
 //
 // G_InitNew
 // Can be called by the startup code or the menu task,
@@ -1150,21 +1085,15 @@ skill_t d_skill;
 int d_episode;
 int d_map;
 
-void
-G_DeferedInitNew
-(skill_t skill,
- int episode,
- int map) {
+void G_DeferedInitNew(skill_t skill, int episode, int map) {
     d_skill = skill;
     d_episode = episode;
     d_map = map;
     gameaction = ga_newgame;
 }
 
-
 void G_DoNewGame(void) {
     demoplayback = false;
-
 
     playeringame[1] = playeringame[2] = playeringame[3] = 0;
     respawnparm = false;
@@ -1175,12 +1104,7 @@ void G_DoNewGame(void) {
     gameaction = ga_nothing;
 }
 
-
-void
-G_InitNew
-(skill_t skill,
- int episode,
- int map) {
+void G_InitNew(skill_t skill, int episode, int map) {
     char *skytexturename;
 
     if (paused) {
@@ -1204,17 +1128,17 @@ G_InitNew
     if ( gamemode == retail )
     {
       if (episode > 4)
-	episode = 4;
+        episode = 4;
     }
     else if ( gamemode == shareware )
     {
       if (episode > 1)
-	   episode = 1;	// only start episode 1 on shareware
+           episode = 1;	// only start episode 1 on shareware
     }
     else
     {
       if (episode > 3)
-	episode = 3;
+        episode = 3;
     }
     */
 
@@ -1241,12 +1165,10 @@ G_InitNew
     if (map < 1)
         map = 1;
 
-    if ((map > 9)
-        && (gamemode != commercial))
+    if ((map > 9) && (gamemode != commercial))
         map = 9;
 
-    if (!D_ValidEpisodeMap(gamemission, gamemode,
-                           gamemode == commercial ? 1 : episode, map))
+    if (!D_ValidEpisodeMap(gamemission, gamemode, gamemode == commercial ? 1 : episode, map))
         I_Error("Unsupported episode/map: %d/%d", episode, map);
 
     M_ClearRandom();
@@ -1304,19 +1226,19 @@ G_InitNew
             skytexturename = "SKY3";
     } else {
         switch (gameepisode) {
-            default:
-            case 1:
-                skytexturename = "SKY1";
-                break;
-            case 2:
-                skytexturename = "SKY2";
-                break;
-            case 3:
-                skytexturename = "SKY3";
-                break;
-            case 4: // Special Edition sky
-                skytexturename = "SKY4";
-                break;
+        default:
+        case 1:
+            skytexturename = "SKY1";
+            break;
+        case 2:
+            skytexturename = "SKY2";
+            break;
+        case 3:
+            skytexturename = "SKY3";
+            break;
+        case 4: // Special Edition sky
+            skytexturename = "SKY4";
+            break;
         }
     }
 
@@ -1324,16 +1246,13 @@ G_InitNew
 
     skytexture = R_TextureNumForName(skytexturename);
 
-
     G_DoLoadLevel();
 }
-
 
 //
 // DEMO RECORDING
 //
-#define DEMOMARKER		0x80
-
+#define DEMOMARKER 0x80
 
 void G_ReadDemoTiccmd(ticcmd_t *cmd) {
     if (*demo_p == DEMOMARKER) {
@@ -1341,8 +1260,8 @@ void G_ReadDemoTiccmd(ticcmd_t *cmd) {
         G_CheckDemoStatus();
         return;
     }
-    cmd->forwardmove = ((int8_t) *demo_p++);
-    cmd->sidemove = ((int8_t) *demo_p++);
+    cmd->forwardmove = ((int8_t)*demo_p++);
+    cmd->sidemove = ((int8_t)*demo_p++);
 
     // If this is a longtics demo, read back in higher resolution
 
@@ -1350,10 +1269,10 @@ void G_ReadDemoTiccmd(ticcmd_t *cmd) {
         cmd->angleturn = *demo_p++;
         cmd->angleturn |= (*demo_p++) << 8;
     } else {
-        cmd->angleturn = ((uint8_t) *demo_p++) << 8;
+        cmd->angleturn = ((uint8_t)*demo_p++) << 8;
     }
 
-    cmd->buttons = (uint8_t) *demo_p++;
+    cmd->buttons = (uint8_t)*demo_p++;
 }
 
 // Increase the size of the demo buffer to allow unlimited demos
@@ -1421,7 +1340,6 @@ void G_WriteDemoTiccmd(ticcmd_t *cmd) {
     G_ReadDemoTiccmd(cmd); // make SURE it is exactly the same
 }
 
-
 //
 // G_RecordDemo
 //
@@ -1452,17 +1370,17 @@ void G_RecordDemo(char *name) {
 // Get the demo version code appropriate for the version set in gameversion.
 int G_VanillaVersionCode(void) {
     switch (gameversion) {
-        case exe_doom_1_2:
-            I_Error("Doom 1.2 does not have a version code!");
-        case exe_doom_1_666:
-            return 106;
-        case exe_doom_1_7:
-            return 107;
-        case exe_doom_1_8:
-            return 108;
-        case exe_doom_1_9:
-        default: // All other versions are variants on v1.9:
-            return 109;
+    case exe_doom_1_2:
+        I_Error("Doom 1.2 does not have a version code!");
+    case exe_doom_1_666:
+        return 106;
+    case exe_doom_1_7:
+        return 107;
+    case exe_doom_1_8:
+        return 108;
+    case exe_doom_1_9:
+    default: // All other versions are variants on v1.9:
+        return 109;
     }
 }
 
@@ -1502,7 +1420,6 @@ void G_BeginRecording(void) {
         *demo_p++ = playeringame[i];
 }
 
-
 //
 // G_PlayDemo
 //
@@ -1520,20 +1437,20 @@ static char *DemoVersionDescription(int version) {
     static char resultbuf[16];
 
     switch (version) {
-        case 104:
-            return "v1.4";
-        case 105:
-            return "v1.5";
-        case 106:
-            return "v1.6/v1.666";
-        case 107:
-            return "v1.7/v1.7a";
-        case 108:
-            return "v1.8";
-        case 109:
-            return "v1.9";
-        default:
-            break;
+    case 104:
+        return "v1.4";
+    case 105:
+        return "v1.5";
+    case 106:
+        return "v1.6/v1.666";
+    case 107:
+        return "v1.7/v1.7a";
+    case 108:
+        return "v1.8";
+    case 109:
+        return "v1.9";
+    default:
+        break;
     }
 
     // Unknown version.  Perhaps this is a pre-v1.4 IWAD?  If the version
@@ -1542,8 +1459,7 @@ static char *DemoVersionDescription(int version) {
     if (version >= 0 && version <= 4) {
         return "v1.0/v1.1/v1.2";
     } else {
-        M_snprintf(resultbuf, sizeof(resultbuf),
-                   "%i.%i (unknown)", version / 100, version % 100);
+        M_snprintf(resultbuf, sizeof(resultbuf), "%i.%i (unknown)", version / 100, version % 100);
         return resultbuf;
     }
 }
@@ -1561,17 +1477,16 @@ void G_DoPlayDemo(void) {
         longtics = true;
     } else {
         char *message = "Demo is from a different game version!\n"
-                "(read %i, should be %i)\n"
-                "\n"
-                "*** You may need to upgrade your version "
-                "of Doom to v1.9. ***\n"
-                "    See: https://www.doomworld.com/classicdoom"
-                "/info/patches.php\n"
-                "    This appears to be %s.";
+                        "(read %i, should be %i)\n"
+                        "\n"
+                        "*** You may need to upgrade your version "
+                        "of Doom to v1.9. ***\n"
+                        "    See: https://www.doomworld.com/classicdoom"
+                        "/info/patches.php\n"
+                        "    This appears to be %s.";
 
-        //I_Error(message, demoversion, G_VanillaVersionCode(),
-        printf(message, demoversion, G_VanillaVersionCode(),
-               DemoVersionDescription(demoversion));
+        // I_Error(message, demoversion, G_VanillaVersionCode(),
+        printf(message, demoversion, G_VanillaVersionCode(), DemoVersionDescription(demoversion));
     }
 
     skill_t skill = *demo_p++;
@@ -1587,8 +1502,8 @@ void G_DoPlayDemo(void) {
     for (int i = 0; i < MAXPLAYERS; i++)
         playeringame[i] = *demo_p++;
 
-    if (consoleplayer != 0 || !playeringame[0]
-        || playeringame[1] || playeringame[2] || playeringame[3])
+    if (consoleplayer != 0 || !playeringame[0] || playeringame[1] || playeringame[2] ||
+        playeringame[3])
         I_Error("Multiplayer demos are not supported");
 
     // don't spend a lot of time in loadlevel
@@ -1620,7 +1535,6 @@ void G_TimeDemo(char *name) {
     gameaction = ga_playdemo;
 }
 
-
 /*
 ===================
 =
@@ -1641,14 +1555,12 @@ bool G_CheckDemoStatus(void) {
         timingdemo = false;
         demoplayback = false;
 
-        I_Error("timed %i gametics in %i realtics (%f fps)",
-                gametic, realtics, fps);
+        I_Error("timed %i gametics in %i realtics (%f fps)", gametic, realtics, fps);
     }
 
     if (demoplayback) {
         W_ReleaseLumpName(defdemoname);
         demoplayback = false;
-
 
         playeringame[1] = playeringame[2] = playeringame[3] = 0;
         respawnparm = false;
@@ -1673,7 +1585,4 @@ bool G_CheckDemoStatus(void) {
     }
 
     return false;
-} 
- 
- 
- 
+}

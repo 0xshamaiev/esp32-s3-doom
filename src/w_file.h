@@ -19,8 +19,8 @@
 #ifndef __W_FILE__
 #define __W_FILE__
 
-#include <stdint.h>
 #include "doomtype.h"
+#include <stdint.h>
 #include <stdio.h>
 
 typedef struct {

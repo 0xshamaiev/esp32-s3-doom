@@ -19,8 +19,8 @@
 #define __HULIB__
 
 // We are referring to patches.
-#include <stdint.h>
 #include "r_defs.h"
+#include <stdint.h>
 
 // font stuff
 #define HU_CHARERASE KEY_BACKSPACE
@@ -106,8 +106,7 @@ void HUlib_eraseTextLine(hu_textline_t *l);
 //
 
 // ?
-void HUlib_initSText(hu_stext_t *s, int x, int y, int h, patch_t **font, int startchar,
-                     bool *on);
+void HUlib_initSText(hu_stext_t *s, int x, int y, int h, patch_t **font, int startchar, bool *on);
 
 // add a new line
 void HUlib_addLineToSText(hu_stext_t *s);

@@ -18,13 +18,12 @@
 //	Functions to blit a block to the screen.
 //
 
-
 #ifndef __V_VIDEO__
 #define __V_VIDEO__
 
-#include <stdint.h>
 #include "doomtype.h"
 #include "m_fixed.h"
+#include <stdint.h>
 
 // Needed because we are refering to patches.
 #include "v_patch.h"
@@ -33,8 +32,7 @@
 // VIDEO
 //
 
-#define CENTERY			(SCREENHEIGHT/2)
-
+#define CENTERY (SCREENHEIGHT / 2)
 
 extern fixed_t dirtybox[4];
 
@@ -43,9 +41,7 @@ void V_Init(void);
 
 // Draw a block from the specified source screen to the screen.
 
-void V_CopyRect(int srcx, int srcy, uint8_t *source,
-                int width, int height,
-                int destx, int desty);
+void V_CopyRect(int srcx, int srcy, uint8_t *source, int width, int height, int destx, int desty);
 
 void V_DrawPatch(int x, int y, patch_t *patch);
 
@@ -69,21 +65,20 @@ void V_DrawBox(int x, int y, int w, int h, int c);
 
 // Draw a raw screen lump
 
-void V_DrawRawScreen(uint8_t * raw);
+void V_DrawRawScreen(uint8_t *raw);
 
 // Temporarily switch to using a different buffer to draw graphics, etc.
 
-void V_UseBuffer(uint8_t * buffer);
+void V_UseBuffer(uint8_t *buffer);
 
 // Return to using the normal screen buffer to draw graphics.
 
 void V_RestoreBuffer(void);
 
-// Save a screenshot of the current screen to a file, named in the 
+// Save a screenshot of the current screen to a file, named in the
 // format described in the string passed to the function, eg.
 // "DOOM%02i.pcx"
 
 void V_ScreenShot(char *format);
 
 #endif
-

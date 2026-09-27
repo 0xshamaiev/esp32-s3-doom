@@ -20,9 +20,9 @@
 #ifndef __R_DATA__
 #define __R_DATA__
 
-#include <stdint.h>
 #include "r_defs.h"
 #include "r_state.h"
+#include <stdint.h>
 
 // Retrieve column data for span blitting.
 uint8_t *R_GetColumn(int tex, int col);

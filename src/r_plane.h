@@ -19,8 +19,8 @@
 #ifndef __R_PLANE__
 #define __R_PLANE__
 
-#include <stdint.h>
 #include "r_data.h"
+#include <stdint.h>
 
 // Visplane related.
 extern int16_t *lastopening;
