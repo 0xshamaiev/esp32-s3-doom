@@ -7,7 +7,6 @@
 #define DOOM_GENERIC
 
 #include <stdint.h>
-#include <stdlib.h>
 
 #ifndef DOOMGENERIC_RESX
 #define DOOMGENERIC_RESX 240
@@ -25,7 +24,6 @@ void doomgeneric_Create(int argc, char **argv);
 
 void doomgeneric_Tick(void);
 
-// Implement below functions for your platform
 void DG_Init(void);
 
 void DG_DrawFrame(void);

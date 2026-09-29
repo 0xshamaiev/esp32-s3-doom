@@ -4,10 +4,8 @@
 // Original code retains its upstream terms and notices below.
 
 #include "doomgeneric.h"
-
-#include "esp_heap_caps.h"
-#include "i_system.h"
 #include "m_argv.h"
+#include "esp_heap_caps.h"
 
 pixel_t *DG_ScreenBuffer = NULL;
 
@@ -21,8 +19,8 @@ void doomgeneric_Create(int argc, char **argv) {
     // because I suspect that a buffer placed in PSRAM won't be
     // as performant and frictionless for SPI screen.
     DG_ScreenBuffer = (pixel_t*) heap_caps_malloc(
-    DOOMGENERIC_RESX * DOOMGENERIC_RESY * sizeof(pixel_t),
-    MALLOC_CAP_INTERNAL | MALLOC_CAP_DMA
+        DOOMGENERIC_RESX * DOOMGENERIC_RESY * sizeof(pixel_t),
+        MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT
     );
 
     DG_Init();

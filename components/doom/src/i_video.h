@@ -20,9 +20,7 @@
 // DESCRIPTION:
 //	System specific interface stuff.
 //
-
-#ifndef __I_VIDEO__
-#define __I_VIDEO__
+#pragma once
 
 #include "doomtype.h"
 #include <stdint.h>

@@ -80,6 +80,12 @@ idf_component_register(
     INCLUDE_DIRS "include"
     PRIV_INCLUDE_DIRS "src"
     REQUIRED_IDF_TARGETS esp32s3
+    PRIV_REQUIRES
+        esp_driver_spi
+        esp_driver_gpio
+        esp_lcd
+        esp_timer
+        heap
 )
 
 if(NOT CMAKE_C_COMPILER_ID STREQUAL "GNU")
