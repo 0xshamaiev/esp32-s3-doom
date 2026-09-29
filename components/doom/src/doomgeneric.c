@@ -4,6 +4,8 @@
 // Original code retains its upstream terms and notices below.
 
 #include "doomgeneric.h"
+
+#include "esp_heap_caps.h"
 #include "i_system.h"
 #include "m_argv.h"
 
@@ -15,9 +17,13 @@ void doomgeneric_Create(int argc, char **argv) {
     myargc = argc;
     myargv = argv;
 
-    DG_ScreenBuffer = malloc(DOOMGENERIC_RESX * DOOMGENERIC_RESY * sizeof(*DG_ScreenBuffer));
-    if (DG_ScreenBuffer == NULL)
-        I_Error("Unable to allocate framebuffer");
+    // I am forcing ESP32 to put the screen buffer onto SRAM,
+    // because I suspect that a buffer placed in PSRAM won't be
+    // as performant and frictionless for SPI screen.
+    DG_ScreenBuffer = (pixel_t*) heap_caps_malloc(
+    DOOMGENERIC_RESX * DOOMGENERIC_RESY * sizeof(pixel_t),
+    MALLOC_CAP_INTERNAL | MALLOC_CAP_DMA
+    );
 
     DG_Init();
     D_DoomMain();

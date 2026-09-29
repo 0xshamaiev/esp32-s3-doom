@@ -53,8 +53,6 @@ static const char rcsid[] = "$Id: i_x.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 
 #include <sys/types.h>
 
-// #define CMAP256
-
 struct FB_BitField {
     uint32_t offset; /* beginning of bitfield	*/
     uint32_t length; /* length of bitfield		*/
@@ -78,16 +76,8 @@ struct FB_ScreenInfo {
 static struct FB_ScreenInfo s_Fb;
 int fb_scaling = 1;
 
-#ifdef CMAP256
-
 bool palette_changed;
 struct color colors[256];
-
-#else // CMAP256
-
-static struct color colors[256];
-
-#endif // CMAP256
 
 void I_GetEvent(void);
 
@@ -100,7 +90,7 @@ uint8_t *I_VideoBuffer = NULL;
 bool screensaver_mode = false;
 
 // Flag indicating whether the screen is currently visible:
-// when the screen isnt visible, don't render the screen
+// when the screen isn't visible, don't render the screen
 
 bool screenvisible;
 
@@ -118,112 +108,24 @@ typedef struct {
 
 static uint16_t rgb565_palette[256];
 
-void cmap_to_rgb565(uint16_t *out, uint8_t *in, int in_pixels) {
-    for (int i = 0; i < in_pixels; i++) {
-        struct color c = colors[*in];
-        uint16_t r = ((uint16_t)(c.r >> 3)) << 11;
-        uint16_t g = ((uint16_t)(c.g >> 2)) << 5;
-        uint16_t b = ((uint16_t)(c.b >> 3)) << 0;
-        *out = (r | g | b);
-
-        in++;
-        for (int j = 0; j < fb_scaling; j++) {
-            out++;
-        }
-    }
-}
-
-void cmap_to_fb(uint8_t *out, uint8_t *in, int in_pixels) {
-    for (int i = 0; i < in_pixels; i++) {
-        struct color c = colors[*in]; // R:8 G:8 B:8
-
-        if (s_Fb.bits_per_pixel == 16) {
-            // RGB565 packing
-            uint16_t p = ((c.r & 0xF8) << 8) | ((c.g & 0xFC) << 3) | (c.b >> 3);
-
-#ifdef SYS_BIG_ENDIAN
-            p = swapeLE16(p); // can't use SHORT() because this needs to stay unsigned
-#endif
-            for (int k = 0; k < fb_scaling; k++) {
-                *(uint16_t *)out = p;
-                out += 2;
-            }
-        } else if (s_Fb.bits_per_pixel == 32) {
-            // Assuming RGBA8888
-            uint32_t pix =
-                (c.r << s_Fb.red.offset) | (c.g << s_Fb.green.offset) | (c.b << s_Fb.blue.offset);
-
-#ifdef SYS_BIG_ENDIAN
-            pix = swapLE32(pix);
-#endif
-            for (int k = 0; k < fb_scaling; k++) {
-                *(uint32_t *)out = pix;
-                out += 4;
-            }
-        } else {
-            // no clue how to convert this
-            I_Error("No idea how to convert %" PRIu32 " bpp pixels", s_Fb.bits_per_pixel);
-        }
-
-        in++;
-    }
-}
-
 void I_InitGraphics(void) {
-    int gfxmodeparm;
-    char *mode;
-
     memset(&s_Fb, 0, sizeof(struct FB_ScreenInfo));
     s_Fb.xres = DOOMGENERIC_RESX;
     s_Fb.yres = DOOMGENERIC_RESY;
     s_Fb.xres_virtual = s_Fb.xres;
     s_Fb.yres_virtual = s_Fb.yres;
+    // The Waveshare 1.14" display expects RGB565
+    s_Fb.bits_per_pixel = 16;
 
-#ifdef CMAP256
+    s_Fb.blue.length = 5;
+    s_Fb.green.length = 6;
+    s_Fb.red.length = 5;
+    s_Fb.transp.length = 0;
 
-    s_Fb.bits_per_pixel = 8;
-
-#else // CMAP256
-
-    gfxmodeparm = M_CheckParmWithArgs("-gfxmode", 1);
-
-    if (gfxmodeparm) {
-        mode = myargv[gfxmodeparm + 1];
-    } else {
-        // default to rgba8888 like the old behavior, for compatibility
-        // maybe could warn here?
-        mode = "rgba8888";
-    }
-
-    if (strcmp(mode, "rgba8888") == 0) {
-        // default mode
-        s_Fb.bits_per_pixel = 32;
-
-        s_Fb.blue.length = 8;
-        s_Fb.green.length = 8;
-        s_Fb.red.length = 8;
-        s_Fb.transp.length = 8;
-
-        s_Fb.blue.offset = 0;
-        s_Fb.green.offset = 8;
-        s_Fb.red.offset = 16;
-        s_Fb.transp.offset = 24;
-    } else if (strcmp(mode, "rgb565") == 0) {
-        s_Fb.bits_per_pixel = 16;
-
-        s_Fb.blue.length = 5;
-        s_Fb.green.length = 6;
-        s_Fb.red.length = 5;
-        s_Fb.transp.length = 0;
-
-        s_Fb.blue.offset = 11;
-        s_Fb.green.offset = 5;
-        s_Fb.red.offset = 0;
-        s_Fb.transp.offset = 16;
-    } else
-        I_Error("Unknown gfxmode value: %s\n", mode);
-
-#endif // CMAP256
+    s_Fb.blue.offset = 11;
+    s_Fb.green.offset = 5;
+    s_Fb.red.offset = 0;
+    s_Fb.transp.offset = 16;
 
     printf("I_InitGraphics: framebuffer: x_res: %" PRIu32 ", y_res: %" PRIu32
            ", x_virtual: %" PRIu32 ", y_virtual: %" PRIu32 ", bpp: "
@@ -271,48 +173,21 @@ void I_UpdateNoBlit(void) {}
 //
 // I_FinishUpdate
 //
-
 void I_FinishUpdate(void) {
-    /* Offsets in case FB is bigger than DOOM */
-    /* 600 = s_Fb height, 200 screenheight */
-    /* 600 = s_Fb height, 200 screenheight */
-    /* 2048 =s_Fb width, 320 screenwidth */
-    int y_offset = (((s_Fb.yres - (SCREENHEIGHT * fb_scaling)) * s_Fb.bits_per_pixel / 8)) / 2;
-    int x_offset = (((s_Fb.xres - (SCREENWIDTH * fb_scaling)) * s_Fb.bits_per_pixel / 8)) / 2;
-    // XXX: siglent FB hack: /4 instead of /2, since it seems to handle the resolution in a funny
-    // way
-    // x_offset     = 0;
-    int x_offset_end =
-        ((s_Fb.xres - (SCREENWIDTH * fb_scaling)) * s_Fb.bits_per_pixel / 8) - x_offset;
-
-    /* DRAW SCREEN */
     uint8_t *line_in = I_VideoBuffer;
-    uint8_t *line_out = (uint8_t *)DG_ScreenBuffer;
+    uint8_t *line_out = DG_ScreenBuffer;
 
     int y = SCREENHEIGHT;
 
     while (y--) {
         for (int i = 0; i < fb_scaling; i++) {
-            line_out += x_offset;
-#ifdef CMAP256
-            if (fb_scaling == 1) {
-                memcpy(line_out, line_in, SCREENWIDTH);
-                /* fb_width is bigger than Doom SCREENWIDTH... */
-            } else {
-                int j;
-
-                for (j = 0; j < SCREENWIDTH; j++) {
-                    int k;
-                    for (k = 0; k < fb_scaling; k++) {
-                        line_out[j * fb_scaling + k] = line_in[j];
-                    }
+            // Write 8-bit palette indices directly into DG_ScreenBuffer
+            for (int x = 0; x < SCREENWIDTH; x++) {
+                uint8_t pixel_idx = line_in[x];
+                for (int s_x = 0; s_x < fb_scaling; s_x++) {
+                    *line_out++ = pixel_idx; // 1 byte per pixel
                 }
             }
-#else
-            // cmap_to_rgb565((void*)line_out, (void*)line_in, SCREENWIDTH);
-            cmap_to_fb(line_out, line_in, SCREENWIDTH);
-#endif
-            line_out += (SCREENWIDTH * fb_scaling * (s_Fb.bits_per_pixel / 8)) + x_offset_end;
         }
         line_in += SCREENWIDTH;
     }
@@ -335,38 +210,25 @@ void I_ReadScreen(uint8_t *scr) { memcpy(scr, I_VideoBuffer, SCREENWIDTH * SCREE
 #define GFX_RGB565_B(color) (0x001F & color)
 
 void I_SetPalette(const uint8_t *palette) {
-    // col_t* c;
+    for (int i = 0; i < 256; i++) {
+        // Read raw RGB values for palette entry i
+        uint8_t r = palette[i * 3 + 0];
+        uint8_t g = palette[i * 3 + 1];
+        uint8_t b = palette[i * 3 + 2];
 
-    // for (i = 0; i < 256; i++)
-    //{
-    //	c = (col_t*)palette;
+        // Apply gamma correction lookup table
+        uint8_t r_gamma = gammatable[usegamma][r];
+        uint8_t g_gamma = gammatable[usegamma][g];
+        uint8_t b_gamma = gammatable[usegamma][b];
 
-    //	rgb565_palette[i] = GFX_RGB565(gammatable[usegamma][c->r],
-    //								   gammatable[usegamma][c->g],
-    //								   gammatable[usegamma][c->b]);
-
-    //	palette += 3;
-    //}
-
-    /* performance boost:
-     * map to the right pixel format over here! */
-
-    for (int i = 0; i < 256; ++i) {
-        colors[i].a = 0;
-        colors[i].r = gammatable[usegamma][*palette++];
-        colors[i].g = gammatable[usegamma][*palette++];
-        colors[i].b = gammatable[usegamma][*palette++];
+        // Convert to 16-bit RGB565 and store in the lookup table
+        rgb565_palette[i] = GFX_RGB565(r_gamma, g_gamma, b_gamma);
     }
 
-#ifdef CMAP256
-
     palette_changed = true;
-
-#endif // CMAP256
 }
 
 // Given an RGB value, find the closest matching palette index.
-
 int I_GetPaletteIndex(int r, int g, int b) {
     col_t color;
 
