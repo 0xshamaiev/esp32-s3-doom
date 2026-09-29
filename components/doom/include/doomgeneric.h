@@ -29,10 +29,6 @@ typedef uint32_t pixel_t;
 
 extern pixel_t *DG_ScreenBuffer;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 void doomgeneric_Create(int argc, char **argv);
 
 void doomgeneric_Tick(void);
@@ -47,9 +43,5 @@ void DG_SleepMs(uint32_t ms);
 uint32_t DG_GetTicksMs(void);
 
 int DG_GetKey(int *pressed, uint8_t *key);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif // DOOM_GENERIC
