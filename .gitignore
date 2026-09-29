@@ -14,3 +14,4 @@
 *.log
 .DS_Store
 /CMakeUserPresets.json
+spiffs/doom*
