@@ -168,7 +168,13 @@ void DG_Init(void) {
 void DG_SleepMs(uint32_t ms) {
     if (ms == 0)
         return;
-    vTaskDelay(pdMS_TO_TICKS(ms));
+
+    // Round any positive request to at least 1ms of sleep
+    TickType_t ticks = pdMS_TO_TICKS(ms);
+    if (ticks == 0)
+        ticks = 1;
+
+    vTaskDelay(ticks);
 }
 
 uint32_t DG_GetTicksMs(void) {

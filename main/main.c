@@ -3,6 +3,8 @@
 
 #include "doomgeneric.h"
 #include "esp_log.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 extern void init_spiffs(void);
 extern void init_st7789_display(void);
@@ -29,5 +31,6 @@ void app_main(void) {
 
     while (true) {
         doomgeneric_Tick();
+        vTaskDelay(1);
     }
 }
