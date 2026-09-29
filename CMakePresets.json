@@ -2,28 +2,25 @@
   "version": 3,
   "cmakeMinimumRequired": {
     "major": 3,
-    "minor": 21,
+    "minor": 22,
     "patch": 0
   },
   "configurePresets": [
     {
       "name": "esp32s3",
-      "displayName": "TinyS3 engine (GCC)",
+      "displayName": "ESP32-S3 firmware (ESP-IDF)",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build",
-      "toolchainFile": "${sourceDir}/cmake/esp32s3-gcc.cmake",
+      "binaryDir": "build",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
+        "IDF_TARGET": "esp32s3",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       }
     }
   ],
   "buildPresets": [
     {
       "name": "esp32s3",
-      "configurePreset": "esp32s3",
-      "targets": [
-        "doomgeneric"
-      ]
+      "configurePreset": "esp32s3"
     }
   ]
 }

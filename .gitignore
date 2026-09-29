@@ -13,3 +13,4 @@
 *.map
 *.log
 .DS_Store
+/CMakeUserPresets.json

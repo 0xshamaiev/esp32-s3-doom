@@ -14,5 +14,5 @@ Checks: >-
   readability-isolate-declaration,
   readability-misleading-indentation
 WarningsAsErrors: ''
-HeaderFilterRegex: '(^|/)src/'
+HeaderFilterRegex: '(^|/)(main|components/doom)/(src/|include/)?'
 FormatStyle: file
