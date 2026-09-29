@@ -9,6 +9,14 @@ void app_main(void) {
              DOOMGENERIC_RESX, DOOMGENERIC_RESY);
     ESP_LOGI("doom", "Game startup awaits display, input, WAD storage, and memory configuration");
 
-    // Mount WAD storage and initialize the board before doomgeneric_Create().
-    // The board port must supply the DG_* callbacks from doomgeneric.h.
+    // Idk how to bolt on a proper debug shell here, so I am gonna hardcode arguments
+    char *argv[] = {
+        "doom",
+        "-iwad",
+        "/spiffs/doom1.wad",
+        "-nosound"
+    };
+    uint8_t argc = sizeof(argv) / sizeof(argv[0]);
+
+    doomgeneric_Create(argc, argv);
 }
