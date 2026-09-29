@@ -106,7 +106,7 @@ typedef struct {
 
 // Palette converted to RGB565
 
-static uint16_t rgb565_palette[256];
+uint16_t rgb565_palette[256];
 
 void I_InitGraphics(void) {
     memset(&s_Fb, 0, sizeof(struct FB_ScreenInfo));

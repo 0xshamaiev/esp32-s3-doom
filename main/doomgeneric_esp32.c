@@ -1,21 +1,24 @@
 // SPDX-FileCopyrightText: 2026 Danylo Shamaiev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "esp_lcd_panel_io.h"
-#include "esp_lcd_panel_vendor.h"
-#include "esp_lcd_panel_ops.h"
+#include "doomgeneric.h"
 #include "driver/gpio.h"
 #include "driver/spi_master.h"
 #include "esp_heap_caps.h"
+#include "esp_lcd_panel_io.h"
+#include "esp_lcd_panel_ops.h"
+#include "esp_lcd_panel_vendor.h"
 #include "esp_log.h"
-#include "doomgeneric.h"
+#include "esp_timer.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 #define CHUNK_LINES 10
 
 // My GPIO setup on TinyS3
-#define PIN_NUM_MOSI   35
-#define PIN_NUM_MISO   37
-#define PIN_NUM_SCLK   36
+#define PIN_NUM_MOSI 35
+#define PIN_NUM_MISO 37
+#define PIN_NUM_SCLK 36
 #define PIN_NUM_LCD_DC 34
 #define PIN_NUM_LCD_CS -1
 #define PIN_NUM_LCD_RST -1
@@ -90,10 +93,8 @@ bool init_st7789_display(void) {
     // }
 
     // Allocate 10-line SRAM DMA Bounce Buffer (320 * 10 * 2 bytes = 6.4 KB)
-    s_dma_bounce_buf = (uint16_t *)heap_caps_malloc(
-        DOOMGENERIC_RESX * 10 * sizeof(uint16_t),
-        MALLOC_CAP_INTERNAL | MALLOC_CAP_DMA
-    );
+    s_dma_bounce_buf = (uint16_t *)heap_caps_malloc(DOOMGENERIC_RESX * 10 * sizeof(uint16_t),
+                                                    MALLOC_CAP_INTERNAL | MALLOC_CAP_DMA);
 
     if (!s_dma_bounce_buf) {
         ESP_LOGE(TAG, "Failed to allocate SRAM DMA bounce buffer!");
@@ -105,7 +106,8 @@ bool init_st7789_display(void) {
 }
 
 void DG_DrawFrame(void) {
-    if (!s_panel_handle || !s_dma_bounce_buf || !DG_ScreenBuffer) return;
+    if (!s_panel_handle || !s_dma_bounce_buf || !DG_ScreenBuffer)
+        return;
 
     pixel_t *src_8bit = DG_ScreenBuffer;
 
@@ -123,11 +125,31 @@ void DG_DrawFrame(void) {
         }
 
         // Draw 10-line chunk to ST7789 via esp_lcd
-        esp_lcd_panel_draw_bitmap(
-            s_panel_handle,
-            0, y,
-            DOOMGENERIC_RESX, y + CHUNK_LINES,
-            s_dma_bounce_buf
-        );
+        esp_lcd_panel_draw_bitmap(s_panel_handle, 0, y, DOOMGENERIC_RESX, y + CHUNK_LINES,
+                                  s_dma_bounce_buf);
     }
+}
+
+void DG_Init(void) {
+    // No idea what to do here
+}
+
+void DG_SleepMs(uint32_t ms) {
+    if (ms == 0)
+        return;
+    vTaskDelay(pdMS_TO_TICKS(ms));
+}
+
+uint32_t DG_GetTicksMs(void) {
+    // ESP-IDF Free RTOS uses 10ms ticks (100 Hz), which is too much for DOOM.
+    // esp_timer_get_time() returns time in microseconds (us) since boot.
+    // Divide by 1000 to convert to milliseconds (ms).
+    return (uint32_t)(esp_timer_get_time() / 1000);
+}
+
+int DG_GetKey(int *pressed, uint8_t *key) {
+    // Stubbed: No buttons pressed for now
+    *pressed = 0;
+    *key = 0;
+    return 0;
 }
