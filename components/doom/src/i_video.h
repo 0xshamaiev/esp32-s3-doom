@@ -136,7 +136,6 @@ extern char *video_driver;
 extern bool screenvisible;
 
 extern int vanilla_keyboard_mapping;
-extern bool screensaver_mode;
 extern int usegamma;
 extern uint8_t *I_VideoBuffer;
 

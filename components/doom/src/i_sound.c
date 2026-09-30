@@ -155,7 +155,7 @@ void I_InitSound(bool use_sfx_prefix) {
 
     // Initialize the sound and music subsystems.
 
-    if (!nosound && !screensaver_mode) {
+    if (!nosound) {
         if (!nosfx) {
             InitSfxModule(use_sfx_prefix);
         }

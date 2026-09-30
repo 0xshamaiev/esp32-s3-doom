@@ -80,12 +80,7 @@ struct color colors[256];
 void I_GetEvent(void);
 
 // The screen buffer; this is modified to draw things to the screen
-
 uint8_t *I_VideoBuffer = NULL;
-
-// If true, game is running as a screensaver
-
-bool screensaver_mode = false;
 
 // Flag indicating whether the screen is currently visible:
 // when the screen isn't visible, don't render the screen
