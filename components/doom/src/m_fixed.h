@@ -18,7 +18,7 @@
 // GNU General Public License for more details.
 //
 // DESCRIPTION:
-//	Fixed point arithemtics, implementation.
+//	Fixed point arithmetics, implementation.
 //
 
 #ifndef __M_FIXED__
@@ -34,7 +34,9 @@
 
 typedef int32_t fixed_t;
 
-fixed_t FixedMul(fixed_t a, fixed_t b);
+static inline fixed_t FixedMul(fixed_t a, fixed_t b) {
+    return ((int64_t) a * (int64_t) b) >> FRACBITS;
+}
 
 fixed_t FixedDiv(fixed_t a, fixed_t b);
 

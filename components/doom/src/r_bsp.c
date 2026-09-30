@@ -36,8 +36,6 @@
 #include "doomstat.h"
 #include "r_state.h"
 
-//#include "r_local.h"
-
 
 seg_t *curline;
 side_t *sidedef;
@@ -221,22 +219,15 @@ void R_ClearClipSegs(void) {
 // and adds any visible pieces to the line list.
 //
 void R_AddLine(seg_t *line) {
-    int x1;
-    int x2;
-    angle_t angle1;
-    angle_t angle2;
-    angle_t span;
-    angle_t tspan;
-
     curline = line;
 
     // OPTIMIZE: quickly reject orthogonal back sides.
-    angle1 = R_PointToAngle(line->v1->x, line->v1->y);
-    angle2 = R_PointToAngle(line->v2->x, line->v2->y);
+    angle_t angle1 = R_PointToAngle(line->v1->x, line->v1->y);
+    angle_t angle2 = R_PointToAngle(line->v2->x, line->v2->y);
 
     // Clip to view edges.
     // OPTIMIZE: make constant out of 2*clipangle (FIELDOFVIEW).
-    span = angle1 - angle2;
+    const angle_t span = angle1 - angle2;
 
     // Back side? I.e. backface culling?
     if (span >= ANG180)
@@ -247,7 +238,7 @@ void R_AddLine(seg_t *line) {
     angle1 -= viewangle;
     angle2 -= viewangle;
 
-    tspan = angle1 + clipangle;
+    angle_t tspan = angle1 + clipangle;
     if (tspan > 2 * clipangle) {
         tspan -= 2 * clipangle;
 
@@ -271,8 +262,8 @@ void R_AddLine(seg_t *line) {
     // but not necessarily visible.
     angle1 = (angle1 + ANG90) >> ANGLETOFINESHIFT;
     angle2 = (angle2 + ANG90) >> ANGLETOFINESHIFT;
-    x1 = viewangletox[angle1];
-    x2 = viewangletox[angle2];
+    const int x1 = viewangletox[angle1];
+    const int x2 = viewangletox[angle2];
 
     // Does not cross a pixel?
     if (x1 == x2)
@@ -371,7 +362,7 @@ bool R_CheckBBox(fixed_t *bspcoord) {
     angle_t angle1 = R_PointToAngle(x1, y1) - viewangle;
     angle_t angle2 = R_PointToAngle(x2, y2) - viewangle;
 
-    angle_t span = angle1 - angle2;
+    const angle_t span = angle1 - angle2;
 
     // Sitting on a line?
     if (span >= ANG180)
@@ -442,7 +433,7 @@ void R_Subsector(int num) {
 #endif
 
     sscount++;
-    subsector_t *sub = &subsectors[num];
+    const subsector_t *sub = &subsectors[num];
     frontsector = sub->sector;
     int count = sub->numlines;
     seg_t *line = &segs[sub->firstline];
@@ -489,7 +480,7 @@ void R_RenderBSPNode(int bspnum) {
     node_t *bsp = &nodes[bspnum];
 
     // Decide which side the view point is on.
-    int side = R_PointOnSide(viewx, viewy, bsp);
+    const int side = R_PointOnSide(viewx, viewy, bsp);
 
     // Recursively divide front space.
     R_RenderBSPNode(bsp->children[side]);
