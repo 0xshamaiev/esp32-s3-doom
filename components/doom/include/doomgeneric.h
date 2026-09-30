@@ -16,6 +16,9 @@
 #define DOOMGENERIC_RESY 135
 #endif
 
+// The display backend converts indexed pixels to RGB565 for the LCD.
+#define DOOMGENERIC_LCD_BPP 16
+
 typedef uint8_t pixel_t;
 
 extern pixel_t *DG_ScreenBuffer;

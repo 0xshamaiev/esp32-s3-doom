@@ -10,12 +10,18 @@
 extern void init_spiffs(void);
 extern void init_st7789_display(void);
 
-void app_main(void) {
-    constexpr size_t framebuffer_size =
-        DOOMGENERIC_RESX * DOOMGENERIC_RESY * sizeof(*DG_ScreenBuffer);
-    constexpr uint32_t framebuffer_caps = MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT;
+static constexpr size_t framebuffer_size =
+    DOOMGENERIC_RESX * DOOMGENERIC_RESY * sizeof(*DG_ScreenBuffer);
+static constexpr uint32_t framebuffer_caps = MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT;
 
+// FreeRTOS keeps splitting the memory frivolously, so I am gonna pin it beforehand
+static void __attribute__((constructor)) reserve_framebuffer(void) {
+    ESP_EARLY_LOGI("doom", "Attempting to reserve a contiguous %u-byte framebuffer in internal SRAM",
+                   (unsigned)framebuffer_size);
     DG_ScreenBuffer = heap_caps_malloc(framebuffer_size, framebuffer_caps);
+}
+
+void app_main(void) {
     if (DG_ScreenBuffer == NULL) {
         ESP_LOGE("doom", "Cannot reserve %zu-byte framebuffer: internal free=%zu, largest=%zu",
                  framebuffer_size, heap_caps_get_free_size(framebuffer_caps),

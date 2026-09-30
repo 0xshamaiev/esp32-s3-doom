@@ -95,7 +95,7 @@ void init_st7789_display(void) {
     esp_lcd_panel_dev_config_t panel_config = {
         .reset_gpio_num = PIN_NUM_LCD_RST,
         .data_endian = LCD_RGB_DATA_ENDIAN_BIG, // ST7789 expects Big Endian smh
-        .bits_per_pixel = 16,
+        .bits_per_pixel = DOOMGENERIC_LCD_BPP,
     };
 
     ESP_ERROR_CHECK(esp_lcd_new_panel_st7789(io_handle, &panel_config, &s_panel_handle));
