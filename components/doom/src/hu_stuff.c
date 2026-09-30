@@ -27,7 +27,6 @@
 
 #include "z_zone.h"
 
-#include "deh_main.h"
 #include "i_swap.h"
 #include "i_video.h"
 
@@ -108,7 +107,7 @@ void HU_Init(void) {
     // load the heads-up font
     int j = HU_FONTSTART;
     for (int i = 0; i < HU_FONTSIZE; i++) {
-        DEH_snprintf(buffer, 9, "STCFN%.3d", j++);
+        snprintf(buffer, 9, "STCFN%.3d", j++);
         hu_font[i] = (patch_t *)W_CacheLumpName(buffer, PU_STATIC);
     }
 }
@@ -143,10 +142,6 @@ void HU_Start(void) {
         s = "Unknown level";
         break;
     }
-
-    // dehacked substitution to get modified level name
-
-    s = DEH_String(s);
 
     while (*s)
         HUlib_addCharToTextLine(&w_title, *(s++));

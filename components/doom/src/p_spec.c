@@ -31,7 +31,6 @@
 #include "doomdef.h"
 #include "doomstat.h"
 
-#include "deh_main.h"
 #include "i_system.h"
 #include "m_argv.h"
 #include "m_misc.h"
@@ -139,8 +138,8 @@ void P_InitPicAnims(void) {
     //	Init animation
     lastanim = anims;
     for (int i = 0; animdefs[i].istexture != -1; i++) {
-        char *startname = DEH_String(animdefs[i].startname);
-        char *endname = DEH_String(animdefs[i].endname);
+        char *startname = animdefs[i].startname;
+        char *endname = animdefs[i].endname;
 
         if (animdefs[i].istexture) {
             // different episode ?

@@ -27,7 +27,6 @@
 #include <string.h>
 
 #include "config.h"
-#include "deh_str.h"
 #include "doomkeys.h"
 #include "doomtype.h"
 #include "i_swap.h"

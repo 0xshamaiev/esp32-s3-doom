@@ -30,7 +30,6 @@
 
 #include "config.h"
 
-#include "doomfeatures.h"
 #include "doomkeys.h"
 #include "doomtype.h"
 #include "i_system.h"

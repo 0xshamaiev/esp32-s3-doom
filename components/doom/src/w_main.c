@@ -21,7 +21,6 @@
 //     Common code to parse command line, identifying WAD files to load.
 //
 
-#include "doomfeatures.h"
 #include "d_iwad.h"
 #include "m_argv.h"
 #include "w_main.h"
@@ -29,7 +28,7 @@
 #include "w_wad.h"
 #include "z_zone.h"
 
-// Parse the command line, merging WAD files that are sppecified.
+// Parse the command line, merging WAD files that are specified.
 // Returns true if at least one file was added.
 
 bool W_ParseCommandLine(void) {

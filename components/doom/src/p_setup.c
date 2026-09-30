@@ -29,7 +29,6 @@
 
 #include "z_zone.h"
 
-#include "deh_main.h"
 #include "i_swap.h"
 #include "m_argv.h"
 #include "m_bbox.h"
@@ -646,9 +645,9 @@ P_SetupLevel
     // find map name
     if (gamemode == commercial) {
         if (map < 10)
-            DEH_snprintf(lumpname, 9, "map0%i", map);
+            snprintf(lumpname, 9, "map0%i", map);
         else
-            DEH_snprintf(lumpname, 9, "map%i", map);
+            snprintf(lumpname, 9, "map%i", map);
     } else {
         lumpname[0] = 'E';
         lumpname[1] = '0' + episode;

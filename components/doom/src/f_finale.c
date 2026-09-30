@@ -27,7 +27,6 @@
 #include <ctype.h>
 
 // Functions.
-#include "deh_main.h"
 #include "i_system.h"
 #include "i_swap.h"
 #include "z_zone.h"
@@ -122,11 +121,6 @@ void F_StartFinale(void) {
             finaleflat = screen->background;
         }
     }
-
-    // Do dehacked substitutions of strings
-
-    finaletext = DEH_String(finaletext);
-    finaleflat = DEH_String(finaleflat);
 
     finalestage = F_STAGE_TEXT;
     finalecount = 0;
@@ -488,9 +482,9 @@ void F_CastPrint(char *text) {
 
 void F_CastDrawer(void) {
     // erase the entire screen to a background
-    V_DrawPatch(0, 0, W_CacheLumpName(DEH_String("BOSSBACK"), PU_CACHE));
+    V_DrawPatch(0, 0, W_CacheLumpName("BOSSBACK", PU_CACHE));
 
-    F_CastPrint(DEH_String(castorder[castnum].name));
+    F_CastPrint(castorder[castnum].name);
 
     // draw the current frame in the middle of the screen
     spritedef_t *sprdef = &sprites[caststate->sprite];
@@ -535,8 +529,8 @@ void F_BunnyScroll(void) {
     char name[10];
     static int laststage;
 
-    patch_t *p1 = W_CacheLumpName(DEH_String("PFUB2"), PU_LEVEL);
-    patch_t *p2 = W_CacheLumpName(DEH_String("PFUB1"), PU_LEVEL);
+    patch_t *p1 = W_CacheLumpName("PFUB2", PU_LEVEL);
+    patch_t *p2 = W_CacheLumpName("PFUB1", PU_LEVEL);
 
     V_MarkRect(0, 0, SCREENWIDTH, SCREENHEIGHT);
 
@@ -558,7 +552,7 @@ void F_BunnyScroll(void) {
     if (finalecount < 1180) {
         V_DrawPatch((SCREENWIDTH - 13 * 8) / 2,
                     (SCREENHEIGHT - 8 * 8) / 2,
-                    W_CacheLumpName(DEH_String("END0"), PU_CACHE));
+                    W_CacheLumpName("END0", PU_CACHE));
         laststage = 0;
         return;
     }
@@ -571,7 +565,7 @@ void F_BunnyScroll(void) {
         laststage = stage;
     }
 
-    DEH_snprintf(name, 10, "END%i", stage);
+    snprintf(name, 10, "END%i", stage);
     V_DrawPatch((SCREENWIDTH - 13 * 8) / 2,
                 (SCREENHEIGHT - 8 * 8) / 2,
                 W_CacheLumpName(name, PU_CACHE));
@@ -600,8 +594,6 @@ static void F_ArtScreenDrawer(void) {
             default:
                 return;
         }
-
-        lumpname = DEH_String(lumpname);
 
         V_DrawPatch(0, 0, W_CacheLumpName(lumpname, PU_CACHE));
     }

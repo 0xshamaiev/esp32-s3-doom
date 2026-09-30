@@ -25,7 +25,7 @@ The firmware loads `doom1.wad` from SPIFFS and runs DOOM's demo on the LCD.
 The game framebuffer lives in internal SRAM. Zone memory goes in PSRAM.
 
 Still missing: keyboard input and audio. Mouse input and multiplayer are removed.
-DeHackEd patches and WAD merging are disabled too.
+WAD merging is disabled too.
 
 The engine supports DOOM and DOOM II. It looks for `doom.wad`, `doom1.wad`, or
 `doom2.wad`, but startup currently hardcodes `/spiffs/doom1.wad`.

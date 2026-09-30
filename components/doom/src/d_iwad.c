@@ -26,7 +26,6 @@
 #include <string.h>
 
 #include "config.h"
-#include "deh_str.h"
 #include "d_iwad.h"
 #include "i_system.h"
 #include "m_argv.h"
@@ -76,7 +75,7 @@ static char *SearchDirectoryForIWAD(char *dir, int mask, GameMission_t *mission)
             continue;
         }
 
-        char *filename = CheckDirectoryHasIWAD(dir, DEH_String(iwads[i].name));
+        char *filename = CheckDirectoryHasIWAD(dir, iwads[i].name);
 
         if (filename != NULL) {
             *mission = iwads[i].mission;

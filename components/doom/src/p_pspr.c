@@ -27,7 +27,6 @@
 #include "doomdef.h"
 #include "d_event.h"
 
-#include "deh_misc.h"
 
 #include "m_random.h"
 #include "p_local.h"
@@ -139,7 +138,7 @@ bool P_CheckAmmo(player_t *player) {
 
     // Minimal amount for one shot varies.
     if (player->readyweapon == wp_bfg)
-        count = deh_bfg_cells_per_shot;
+        count = 40;
     else if (player->readyweapon == wp_supershotgun)
         count = 2; // Double barrel.
     else
@@ -436,20 +435,6 @@ A_Saw
     player->mo->flags |= MF_JUSTATTACKED;
 }
 
-// Doom does not check the bounds of the ammo array.  As a result,
-// it is possible to use an ammo type > 4 that overflows into the
-// maxammo array and affects that instead.  Through dehacked, for
-// example, it is possible to make a weapon that decreases the max
-// number of ammo for another weapon.  Emulate this.
-
-static void DecreaseAmmo(player_t *player, int ammonum, int amount) {
-    if (ammonum < NUMAMMO) {
-        player->ammo[ammonum] -= amount;
-    } else {
-        player->maxammo[ammonum - NUMAMMO] -= amount;
-    }
-}
-
 
 //
 // A_FireMissile
@@ -458,7 +443,7 @@ void
 A_FireMissile
 (player_t *player,
  pspdef_t *psp) {
-    DecreaseAmmo(player, weaponinfo[player->readyweapon].ammo, 1);
+    player->ammo[weaponinfo[player->readyweapon].ammo] -= 1;
     P_SpawnPlayerMissile(player->mo, MT_ROCKET);
 }
 
@@ -470,8 +455,7 @@ void
 A_FireBFG
 (player_t *player,
  pspdef_t *psp) {
-    DecreaseAmmo(player, weaponinfo[player->readyweapon].ammo,
-                 deh_bfg_cells_per_shot);
+    player->ammo[weaponinfo[player->readyweapon].ammo] -= 40;
     P_SpawnPlayerMissile(player->mo, MT_BFG);
 }
 
@@ -483,7 +467,7 @@ void
 A_FirePlasma
 (player_t *player,
  pspdef_t *psp) {
-    DecreaseAmmo(player, weaponinfo[player->readyweapon].ammo, 1);
+    player->ammo[weaponinfo[player->readyweapon].ammo] -= 1;
 
     P_SetPsprite(player,
                  ps_flash,
@@ -544,7 +528,7 @@ A_FirePistol
     S_StartSound(player->mo, sfx_pistol);
 
     P_SetMobjState(player->mo, S_PLAY_ATK2);
-    DecreaseAmmo(player, weaponinfo[player->readyweapon].ammo, 1);
+    player->ammo[weaponinfo[player->readyweapon].ammo] -= 1;
 
     P_SetPsprite(player,
                  ps_flash,
@@ -565,7 +549,7 @@ A_FireShotgun
     S_StartSound(player->mo, sfx_shotgn);
     P_SetMobjState(player->mo, S_PLAY_ATK2);
 
-    DecreaseAmmo(player, weaponinfo[player->readyweapon].ammo, 1);
+    player->ammo[weaponinfo[player->readyweapon].ammo] -= 1;
 
     P_SetPsprite(player,
                  ps_flash,
@@ -588,7 +572,7 @@ A_FireShotgun2
     S_StartSound(player->mo, sfx_dshtgn);
     P_SetMobjState(player->mo, S_PLAY_ATK2);
 
-    DecreaseAmmo(player, weaponinfo[player->readyweapon].ammo, 2);
+    player->ammo[weaponinfo[player->readyweapon].ammo] -= 2;
 
     P_SetPsprite(player,
                  ps_flash,
@@ -621,7 +605,7 @@ A_FireCGun
         return;
 
     P_SetMobjState(player->mo, S_PLAY_ATK2);
-    DecreaseAmmo(player, weaponinfo[player->readyweapon].ammo, 1);
+    player->ammo[weaponinfo[player->readyweapon].ammo] -= 1;
 
     P_SetPsprite(player,
                  ps_flash,

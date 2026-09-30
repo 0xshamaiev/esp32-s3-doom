@@ -25,7 +25,6 @@
 #include <stdio.h>
 
 #include "i_system.h"
-#include "deh_main.h"
 #include "doomdef.h"
 #include "p_local.h"
 
@@ -133,8 +132,8 @@ void P_InitSwitchList(void) {
 
             value = R_TextureNumForName(alphSwitchList[i].name1);
 #endif
-            switchlist[index++] = R_TextureNumForName(DEH_String(alphSwitchList[i].name1));
-            switchlist[index++] = R_TextureNumForName(DEH_String(alphSwitchList[i].name2));
+            switchlist[index++] = R_TextureNumForName(alphSwitchList[i].name1);
+            switchlist[index++] = R_TextureNumForName(alphSwitchList[i].name2);
         }
     }
 }

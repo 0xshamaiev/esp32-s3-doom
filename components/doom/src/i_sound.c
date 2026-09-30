@@ -25,7 +25,6 @@
 
 
 #include "config.h"
-#include "doomfeatures.h"
 #include "doomtype.h"
 
 #include "i_sound.h"

@@ -20,7 +20,6 @@
 // DESCRIPTION: Door animation code (opening/closing)
 //
 
-#include "deh_main.h"
 #include "doomdef.h"
 #include "p_local.h"
 #include "z_zone.h"
@@ -187,7 +186,7 @@ int EV_DoLockedDoor(line_t *line, vldoor_e type, mobj_t *thing) {
         if (!p)
             return 0;
         if (!p->cards[it_bluecard] && !p->cards[it_blueskull]) {
-            p->message = DEH_String(PD_BLUEO);
+            p->message = PD_BLUEO;
             S_StartSound(NULL, sfx_oof);
             return 0;
         }
@@ -198,7 +197,7 @@ int EV_DoLockedDoor(line_t *line, vldoor_e type, mobj_t *thing) {
         if (!p)
             return 0;
         if (!p->cards[it_redcard] && !p->cards[it_redskull]) {
-            p->message = DEH_String(PD_REDO);
+            p->message = PD_REDO;
             S_StartSound(NULL, sfx_oof);
             return 0;
         }
@@ -209,7 +208,7 @@ int EV_DoLockedDoor(line_t *line, vldoor_e type, mobj_t *thing) {
         if (!p)
             return 0;
         if (!p->cards[it_yellowcard] && !p->cards[it_yellowskull]) {
-            p->message = DEH_String(PD_YELLOWO);
+            p->message = PD_YELLOWO;
             S_StartSound(NULL, sfx_oof);
             return 0;
         }
@@ -308,7 +307,7 @@ void EV_VerticalDoor(line_t *line, mobj_t *thing) {
             return;
 
         if (!player->cards[it_bluecard] && !player->cards[it_blueskull]) {
-            player->message = DEH_String(PD_BLUEK);
+            player->message = PD_BLUEK;
             S_StartSound(NULL, sfx_oof);
             return;
         }
@@ -320,7 +319,7 @@ void EV_VerticalDoor(line_t *line, mobj_t *thing) {
             return;
 
         if (!player->cards[it_yellowcard] && !player->cards[it_yellowskull]) {
-            player->message = DEH_String(PD_YELLOWK);
+            player->message = PD_YELLOWK;
             S_StartSound(NULL, sfx_oof);
             return;
         }
@@ -332,7 +331,7 @@ void EV_VerticalDoor(line_t *line, mobj_t *thing) {
             return;
 
         if (!player->cards[it_redcard] && !player->cards[it_redskull]) {
-            player->message = DEH_String(PD_REDK);
+            player->message = PD_REDK;
             S_StartSound(NULL, sfx_oof);
             return;
         }
