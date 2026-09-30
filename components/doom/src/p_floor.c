@@ -159,17 +159,8 @@ result_e T_MovePlane
                         }
                         return pastdest;
                     }
-                    lastpos = sector->ceilingheight;
                     sector->ceilingheight += speed;
-                    flag = P_ChangeSector(sector, crush);
-                    // UNUSED
-#if 0
-                    if (flag == true) {
-                        sector->ceilingheight = lastpos;
-                        P_ChangeSector(sector, crush);
-                        return crushed;
-                    }
-#endif
+                    P_ChangeSector(sector, crush);
                 }
                 break;
             }
@@ -392,8 +383,6 @@ int EV_DoFloor(line_t *line, floor_e floortype) {
 int EV_BuildStairs(line_t *line, stair_e type) {
     int ok;
 
-    floormove_t *floor;
-
     fixed_t stairsize = 0;
     fixed_t speed = 0;
 
@@ -408,7 +397,7 @@ int EV_BuildStairs(line_t *line, stair_e type) {
 
         // new floor thinker
         rtn = 1;
-        floor = Z_Malloc(sizeof(*floor), PU_LEVSPEC, 0);
+        floormove_t *floor = Z_Malloc(sizeof(*floor), PU_LEVSPEC, 0);
         P_AddThinker(&floor->thinker);
         sec->specialdata = floor;
         floor->thinker.function.acp1 = (actionf_p1) T_MoveFloor;

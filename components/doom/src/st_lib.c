@@ -76,13 +76,12 @@ void STlib_drawNum(st_number_t *n, bool refresh) {
     int numdigits = n->width;
     int num = *n->num;
 
-    int w = SHORT(n->p[0]->width);
-    int h = SHORT(n->p[0]->height);
-    int x = n->x;
+    const int w = SHORT(n->p[0]->width);
+    const int h = SHORT(n->p[0]->height);
 
     n->oldnum = *n->num;
 
-    int neg = num < 0;
+    const int neg = num < 0;
 
     if (neg) {
         if (numdigits == 2 && num < -9)
@@ -94,7 +93,7 @@ void STlib_drawNum(st_number_t *n, bool refresh) {
     }
 
     // clear the area
-    x = n->x - numdigits * w;
+    int x = n->x - numdigits * w;
 
     if (n->y - ST_Y < 0)
         I_Error("drawNum: n->y - ST_Y < 0");

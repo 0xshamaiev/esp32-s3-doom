@@ -554,7 +554,7 @@ void M_QuickLoad(void) {
 // Had a "quick hack to fix romero bug"
 //
 void M_DrawReadThis1(void) {
-    char *lumpname = "CREDIT";
+    char *lumpname;
     int skullx = 330;
     int skully = 175;
 
@@ -775,7 +775,6 @@ void M_EndGameResponse(int key) {
 }
 
 void M_EndGame(int choice) {
-    choice = 0;
     if (!usergame) {
         S_StartSound(NULL, sfx_oof);
         return;

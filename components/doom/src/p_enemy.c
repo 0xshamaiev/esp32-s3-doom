@@ -1385,8 +1385,7 @@ void A_BrainAwake(mobj_t *mo) {
     numbraintargets = 0;
     braintargeton = 0;
 
-    thinker_t *thinker = thinkercap.next;
-    for (thinker = thinkercap.next; thinker != &thinkercap; thinker = thinker->next) {
+    for (thinker_t *thinker = thinkercap.next; thinker != &thinkercap; thinker = thinker->next) {
         if (thinker->function.acp1 != (actionf_p1)P_MobjThinker)
             continue; // not a mobj
 
@@ -1421,9 +1420,9 @@ void A_BrainScream(mobj_t *mo) {
 }
 
 void A_BrainExplode(mobj_t *mo) {
-    int x = mo->x + (P_Random() - P_Random()) * 2048;
-    int y = mo->y;
-    int z = 128 + P_Random() * 2 * FRACUNIT;
+    const int x = mo->x + (P_Random() - P_Random()) * 2048;
+    const int y = mo->y;
+    const int z = 128 + P_Random() * 2 * FRACUNIT;
     mobj_t *th = P_SpawnMobj(x, y, z, MT_ROCKET);
     th->momz = P_Random() * 512;
 
@@ -1469,14 +1468,14 @@ void A_SpawnFly(mobj_t *mo) {
     if (--mo->reactiontime)
         return; // still flying
 
-    mobj_t *targ = P_SubstNullMobj(mo->target);
+    const mobj_t *targ = P_SubstNullMobj(mo->target);
 
     // First spawn teleport fog.
     mobj_t *fog = P_SpawnMobj(targ->x, targ->y, targ->z, MT_SPAWNFIRE);
     S_StartSound(fog, sfx_telept);
 
     // Randomly select monster to spawn.
-    int r = P_Random();
+    const int r = P_Random();
 
     // Probability distribution (kind of :),
     // decreasing likelihood.

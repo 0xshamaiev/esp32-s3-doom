@@ -54,6 +54,17 @@ cmake --build --preset esp32s3-clion
 Use the build preset so the ESP-IDF environment is also available to build-time
 steps such as bootloader configuration.
 
+Run the optional `clang-tidy` target to analyze both the engine and app:
+
+```sh
+cmake --build --preset esp32s3-clion --target clang-tidy
+```
+
+The target requires clang-tidy with Xtensa and C23 support. Set
+`DOOM_CLANG_TIDY` in your local CMake preset to select a different executable.
+Analysis uses the components' firmware include paths and definitions, with the
+GCC system headers from the configured toolchain.
+
 Another option is to set your ESP-IDF `export.sh` as the CLion toolchain's
 environment file and use the **esp32s3** preset.
 [JetBrains has a setup guide](https://www.jetbrains.com/help/clion/esp-idf.html).

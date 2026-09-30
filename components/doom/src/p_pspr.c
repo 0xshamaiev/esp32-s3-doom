@@ -696,12 +696,10 @@ void P_SetupPsprites(player_t *player) {
 // Called every tic by player thinking routine.
 //
 void P_MovePsprites(player_t *player) {
-    state_t *state;
-
     pspdef_t *psp = &player->psprites[0];
     for (int i = 0; i < NUMPSPRITES; i++, psp++) {
         // a null state means not active
-        if ((state = psp->state)) {
+        if (psp->state) {
             // drop tic count and possibly change state
 
             // a -1 tic count never changes
@@ -716,5 +714,3 @@ void P_MovePsprites(player_t *player) {
     player->psprites[ps_flash].sx = player->psprites[ps_weapon].sx;
     player->psprites[ps_flash].sy = player->psprites[ps_weapon].sy;
 }
-
-

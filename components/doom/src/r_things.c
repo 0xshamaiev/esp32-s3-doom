@@ -42,19 +42,6 @@
 #define MINZ				(FRACUNIT*4)
 #define BASEYCENTER			100
 
-//void R_DrawColumn (void);
-//void R_DrawFuzzColumn (void);
-
-
-typedef struct {
-    int x1;
-    int x2;
-
-    int column;
-    int topclip;
-    int bottomclip;
-} maskdraw_t;
-
 
 //
 // Sprite rotation 0 is facing the viewer,
@@ -92,12 +79,7 @@ char *spritename;
 // R_InstallSpriteLump
 // Local function for R_InitSprites.
 //
-void
-R_InstallSpriteLump
-(int lump,
- uint32_t frame,
- uint32_t rotation,
- bool flipped) {
+void R_InstallSpriteLump(int lump, uint32_t frame, uint32_t rotation, bool flipped) {
     if (frame >= 29 || rotation > 8)
         I_Error("R_InstallSpriteLump: "
                 "Bad frame characters in lump %i", lump);
@@ -341,11 +323,7 @@ void R_DrawMaskedColumn(column_t *column) {
 // R_DrawVisSprite
 //  mfloorclip and mceilingclip should also be set.
 //
-void
-R_DrawVisSprite
-(vissprite_t *vis,
- int x1,
- int x2) {
+void R_DrawVisSprite(vissprite_t *vis, int x1, int x2) {
     patch_t *patch = W_CacheLumpNum(vis->patch + firstspritelump, PU_CACHE);
 
     dc_colormap = vis->colormap;

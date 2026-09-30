@@ -51,11 +51,10 @@ int EV_Teleport(line_t *line, int side, mobj_t *thing) {
     if (side == 1)
         return 0;
 
-    int tag = line->tag;
+    const int tag = line->tag;
     for (int i = 0; i < numsectors; i++) {
         if (sectors[i].tag == tag) {
-            thinker_t *thinker = thinkercap.next;
-            for (thinker = thinkercap.next;
+            for (thinker_t *thinker = thinkercap.next;
                  thinker != &thinkercap;
                  thinker = thinker->next) {
                 // not a mobj

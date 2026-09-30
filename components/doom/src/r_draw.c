@@ -284,10 +284,6 @@ void R_DrawFuzzColumn(void) {
 
     uint8_t *dest = ylookup[dc_yl] + columnofs[dc_x];
 
-    // Looks familiar.
-    fixed_t fracstep = dc_iscale;
-    fixed_t frac = dc_texturemid + (dc_yl - centery) * fracstep;
-
     // Looks like an attempt at dithering,
     //  using the colormap #6 (of 0-31, a bit
     //  brighter than average).
@@ -303,8 +299,6 @@ void R_DrawFuzzColumn(void) {
             fuzzpos = 0;
 
         dest += SCREENWIDTH;
-
-        frac += fracstep;
     } while (count--);
 }
 
@@ -340,10 +334,6 @@ void R_DrawFuzzColumnLow(void) {
     uint8_t *dest = ylookup[dc_yl] + columnofs[x];
     uint8_t *dest2 = ylookup[dc_yl] + columnofs[x + 1];
 
-    // Looks familiar.
-    fixed_t fracstep = dc_iscale;
-    fixed_t frac = dc_texturemid + (dc_yl - centery) * fracstep;
-
     // Looks like an attempt at dithering,
     //  using the colormap #6 (of 0-31, a bit
     //  brighter than average).
@@ -361,8 +351,6 @@ void R_DrawFuzzColumnLow(void) {
 
         dest += SCREENWIDTH;
         dest2 += SCREENWIDTH;
-
-        frac += fracstep;
     } while (count--);
 }
 

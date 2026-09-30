@@ -219,7 +219,6 @@ R_DrawColumnInCache
 //
 void R_GenerateComposite(int texnum) {
     int x;
-    int i;
 
     texture_t *texture = textures[texnum];
 
@@ -231,7 +230,7 @@ void R_GenerateComposite(int texnum) {
     // Composite the columns together.
     texpatch_t *patch = texture->patches;
 
-    for (i = 0, patch = texture->patches;
+    for (int i = 0;
          i < texture->patchcount;
          i++, patch++) {
         patch_t *realpatch = W_CacheLumpNum(patch->patch, PU_CACHE);
@@ -272,7 +271,6 @@ void R_GenerateComposite(int texnum) {
 void R_GenerateLookup(int texnum) {
     uint8_t *patchcount; // patchcount[texture->width]
     int x;
-    int i;
 
     texture_t *texture = textures[texnum];
 
@@ -291,7 +289,7 @@ void R_GenerateLookup(int texnum) {
     memset(patchcount, 0, texture->width);
     texpatch_t *patch = texture->patches;
 
-    for (i = 0, patch = texture->patches;
+    for (int i = 0;
          i < texture->patchcount;
          i++, patch++) {
         patch_t *realpatch = W_CacheLumpNum(patch->patch, PU_CACHE);
@@ -402,7 +400,6 @@ void R_InitTextures(void) {
     int j;
 
     int *maptex2;
-    int *maptex1;
 
     char name[9];
 
@@ -427,7 +424,7 @@ void R_InitTextures(void) {
     // Load the map texture definitions from textures.lmp.
     // The data is contained in one or two lumps,
     //  TEXTURE1 for shareware, plus TEXTURE2 for commercial.
-    int *maptex = maptex1 = W_CacheLumpName("TEXTURE1", PU_STATIC);
+    int *maptex = W_CacheLumpName("TEXTURE1", PU_STATIC);
     int numtextures1 = LONG(*maptex);
     int maxoff = W_LumpLength(W_GetNumForName("TEXTURE1"));
     int *directory = maptex + 1;
@@ -450,8 +447,6 @@ void R_InitTextures(void) {
     texturecompositesize = Z_Malloc(numtextures * sizeof(*texturecompositesize), PU_STATIC, 0);
     texturewidthmask = Z_Malloc(numtextures * sizeof(*texturewidthmask), PU_STATIC, 0);
     textureheight = Z_Malloc(numtextures * sizeof(*textureheight), PU_STATIC, 0);
-
-    int totalwidth = 0;
 
     //	Really complex printing shit...
     int temp1 = W_GetNumForName("S_START"); // P_???????
@@ -519,8 +514,6 @@ void R_InitTextures(void) {
 
         texturewidthmask[i] = j - 1;
         textureheight[i] = texture->height << FRACBITS;
-
-        totalwidth += texture->width;
     }
 
     Z_Free(patchlookup);

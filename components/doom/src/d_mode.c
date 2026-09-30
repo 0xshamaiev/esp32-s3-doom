@@ -43,7 +43,7 @@ static struct {
 // Check the supported Doom game modes.
 
 bool D_ValidGameMode(GameMission_t mission, GameMode_t mode) {
-    for (int i = 0; i < arrlen(valid_modes); ++i) {
+    for (size_t i = 0; i < arrlen(valid_modes); ++i) {
         if (valid_modes[i].mode == mode && valid_modes[i].mission == mission) {
             return true;
         }
@@ -55,7 +55,7 @@ bool D_ValidGameMode(GameMission_t mission, GameMode_t mode) {
 bool D_ValidEpisodeMap(GameMission_t mission, GameMode_t mode, int episode, int map) {
     // Find the table entry for this mission/mode combination.
 
-    for (int i = 0; i < arrlen(valid_modes); ++i) {
+    for (size_t i = 0; i < arrlen(valid_modes); ++i) {
         if (mission == valid_modes[i].mission && mode == valid_modes[i].mode) {
             return episode >= 1 && episode <= valid_modes[i].episode && map >= 1 &&
                    map <= valid_modes[i].map;
@@ -96,7 +96,7 @@ bool D_ValidGameVersion(GameMission_t mission, GameVersion_t version) {
         mission = doom;
     }
 
-    for (int i = 0; i < arrlen(valid_versions); ++i) {
+    for (size_t i = 0; i < arrlen(valid_versions); ++i) {
         if (valid_versions[i].mission == mission && valid_versions[i].version == version) {
             return true;
         }

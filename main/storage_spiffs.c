@@ -32,7 +32,7 @@ void storage_init(void) {
     size_t used = 0;
     ret = esp_spiffs_info("storage", &total, &used);
     if (ret == ESP_OK) {
-        ESP_LOGI("spiffs", "Partition size: total: %d, used: %d", total, used);
+        ESP_LOGI("spiffs", "Partition size: total: %zu, used: %zu", total, used);
     }
 }
 
