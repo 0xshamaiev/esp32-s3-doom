@@ -82,13 +82,7 @@ void I_GetEvent(void);
 // The screen buffer; this is modified to draw things to the screen
 uint8_t *I_VideoBuffer = NULL;
 
-// Flag indicating whether the screen is currently visible:
-// when the screen isn't visible, don't render the screen
-
-bool screenvisible;
-
 // Gamma correction level to use
-
 int usegamma = 0;
 
 typedef struct {
@@ -98,7 +92,6 @@ typedef struct {
 } col_t;
 
 // Palette converted to RGB565
-
 uint16_t rgb565_palette[256];
 
 void I_InitGraphics(void) {
@@ -136,11 +129,7 @@ void I_InitGraphics(void) {
     printf("I_InitGraphics: Nearest-neighbor scaling: %dx%d -> %dx%d\n",
            SCREENWIDTH, SCREENHEIGHT, DOOMGENERIC_RESX, DOOMGENERIC_RESY);
 
-    /* Allocate screen to draw to */
     I_VideoBuffer = (uint8_t *)Z_Malloc(SCREENWIDTH * SCREENHEIGHT, PU_STATIC, NULL);
-    // For DOOM to draw on
-
-    screenvisible = true;
 
     extern void I_InitInput(void);
     I_InitInput();

@@ -133,7 +133,6 @@ struct color {
 };
 
 extern char *video_driver;
-extern bool screenvisible;
 
 extern int vanilla_keyboard_mapping;
 extern int usegamma;
