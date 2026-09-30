@@ -1,48 +1,50 @@
-# Development
+# Development notes
 
-## Components
+## Build setup
 
-The root CMake file initializes ESP-IDF. `main` explicitly depends on `doom` and
-`log`. The engine component owns its complete source list, private headers, public
-headers, and C23 compilation settings. It exports only `include/`; application
-code should include `doomgeneric.h` and, when implementing controls, `doomkeys.h`.
+The root CMake file sets up ESP-IDF. `main/` has the app and hardware code.
+`components/doom/` has the engine, its source list, and its C23 settings.
 
-ESP-IDF owns the compiler, linker scripts, bootloader, partition table, and binary
-generation. There is no separate standalone engine toolchain or build mode.
+The engine exposes `include/`. Use `doomgeneric.h` from the app, and
+`doomkeys.h` when adding controls. The other engine headers are private.
+
+ESP-IDF handles the compiler, linker, bootloader, partition table, and firmware
+image. There's no separate engine build.
 
 ## CLion
 
-CLion launched from the Dock does not necessarily inherit the ESP-IDF environment
-from an interactive terminal. Sourcing ESP-IDF's `export.sh` in CLion's terminal
-activates that terminal only; it does not update the CMake process environment.
+If you open CLion from the Dock, it might not have the ESP-IDF environment.
+Running `export.sh` in CLion's terminal only fixes that terminal. CMake still
+needs its own environment.
 
-This repository provides a local preset to give CMake the activated environment:
+Here's the setup:
 
-1. Open the repository root as a CMake project.
-2. In an interactive terminal at the repository root, run:
+1. Open the project root in CLion.
+2. Run this in a terminal at the project root:
 
    ```sh
    . /path/to/esp-idf/export.sh
    python tools/configure_ide.py
    ```
 
-   Replace `/path/to/esp-idf` with your ESP-IDF installation directory.
-   A personal shell alias such as `get_idf` can be used as a shortcut for sourcing
-   `export.sh`; the alias is not supplied by ESP-IDF or required by this project.
+   Use your actual ESP-IDF path. If you already have an alias like `get_idf`,
+   that works too.
 
 3. In **Settings → Build, Execution, Deployment → CMake**, enable
-   **esp32s3-clion** and disable the old **Debug** profile and unused profiles.
-4. Use **Tools → CMake → Reset Cache and Reload Project**.
-5. Build the **app** target. Flash from the terminal with `idf.py`, or use the
-   **flash** target after configuring the appropriate serial port.
+   **esp32s3-clion**. Disable the old **Debug** profile and any unused ones.
+4. Run **Tools → CMake → Reset Cache and Reload Project**.
+5. Build the **app** target. Flash with `idf.py` from a terminal, or use the
+   **flash** target once its serial port is set.
 
-`CMakeUserPresets.json` is ignored by Git and contains only local build paths and
-the selected ESP-IDF environment. Regenerate it after changing ESP-IDF versions or
-installation paths. Other user presets are preserved. The IDE uses `build-clion/`,
-separate from the terminal's `build/`, while both use the project's `sdkconfig`.
-Avoid changing `sdkconfig` from two builds at the same time.
+The script writes `CMakeUserPresets.json`. It's local and ignored by Git.
+Run the script again if you move ESP-IDF or switch versions. It keeps your
+other presets.
 
-You can also test the local preset outside CLion without activating the shell:
+CLion builds in `build-clion/`. Terminal builds normally go in `build/`.
+Both use the same `sdkconfig`, so don't change it from both builds at once.
+Make sure you're flashing from the folder you actually rebuilt.
+
+The local preset also works outside CLion, without sourcing `export.sh` first:
 
 ```sh
 cmake --preset esp32s3-clion
@@ -52,29 +54,29 @@ cmake --build --preset esp32s3-clion
 Use the build preset so the ESP-IDF environment is also available to build-time
 steps such as bootloader configuration.
 
-Alternatively, configure a CLion toolchain environment file pointing at your
-ESP-IDF installation's `export.sh`, and use the shared **esp32s3** preset.
-See [JetBrains' ESP-IDF setup guide](https://www.jetbrains.com/help/clion/esp-idf.html).
+Another option is to set your ESP-IDF `export.sh` as the CLion toolchain's
+environment file and use the **esp32s3** preset.
+[JetBrains has a setup guide](https://www.jetbrains.com/help/clion/esp-idf.html).
 
 ### “This file doesn't belong to any project”
 
-This means CLion has no successfully loaded target containing that file. Both
-`main/main.c` and the engine sources are registered with ESP-IDF. Check the CMake
-output for configuration errors, ensure the ESP-IDF profile is enabled, then
-reset its cache and reload. A stale standalone `Debug` profile cannot supply the
-new firmware project model.
+Usually CMake failed to load, or CLion is using the wrong profile.
+Check the CMake errors, enable the ESP-IDF profile, then reset the cache and
+reload. The old standalone **Debug** profile won't work with this build.
 
-The file should appear in the active profile's `compile_commands.json` and the
-CMake target `__idf_main`. Do not mark the source directory manually to conceal a
-failed CMake configuration.
+App files should show up in `compile_commands.json` under `__idf_main`.
+Engine files belong to `__idf_doom`. Fix the CMake error rather than manually
+marking folders as source directories.
 
-## Board integration
+## App startup
 
-Keep application and hardware startup code in `main/`. When drivers become
-substantial, give them their own components and explicit dependencies.
+`main/main.c` reserves the framebuffer early, mounts storage, and starts the LCD.
+Then it calls `doomgeneric_Create()` and keeps calling `doomgeneric_Tick()`.
+The loop delays for one RTOS tick so other tasks get CPU time.
 
-Before calling `doomgeneric_Create()`, implement `DG_Init`, `DG_DrawFrame`,
-`DG_SleepMs`, `DG_GetTicksMs`, and `DG_GetKey`; mount WAD storage; and configure
-sufficient memory. The current engine zone allocation requests 6–8 MiB by
-default. Call `doomgeneric_Tick()` repeatedly from an appropriately sized and
-scheduled task once initialization succeeds.
+The framebuffer stays in internal SRAM. Zone memory uses PSRAM.
+`main/doomgeneric_esp32.c` has the timing and drawing hooks; input is still a stub.
+
+Keep hardware code in its own files. The display already has a small interface,
+so swapping it doesn't require changing the Doom hooks.
+See [the display notes](display.md).

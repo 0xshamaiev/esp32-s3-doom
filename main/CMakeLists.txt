@@ -5,6 +5,8 @@ idf_component_register(
     SRCS
         main.c
         doomgeneric_esp32.c
+        display_st7789.c
+        storage_spiffs.c
     REQUIRES
         esp_lcd
         esp_driver_spi
@@ -13,6 +15,8 @@ idf_component_register(
         esp_psram
         spiffs
     PRIV_REQUIRES doom log
+    # Doom calls DG_* hooks that app_main does not reference directly.
+    WHOLE_ARCHIVE
 )
 
 spiffs_create_partition_image(storage ../spiffs FLASH_IN_PROJECT)

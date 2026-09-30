@@ -2,13 +2,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "doomgeneric.h"
+#include "display.h"
+#include "storage.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-
-extern void init_spiffs(void);
-extern void init_st7789_display(void);
 
 static constexpr size_t framebuffer_size =
     DOOMGENERIC_RESX * DOOMGENERIC_RESY * sizeof(*DG_ScreenBuffer);
@@ -36,8 +35,8 @@ void app_main(void) {
              DOOMGENERIC_RESX, DOOMGENERIC_RESY);
     ESP_LOGI("doom", "Game startup awaits display, input, WAD storage, and memory configuration");
 
-    init_spiffs();
-    init_st7789_display();
+    storage_init();
+    display_init(DOOMGENERIC_RESX, DOOMGENERIC_RESY);
 
     // Idk how to bolt on a proper debug shell here, so I am gonna hardcode arguments
     char *argv[] = {

@@ -21,24 +21,15 @@ Controls are intended to use keys only.
 
 ## Current status
 
-This is a work in progress. The engine compiles as an ESP-IDF component, and the
-project builds a firmware image with a bootloader and partition table. The current
-application entry point only logs startup readiness; it does not launch DOOM yet.
-Display and keyboard drivers, WAD storage, and board memory configuration still
-need to be connected to the engine.
+The firmware loads `doom1.wad` from SPIFFS and runs DOOM's demo on the LCD.
+The game framebuffer lives in internal SRAM. Zone memory goes in PSRAM.
 
-The current scope and limitations are:
+Still missing: keyboard input and audio. Mouse input and multiplayer are removed.
+DeHackEd patches and WAD merging are disabled too.
 
-- **Single-player only:** no network multiplayer.
-- **Keyboard input:** no mouse support.
-- **DOOM and DOOM II:** IWAD discovery is limited to `doom.wad`, `doom1.wad`
-  (shareware), and `doom2.wad`.
-- **No audio output yet:** sound effects and music have no active platform backend.
-- **No DeHackEd patches or WAD merging:** these features are disabled.
-
-Game data is not included. Running the game will require a compatible IWAD—the
-file containing its maps, graphics, and other assets—on storage accessible to the
-board.
+The engine supports DOOM and DOOM II. It looks for `doom.wad`, `doom1.wad`, or
+`doom2.wad`, but startup currently hardcodes `/spiffs/doom1.wad`.
+Game data isn't included.
 
 ## Build and flash
 
@@ -53,15 +44,16 @@ idf.py build
 Replace `/path/to/esp-idf` with your ESP-IDF installation directory. The project
 selects ESP32-S3 by default and writes build artifacts to `build/`.
 
-To flash the current startup firmware and view its serial output:
+Put your WAD at `spiffs/doom1.wad` before building. CMake packs that folder into
+an image for the `storage` partition. `spiffs/doom*` is ignored by Git.
+
+To flash and watch the log:
 
 ```sh
 idf.py -p YOUR_PORT flash monitor
 ```
 
-Replace `YOUR_PORT` with the board's serial port. Exit the monitor with `Ctrl+]`.
-Flashing this version provides the startup application described above; gameplay
-integration is still in progress.
+Use your board's serial port in place of `YOUR_PORT`. `Ctrl+]` closes the monitor.
 
 ## Repository layout
 
@@ -71,14 +63,14 @@ components/doom/
   include/                Public engine API and key codes
   src/                    Engine implementation and private headers
   cmake/                  Optional engine analysis tooling
-docs/development.md       Build and CLion setup
+docs/                     Documentation and notes
 tools/configure_ide.py    Generate a local IDE environment preset
 CMakeLists.txt            ESP-IDF application initialization
 CMakePresets.json         Shared ESP32-S3 firmware preset
 ```
 
-For CLion configuration and notes on implementing the board support, see the
-[development guide](docs/development.md).
+[Build and CLion notes](docs/development.md).
+[How to swap the display driver](docs/display.md).
 
 ## License and credits
 
