@@ -3,6 +3,7 @@
 
 #include "doomgeneric.h"
 #include "display.h"
+#include "input.h"
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -38,8 +39,5 @@ uint32_t DG_GetTicksMs(void) {
 }
 
 int DG_GetKey(int *pressed, uint8_t *key) {
-    // Stubbed: No buttons pressed for now
-    *pressed = 0;
-    *key = 0;
-    return 0;
+    return input_poll(pressed, key);
 }

@@ -3,6 +3,7 @@
 
 #include "doomgeneric.h"
 #include "display.h"
+#include "input.h"
 #include "storage.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
@@ -37,6 +38,7 @@ void app_main(void) {
 
     storage_init();
     display_init(DOOMGENERIC_RESX, DOOMGENERIC_RESY);
+    input_init();
 
     // Idk how to bolt on a proper debug shell here, so I am gonna hardcode arguments
     char *argv[] = {
@@ -44,7 +46,6 @@ void app_main(void) {
         "-iwad",
         "/spiffs/doom1.wad",
         "-nosound",
-        "-demo"
     };
     uint8_t argc = sizeof(argv) / sizeof(argv[0]);
 

@@ -7,6 +7,8 @@ idf_component_register(
         doomgeneric_esp32.c
         display_st7789.c
         storage_spiffs.c
+        input_usb_hid.c
+        hid_report.c
     REQUIRES
         esp_lcd
         esp_driver_spi
@@ -14,6 +16,7 @@ idf_component_register(
         esp_timer
         esp_psram
         spiffs
+        usb_host_hid
     PRIV_REQUIRES doom log
     # Doom calls DG_* hooks that app_main does not reference directly.
     WHOLE_ARCHIVE
