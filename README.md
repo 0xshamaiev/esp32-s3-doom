@@ -15,16 +15,17 @@ framebuffer is configured for the display's 240 × 135 resolution.
 | --- | --- |
 | TinyS3 ESP32-S3 development board | Runs the firmware and game engine |
 | Waveshare 1.14-inch, 240 × 135 LCD | Displays the game |
-| i8 mini keyboard | Provides keyboard controls |
+| i8 mini keyboard | Provides keyboard controls over USB OTG |
 
-Controls are intended to use keys only.
+Controls are intended to use keys only. The TinyS3 can't supply 5V on its USB-C
+port, so the keyboard needs an OTG adapter or cable that powers it.
 
 ## Current status
 
-The firmware loads `doom1.wad` from SPIFFS and runs DOOM's demo on the LCD.
+The firmware loads `doom1.wad` from SPIFFS and runs DOOM on the LCD.
 The game framebuffer lives in internal SRAM. Zone memory goes in PSRAM.
 
-Still missing: keyboard input and audio. Mouse input and multiplayer are removed.
+Still missing: audio. Mouse input and multiplayer are removed.
 WAD merging is disabled too.
 
 The engine supports DOOM and DOOM II. It looks for `doom.wad`, `doom1.wad`, or
@@ -47,13 +48,16 @@ selects ESP32-S3 by default and writes build artifacts to `build/`.
 Put your WAD at `spiffs/doom1.wad` before building. CMake packs that folder into
 an image for the `storage` partition. `spiffs/doom*` is ignored by Git.
 
-To flash and watch the log:
+To flash:
 
 ```sh
-idf.py -p YOUR_PORT flash monitor
+idf.py -p YOUR_PORT flash
 ```
 
-Use your board's serial port in place of `YOUR_PORT`. `Ctrl+]` closes the monitor.
+Use your board's serial port in place of `YOUR_PORT`. Once the game starts, the
+USB-C port works as a USB host for the keyboard and disappears from your computer.
+To flash again, hold BOOT, tap RESET, then release BOOT. Logs go to UART0 on
+GPIO 43 (TX) and 44 (RX).
 
 ## Repository layout
 

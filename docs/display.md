@@ -1,10 +1,11 @@
 # Display code
 
-The hardware code is split up now:
+The hardware code is split up like this:
 
 - `main/main.c` reserves the framebuffer, starts things up, and runs the game loop.
 - `main/doomgeneric_esp32.c` has the `DG_*` hooks for drawing, timing, and input.
 - `main/storage_spiffs.c` mounts the SPIFFS partition with the WAD in it.
+- `main/input_usb_hid.c` reads the USB keyboard; `main/hid_report.c` decodes its reports.
 - `main/display_st7789.c` handles the LCD: pins, SPI speed, panel settings,
   rotation, pixel conversion, and the DMA buffer.
 

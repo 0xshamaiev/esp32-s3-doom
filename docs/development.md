@@ -86,7 +86,8 @@ Then it calls `doomgeneric_Create()` and keeps calling `doomgeneric_Tick()`.
 The loop delays for one RTOS tick so other tasks get CPU time.
 
 The framebuffer stays in internal SRAM. Zone memory uses PSRAM.
-`main/doomgeneric_esp32.c` has the timing and drawing hooks; input is still a stub.
+`main/doomgeneric_esp32.c` has the timing, drawing, and input hooks.
+Keyboard events come from `main/input_usb_hid.c`.
 
 Keep hardware code in its own files. The display already has a small interface,
 so swapping it doesn't require changing the Doom hooks.

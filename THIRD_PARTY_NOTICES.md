@@ -28,7 +28,9 @@ For this port's license scope, see
 ESP-IDF is installed separately. Its original code is primarily licensed under
 Apache License 2.0, with copyright held by Espressif Systems and the respective
 contributors. A copy of the installed SDK's root license is included in
-[licenses/Apache-2.0.txt](licenses/Apache-2.0.txt).
+[licenses/Apache-2.0.txt](licenses/Apache-2.0.txt). The build also downloads the
+Apache-2.0 `espressif/usb` and `espressif/usb_host_hid` components, pinned in
+`dependencies.lock`.
 
 ESP-IDF also incorporates third-party code under other licenses. For example,
 its copyright inventory identifies MIT-licensed FreeRTOS and Xtensa headers, and
