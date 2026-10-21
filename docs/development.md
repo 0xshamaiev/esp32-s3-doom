@@ -85,7 +85,7 @@ marking folders as source directories.
 Then it calls `doomgeneric_Create()` and keeps calling `doomgeneric_Tick()`.
 The loop delays for one RTOS tick so other tasks get CPU time.
 
-The framebuffer stays in internal SRAM. Zone memory uses PSRAM.
+The framebuffer and zone memory both use PSRAM.
 `main/doomgeneric_esp32.c` has the timing, drawing, and input hooks.
 Keyboard events come from `main/input_usb_hid.c`.
 

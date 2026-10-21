@@ -8,9 +8,14 @@
 #include "esp_lcd_panel_ops.h"
 #include "esp_lcd_panel_vendor.h"
 #include "esp_log.h"
+#include <string.h>
 
 #define CHUNK_LINES 10
 #define LCD_SPI_CLOCK_HZ (40 * 1000 * 1000)
+
+// GMT020-02 2.0-inch glass in landscape; it covers the controller's whole RAM
+#define PANEL_WIDTH 320
+#define PANEL_HEIGHT 240
 
 // My GPIO setup on TinyS3
 #define PIN_NUM_MOSI 35
@@ -41,8 +46,17 @@ static void draw_chunk(int y, int rows) {
     ESP_ERROR_CHECK(esp_lcd_panel_io_tx_param(s_panel_io, -1, NULL, 0));
 }
 
-static void configure_waveshare_panel(void) {
-    // Panel settings used by Waveshare's 1.14-inch ST7789 driver
+static void clear_panel(void) {
+    memset(s_dma_bounce_buf, 0, PANEL_WIDTH * CHUNK_LINES * sizeof(*s_dma_bounce_buf));
+
+    for (int y = 0; y < PANEL_HEIGHT; y += CHUNK_LINES) {
+        ESP_ERROR_CHECK(esp_lcd_panel_draw_bitmap(s_panel_handle, 0, y,
+                                                 PANEL_WIDTH, y + CHUNK_LINES, s_dma_bounce_buf));
+    }
+    ESP_ERROR_CHECK(esp_lcd_panel_io_tx_param(s_panel_io, -1, NULL, 0));
+}
+
+static void configure_ST7789_panel(void) {
     ESP_ERROR_CHECK(esp_lcd_panel_io_tx_param(
         s_panel_io, 0xC0, (uint8_t[]){0x2C}, 1)); // LCM control
     ESP_ERROR_CHECK(esp_lcd_panel_io_tx_param(
@@ -62,7 +76,8 @@ void display_init(int width, int height) {
     s_frame_width = width;
     s_frame_height = height;
 
-    const size_t dma_buffer_size = s_frame_width * CHUNK_LINES * sizeof(*s_dma_bounce_buf);
+    // Sized for the full panel width so clear_panel() can reuse it
+    constexpr size_t dma_buffer_size = PANEL_WIDTH * CHUNK_LINES * sizeof(*s_dma_bounce_buf);
     const spi_bus_config_t bus_config = {
         .sclk_io_num = PIN_NUM_SCLK,
         .mosi_io_num = PIN_NUM_MOSI,
@@ -97,13 +112,10 @@ void display_init(int width, int height) {
 
     ESP_ERROR_CHECK(esp_lcd_panel_reset(s_panel_handle));
     ESP_ERROR_CHECK(esp_lcd_panel_init(s_panel_handle));
-    configure_waveshare_panel();
+    configure_ST7789_panel();
 
-    // Landscape window within the controller's 240x320 RAM
     ESP_ERROR_CHECK(esp_lcd_panel_swap_xy(s_panel_handle, true));
     ESP_ERROR_CHECK(esp_lcd_panel_mirror(s_panel_handle, false, true));
-    ESP_ERROR_CHECK(esp_lcd_panel_set_gap(s_panel_handle, 40, 52));
-    ESP_ERROR_CHECK(esp_lcd_panel_disp_on_off(s_panel_handle, true));
 
     s_dma_bounce_buf = heap_caps_malloc(dma_buffer_size, MALLOC_CAP_INTERNAL | MALLOC_CAP_DMA);
 
@@ -111,6 +123,14 @@ void display_init(int width, int height) {
         ESP_LOGE(TAG, "Failed to allocate SRAM DMA bounce buffer!");
         ESP_ERROR_CHECK(ESP_ERR_NO_MEM);
     }
+
+    // Clear before the gap is set, while (0, 0) still maps to the panel corner
+    clear_panel();
+
+    // Center the frame; leftover rows and columns become the letterbox
+    ESP_ERROR_CHECK(esp_lcd_panel_set_gap(s_panel_handle, (PANEL_WIDTH - s_frame_width) / 2,
+                                          (PANEL_HEIGHT - s_frame_height) / 2));
+    ESP_ERROR_CHECK(esp_lcd_panel_disp_on_off(s_panel_handle, true));
 
     ESP_LOGI(TAG, "ST7789 ready: %dx%d RGB565 at %d MHz",
              s_frame_width, s_frame_height, LCD_SPI_CLOCK_HZ / 1000000);

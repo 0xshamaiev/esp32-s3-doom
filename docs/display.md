@@ -28,8 +28,13 @@ Finish reading the frame and palette before returning. Doom can change both
 for the next frame, so don't leave DMA reading them in the background.
 
 The ST7789 driver converts and sends ten rows at a time, or fewer at the bottom.
-It waits for each transfer before reusing the DMA buffer. At 240 × 135, that
-buffer is 4,800 bytes. The 32,400-byte game framebuffer stays in internal SRAM.
+It waits for each transfer before reusing the DMA buffer. That buffer covers the
+panel's full 320-pixel width: 6,400 bytes in internal SRAM. The 64,000-byte game
+framebuffer lives in PSRAM. Only the CPU reads it, so it doesn't need DMA access.
+
+At startup the driver paints the whole 320 × 240 panel black, then centers the
+frame with `esp_lcd_panel_set_gap()`. A 320 × 200 frame gets 20-row bars above
+and below.
 
 ## Want a different LCD?
 

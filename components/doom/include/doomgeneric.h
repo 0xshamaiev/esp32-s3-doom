@@ -9,11 +9,11 @@
 #include <stdint.h>
 
 #ifndef DOOMGENERIC_RESX
-#define DOOMGENERIC_RESX 240
+#define DOOMGENERIC_RESX 320
 #endif
 
 #ifndef DOOMGENERIC_RESY
-#define DOOMGENERIC_RESY 135
+#define DOOMGENERIC_RESY 200
 #endif
 
 // The display backend converts indexed pixels to RGB565 for the LCD.

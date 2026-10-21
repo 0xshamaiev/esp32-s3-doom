@@ -1,20 +1,21 @@
 # DOOM on TinyS3
 
 This is my port of the classic DOOM engine for the TinyS3 ESP32-S3 development
-board. The hardware setup pairs the board with a Waveshare 1.14-inch, 240 × 135
-LCD and an i8 mini keyboard. The goal is a small, keyboard-controlled DOOM system
+board. The hardware setup pairs the board with a 2.0-inch, 320 × 240 ST7789V
+LCD (GMT020-02) and an i8 mini keyboard. The goal is a small, keyboard-controlled DOOM system
 built with ESP-IDF.
 
 The engine has been trimmed down for this project, with a focus on single-player
-DOOM and DOOM II. Mouse input and network multiplayer have been removed, and the
-framebuffer is configured for the display's 240 × 135 resolution.
+DOOM and DOOM II. Mouse input and network multiplayer have been removed. The
+framebuffer is DOOM's native 320 × 200, centered on the display with black bars
+above and below.
 
 ## Hardware
 
 | Part | Role |
 | --- | --- |
 | TinyS3 ESP32-S3 development board | Runs the firmware and game engine |
-| Waveshare 1.14-inch, 240 × 135 LCD | Displays the game |
+| GMT020-02 2.0-inch, 320 × 240 ST7789V LCD | Displays the game |
 | i8 mini keyboard | Provides keyboard controls over USB OTG |
 
 Controls are intended to use keys only. The TinyS3 can't supply 5V on its USB-C
@@ -23,7 +24,7 @@ port, so the keyboard needs an OTG adapter or cable that powers it.
 ## Current status
 
 The firmware loads `doom1.wad` from SPIFFS and runs DOOM on the LCD.
-The game framebuffer lives in internal SRAM. Zone memory goes in PSRAM.
+The game framebuffer and zone memory both live in PSRAM.
 
 Still missing: audio. Mouse input and multiplayer are removed.
 WAD merging is disabled too.

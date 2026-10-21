@@ -12,24 +12,26 @@
 
 static constexpr size_t framebuffer_size =
     DOOMGENERIC_RESX * DOOMGENERIC_RESY * sizeof(*DG_ScreenBuffer);
-static constexpr uint32_t framebuffer_caps = MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT;
+// Doom's static arrays fill most of the free internal SRAM, and the LCD driver only
+// reads this buffer from the CPU, so PSRAM works for it
+static constexpr uint32_t framebuffer_caps = MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT;
 
 // FreeRTOS keeps splitting the memory frivolously, so I am gonna pin it beforehand
 static void __attribute__((constructor)) reserve_framebuffer(void) {
-    ESP_EARLY_LOGI("doom", "Attempting to reserve a contiguous %u-byte framebuffer in internal SRAM",
+    ESP_EARLY_LOGI("doom", "Attempting to reserve a contiguous %u-byte framebuffer in PSRAM",
                    (unsigned)framebuffer_size);
     DG_ScreenBuffer = heap_caps_malloc(framebuffer_size, framebuffer_caps);
 }
 
 void app_main(void) {
     if (DG_ScreenBuffer == NULL) {
-        ESP_LOGE("doom", "Cannot reserve %zu-byte framebuffer: internal free=%zu, largest=%zu",
+        ESP_LOGE("doom", "Cannot reserve %zu-byte framebuffer: PSRAM free=%zu, largest=%zu",
                  framebuffer_size, heap_caps_get_free_size(framebuffer_caps),
                  heap_caps_get_largest_free_block(framebuffer_caps));
         heap_caps_print_heap_info(framebuffer_caps);
         return;
     }
-    ESP_LOGI("doom", "Reserved contiguous %zu-byte framebuffer in internal SRAM at %p",
+    ESP_LOGI("doom", "Reserved contiguous %zu-byte framebuffer in PSRAM at %p",
              framebuffer_size, (void *)DG_ScreenBuffer);
 
     ESP_LOGI("doom", "ESP32-S3 Doom firmware ready (%dx%d framebuffer)",
